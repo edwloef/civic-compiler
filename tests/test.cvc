@@ -1,0 +1,38 @@
+#include "civic.h"
+#include "core.h"
+#include "coreio.h"
+
+export int main() {
+    core();
+    coreio();
+
+    return 0;
+}
+
+void core() {
+    printInt(gcd(15, 3));
+    printInt(gcd(3, 15));
+    printInt(gcd(1, 1));
+
+    printInt(fac(0));
+    printInt(fac(5));
+    printInt(fac(15));
+
+    printInt(fib(0));
+    printInt(fib(5));
+    printInt(fib(15));
+
+    printInt((int) isprime(7));
+    printInt((int) isprime(8));
+    printInt((int) isprime(9));
+}
+
+void coreio() {
+    fibs(0);
+    fibs(5);
+    fibs(15);
+
+    primes(7);
+    primes(8);
+    primes(9);
+}
