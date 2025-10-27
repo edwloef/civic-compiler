@@ -20,5 +20,6 @@ export void primes(int n) {
         while (!isprime()) a = a + 1;
         printInt(a);
         printNewlines(1);
+        a = a + 1;
     }
 }

@@ -11,20 +11,32 @@ export int main() {
 
 void core() {
     printInt(gcd(15, 3));
+    printNewlines(1);
     printInt(gcd(3, 15));
+    printNewlines(1);
     printInt(gcd(1, 1));
+    printNewlines(1);
 
     printInt(fac(0));
+    printNewlines(1);
     printInt(fac(5));
+    printNewlines(1);
     printInt(fac(15));
+    printNewlines(1);
 
     printInt(fib(0));
+    printNewlines(1);
     printInt(fib(5));
+    printNewlines(1);
     printInt(fib(15));
+    printNewlines(1);
 
     printInt((int) isprime(7));
+    printNewlines(1);
     printInt((int) isprime(8));
+    printNewlines(1);
     printInt((int) isprime(9));
+    printNewlines(1);
 }
 
 void coreio() {
