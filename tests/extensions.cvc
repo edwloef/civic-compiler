@@ -1,0 +1,1 @@
+export void assert(bool x) { int y = 0 / (int)x; }
