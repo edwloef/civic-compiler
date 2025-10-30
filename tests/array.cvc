@@ -59,7 +59,7 @@ export void scanFloatMat(float[m, n] mat) {
 }
 
 export void matMul(float[m, n] a, float[o, p] b, float[q, l] c) {
-  if (n != o || m != q || p != q)
+  if (n != o || m != q || p != l)
     return;
   for (int i = 0, m)
     for (int j = 0, p)

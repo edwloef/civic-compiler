@@ -1,3 +1,4 @@
+#include "array.h"
 #include "civic.h"
 #include "core.h"
 #include "coreio.h"
@@ -5,6 +6,7 @@
 export int main() {
   core();
   coreio();
+  array();
 
   return 0;
 }
@@ -47,4 +49,20 @@ void coreio() {
   primes(7);
   primes(8);
   primes(9);
+}
+
+void array() {
+  float[2, 3] a;
+  float[3, 4] b;
+  float[2, 4] c;
+
+  scanFloatMat(a);
+  printFloatMat(a);
+
+  scanFloatMat(b);
+  printFloatMat(b);
+
+  matMul(a, b, c);
+  printNewlines(1);
+  printFloatMat(c);
 }
