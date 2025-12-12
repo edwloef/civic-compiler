@@ -1,0 +1,296 @@
+start phase RootPhase {
+    actions {
+        pass SPdoScanParse;
+        Stats;
+        Print;
+        Opt;
+    }
+};
+
+traversal Print {
+    uid = PRT
+};
+
+phase Opt {
+    actions {
+        traversal Subtraction {
+            uid = OS,
+            nodes = { Binop }
+        };
+
+        traversal StrengthReduction {
+            uid = OSR,
+            nodes = { BinOp }
+        };
+    }
+};
+
+phase Stats {
+    actions {
+        traversal CountOps {
+            uid = SCO,
+            nodes = { Program, BinOp },
+            travdata {
+                int add,
+                int sub,
+                int mul,
+                int div,
+                int mod
+            }
+        };
+
+        traversal CountIdents {
+            uid = SCI,
+            nodes = { Id },
+            travdata {
+                user htable_stptr count
+            }
+        };
+    }
+};
+
+/*** AST ***/
+
+enum BasicType {
+    prefix = TY,
+    values {
+        bool, int, float, void
+    }
+};
+
+enum MonOpKind {
+    prefix = MO,
+    values {
+        pos, neg, not
+    }
+};
+
+enum BinOpKind {
+    prefix = BO,
+    values {
+        add, sub, mul, div, mod, lt, le, gt, ge, eq, ne, and, or
+    }
+};
+
+root node Program {
+    children {
+        Decls decls { constructor, mandatory }
+    },
+
+    attributes {
+        int add,
+        int sub,
+        int mul,
+        int div,
+        int mod
+    }
+};
+
+node Decls {
+    children {
+        Decl decl { constructor, mandatory },
+        Decls next { constructor }
+    }
+};
+
+nodeset Decl = { FunDecl, VarDecl };
+
+node Stmts {
+    children {
+        Stmt stmt { constructor, mandatory },
+        Stmts next { constructor }
+    }
+};
+
+nodeset Stmt = { Assign, IfElse, While, DoWhile, For, Return };
+
+node Exprs {
+    children {
+        Expr expr { constructor, mandatory },
+        Exprs next { constructor }
+    }
+};
+
+nodeset Expr = { Monop, Binop, Cast, Int, Float, Bool, Call };
+
+node ArrExprs {
+    children {
+        ArrExpr expr { constructor, mandatory },
+        ArrExprs next { constructor }
+    }
+};
+
+nodeset ArrExpr = Expr | { ArrExprs };
+
+node FunDecls {
+    children {
+        FunDecl decl { constructor, mandatory},
+        FunDecls next { constructor }
+    }
+};
+
+node FunDecl {
+    children {
+        Id id { constructor, mandatory },
+        VarDecls decls { constructor },
+        FunBody body { }
+    },
+
+    attributes {
+        BasicType ty { constructor },
+        bool external,
+        bool exported
+    }
+};
+
+node FunBody {
+    children {
+        VarDecls var_decls { constructor },
+        FunDecls fun_decls { constructor },
+        Stmts stmts { constructor }
+    }
+};
+
+node VarDecls {
+    children {
+        VarDecl decl { constructor, mandatory },
+        VarDecls next { constructor }
+    }
+};
+
+node VarDecl {
+    children {
+        Type ty { constructor, mandatory },
+        Id id { constructor, mandatory },
+        ArrExpr expr { constructor }
+    },
+
+    attributes {
+        bool external,
+        bool exported
+    }
+};
+
+node Assign {
+    children {
+        VarRef ref { constructor, mandatory },
+        ArrExpr expr { constructor, mandatory }
+    }
+};
+
+node Call {
+    children {
+        Id id { constructor, mandatory },
+        Exprs exprs { constructor }
+    }
+};
+
+node IfElse {
+    children {
+        Expr expr { constructor, mandatory },
+        Stmts if_block { constructor },
+        Stmts else_block { constructor }
+    }
+};
+
+node While {
+    children {
+        Expr expr { constructor, mandatory },
+        Stmts stmts { constructor }
+    }
+};
+
+node DoWhile {
+    children {
+        Stmts stmts { constructor },
+        Expr expr { constructor, mandatory }
+    }
+};
+
+node For {
+    children {
+        Id id { constructor, mandatory },
+        Expr loop_start { constructor, mandatory },
+        Expr loop_end { constructor, mandatory },
+        Expr loop_step { constructor },
+        Stmts stmts { constructor, mandatory }
+    }
+};
+
+node Return {
+    children {
+        Expr expr { constructor }
+    }
+};
+
+node Binop {
+    children {
+        Expr left { constructor, mandatory },
+        Expr right { constructor, mandatory }
+    },
+
+    attributes {
+        BinOpKind op { constructor }
+    }
+};
+
+node Monop {
+    children {
+        Expr expr { constructor, mandatory }
+    },
+
+    attributes {
+        MonOpKind op { constructor }
+    }
+};
+
+node Cast {
+    children {
+        Expr expr { constructor, mandatory }
+    },
+
+    attributes {
+        BasicType ty { constructor }
+    }
+};
+
+node Id {
+    attributes {
+        string val { constructor, mandatory }
+    }
+};
+
+node Type {
+    children {
+        Exprs exprs { constructor }
+    },
+
+    attributes {
+        BasicType ty { constructor }
+    }
+};
+
+node VarRef {
+    children {
+        Id id { constructor, mandatory },
+        Exprs exprs { constructor }
+    }
+};
+
+node Int {
+    attributes {
+        int val { constructor }
+    }
+};
+
+node Float {
+    attributes {
+        float val { constructor }
+    }
+};
+
+node Bool {
+    attributes {
+        bool val { constructor }
+    }
+};
