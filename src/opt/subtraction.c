@@ -9,12 +9,11 @@
 
 #include "ccn/ccn.h"
 #include "ccngen/ast.h"
-#include "ccngen/trav.h"
 #include "ccngen/enum.h"
+#include "ccngen/trav.h"
 #include "palm/str.h"
 
-node_st *OSbinop(node_st *node)
-{
+node_st *OSbinop(node_st *node) {
     TRAVleft(node);
     TRAVright(node);
 

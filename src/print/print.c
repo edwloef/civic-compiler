@@ -110,7 +110,7 @@ node_st *PRTexprs(node_st *node) {
 }
 
 node_st *PRTarrexprs(node_st *node) {
-	if (NODE_TYPE(ARREXPRS_EXPR(node)) == NT_ARREXPRS) {
+    if (NODE_TYPE(ARREXPRS_EXPR(node)) == NT_ARREXPRS) {
         printf("[");
         TRAVexpr(node);
         printf("]");
@@ -119,7 +119,7 @@ node_st *PRTarrexprs(node_st *node) {
     if (ARREXPRS_NEXT(node))
         printf(", ");
     TRAVnext(node);
-	return node;
+    return node;
 }
 
 node_st *PRTfundecls(node_st *node) {
@@ -179,7 +179,7 @@ node_st *PRTvardecl(node_st *node) {
 }
 
 node_st *PRTassign(node_st *node) {
-	TRAVref(node);
+    TRAVref(node);
     printf(" = ");
     if (NODE_TYPE(ASSIGN_EXPR(node)) == NT_ARREXPRS) {
         printf("[");

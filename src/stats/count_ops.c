@@ -17,7 +17,7 @@ void SCOinit(void) {}
 void SCOfini(void) {}
 
 node_st *SCOprogram(node_st *node) {
-    TRAVstmts(node);
+    TRAVdecls(node);
 
     PROGRAM_ADD(node) = DATA_SCO_GET()->add;
     PROGRAM_SUB(node) = DATA_SCO_GET()->sub;
