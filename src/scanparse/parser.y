@@ -334,6 +334,14 @@ funheader: basictype id PAREN_L comma_sep_paramtypes PAREN_R
            {
              $$ = ASTfundecl($2, $4, TY_void);
            }
+         | basictype id PAREN_L PAREN_R
+           {
+             $$ = ASTfundecl($2, NULL, $1);
+           }
+         | TY_VOID id PAREN_L PAREN_R
+           {
+             $$ = ASTfundecl($2, NULL, TY_void);
+           }
            ;
 
 block: stmt

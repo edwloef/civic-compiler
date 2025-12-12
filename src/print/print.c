@@ -246,8 +246,12 @@ node_st *PRTfor(node_st *node) {
 }
 
 node_st *PRTreturn(node_st *node) {
-    printf("return ");
-    TRAVexpr(node);
+    printf("return");
+    if (RETURN_EXPR(node)) {
+        printf(" ");
+        TRAVexpr(node);
+    }
+    printf("\n");
     return node;
 }
 
@@ -267,7 +271,7 @@ node_st *PRTmonop(node_st *node) {
 }
 
 node_st *PRTcast(node_st *node) {
-    printf("(%s)", fmt_BasicType(CAST_TY(node)));
+    printf("(%s) ", fmt_BasicType(CAST_TY(node)));
     TRAVexpr(node);
     return node;
 }

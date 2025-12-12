@@ -111,7 +111,7 @@ node Exprs {
     }
 };
 
-nodeset Expr = { Monop, Binop, Cast, Int, Float, Bool, Call };
+nodeset Expr = { Monop, Binop, Cast, Call, VarRef, Int, Float, Bool };
 
 node ArrExprs {
     children {
@@ -175,13 +175,6 @@ node Assign {
     children {
         VarRef ref { constructor, mandatory },
         ArrExpr expr { constructor, mandatory }
-    }
-};
-
-node Call {
-    children {
-        Id id { constructor, mandatory },
-        Exprs exprs { constructor }
     }
 };
 
@@ -254,6 +247,20 @@ node Cast {
     }
 };
 
+node Call {
+    children {
+        Id id { constructor, mandatory },
+        Exprs exprs { constructor }
+    }
+};
+
+node VarRef {
+    children {
+        Id id { constructor, mandatory },
+        Exprs exprs { constructor }
+    }
+};
+
 node Id {
     attributes {
         string val { constructor, mandatory }
@@ -267,13 +274,6 @@ node Type {
 
     attributes {
         BasicType ty { constructor }
-    }
-};
-
-node VarRef {
-    children {
-        Id id { constructor, mandatory },
-        Exprs exprs { constructor }
     }
 };
 
