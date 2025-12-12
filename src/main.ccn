@@ -29,7 +29,7 @@ phase Stats {
     actions {
         traversal CountOps {
             uid = SCO,
-            nodes = { Program, BinOp },
+            nodes = { BinOp },
             travdata {
                 int add,
                 int sub,
@@ -75,14 +75,6 @@ enum BinOpKind {
 root node Program {
     children {
         Decls decls { constructor, mandatory }
-    },
-
-    attributes {
-        int add,
-        int sub,
-        int mul,
-        int div,
-        int mod
     }
 };
 

@@ -15,20 +15,13 @@
 extern int yyerror(char *err);
 
 #define FILTER(token) \
-  global.col += yyleng;  \
-  return(token);
-
-#define LINEBUF_SIZE 256
-
-void token_action();
-
-#define YY_USER_ACTION token_action();
+    global.col += yyleng; \
+    return(token);
 
 %}
 
 %option noyywrap
 %option nounput
-%option yylineno
 
 %x comment
 
@@ -123,9 +116,3 @@ void token_action();
                                                          }
 
 %%
-
-void token_action() {
-    yylloc.first_line = yylloc.last_line = global.line;
-    yylloc.first_column = global.col;
-    yylloc.last_column = global.col + yyleng - 1;
-}

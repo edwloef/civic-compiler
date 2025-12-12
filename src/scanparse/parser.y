@@ -15,7 +15,6 @@ static node_st *parseresult = NULL;
 extern int yylex();
 int yyerror(char *errname);
 extern FILE *yyin;
-void AddLocToNode(node_st *node, void *begin_loc, void *end_loc);
 
 %}
 
@@ -62,7 +61,7 @@ program: decls
          {
            parseresult = ASTprogram($1);
          }
-         ;
+       ;
 
 decls: decl decls
        {
@@ -72,7 +71,7 @@ decls: decl decls
        {
          $$ = ASTdecls($1, NULL);
        }
-       ;
+     ;
 
 decl: KW_EXTERN funheader SEMICOLON
       {
@@ -102,7 +101,7 @@ decl: KW_EXTERN funheader SEMICOLON
       {
         $$ = $1;
       }
-      ;
+    ;
 
 stmts: stmt stmts
        {
@@ -112,7 +111,7 @@ stmts: stmt stmts
        {
          $$ = ASTstmts($1, NULL);
        }
-       ;
+     ;
 
 stmt: varref ASSIGN arrexpr SEMICOLON
       {
@@ -150,7 +149,7 @@ stmt: varref ASSIGN arrexpr SEMICOLON
       {
         $$ = ASTreturn($2);
       }
-      ;
+    ;
 
 comma_sep_exprs: expr COMMA comma_sep_exprs
                  {
@@ -160,7 +159,7 @@ comma_sep_exprs: expr COMMA comma_sep_exprs
                  {
                    $$ = ASTexprs($1, NULL);
                  }
-                 ;
+               ;
 
 expr: PAREN_L basictype PAREN_R expr %prec CAST
       {
@@ -250,7 +249,7 @@ expr: PAREN_L basictype PAREN_R expr %prec CAST
       {
         $$ = ASTbool($1);
       }
-      ;
+    ;
 
 comma_sep_arrexprs: arrexpr COMMA comma_sep_arrexprs
                     {
@@ -260,7 +259,7 @@ comma_sep_arrexprs: arrexpr COMMA comma_sep_arrexprs
                     {
                       $$ = ASTarrexprs($1, NULL);
                     }
-                    ;
+                  ;
 
 arrexpr: expr
          {
@@ -270,7 +269,7 @@ arrexpr: expr
          {
            $$ = $2;
          }
-         ;
+       ;
 
 vardecls: vardecl vardecls
           {
@@ -280,7 +279,7 @@ vardecls: vardecl vardecls
           {
             $$ = ASTvardecls($1, NULL);
           }
-          ;
+        ;
 
 vardecl: type id SEMICOLON
          {
@@ -290,6 +289,7 @@ vardecl: type id SEMICOLON
          {
            $$ = ASTvardecl($1, $2, $4);
          }
+       ;
 
 fundecls: fundecl fundecls
           {
@@ -299,7 +299,7 @@ fundecls: fundecl fundecls
           {
             $$ = ASTfundecls($1, NULL);
           }
-          ;
+        ;
 
 fundecl: funheader SEMICOLON
          {
@@ -309,6 +309,7 @@ fundecl: funheader SEMICOLON
          {
            $$ = $1;
          }
+       ;
 
 fundefs: fundef fundefs
          {
@@ -318,13 +319,14 @@ fundefs: fundef fundefs
          {
            $$ = ASTfundecls($1, NULL);
          }
-         ;
+       ;
 
 fundef: funheader BRACE_L vardecls fundefs stmts BRACE_R
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, $4, $5);
         }
+      ;
 
 funheader: basictype id PAREN_L comma_sep_paramtypes PAREN_R
            {
@@ -342,7 +344,7 @@ funheader: basictype id PAREN_L comma_sep_paramtypes PAREN_R
            {
              $$ = ASTfundecl($2, NULL, TY_void);
            }
-           ;
+         ;
 
 block: stmt
        {
@@ -352,7 +354,7 @@ block: stmt
        {
          $$ = $2;
        }
-       ;
+     ;
 
 varref: id BRACKET_L comma_sep_exprs BRACKET_R
         {
@@ -362,7 +364,7 @@ varref: id BRACKET_L comma_sep_exprs BRACKET_R
         {
           $$ = ASTvarref($1, NULL);
         }
-        ;
+      ;
 
 comma_sep_ids: id COMMA comma_sep_exprs
                {
@@ -372,13 +374,13 @@ comma_sep_ids: id COMMA comma_sep_exprs
                {
                  $$ = ASTexprs($1, NULL);
                }
-               ;
+             ;
 
 id: ID
     {
       $$ = ASTid($1);
     }
-    ;
+  ;
 
 type: basictype
       {
@@ -388,7 +390,7 @@ type: basictype
       {
         $$ = ASTtype($3, $1);
       }
-      ;
+    ;
 
 comma_sep_paramtypes: paramtype COMMA comma_sep_exprs
                       {
@@ -398,7 +400,7 @@ comma_sep_paramtypes: paramtype COMMA comma_sep_exprs
                       {
                         $$ = ASTexprs($1, NULL);
                       }
-                      ;
+                    ;
 
 paramtype: basictype
            {
@@ -408,7 +410,7 @@ paramtype: basictype
            {
              $$ = ASTtype($3, $1);
            }
-           ;
+         ;
 
 basictype: TY_BOOL
            {
@@ -422,16 +424,16 @@ basictype: TY_BOOL
            {
              $$ = TY_float;
            }
-           ;
+         ;
 
 %%
 
 int yyerror(char *error)
 {
-  CTI(CTI_ERROR, true, "line %d, col %d\nError parsing source code: %s\n",
-            global.line, global.col, error);
-  CTIabortOnError();
-  return 0;
+    CTI(CTI_ERROR, true, "%s:%d:%d: %s\n", global.input_file, global.line + 1,
+        global.col + 1, error);
+    CTIabortOnError();
+    return 0;
 }
 
 node_st *SPdoScanParse(node_st *root)
@@ -439,7 +441,7 @@ node_st *SPdoScanParse(node_st *root)
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
     yyin = fopen(global.input_file, "r");
     if (yyin == NULL) {
-        CTI(CTI_ERROR, true, "Cannot open file '%s'.", global.input_file);
+        CTI(CTI_ERROR, true, "couldn't read '%s'", global.input_file);
         CTIabortOnError();
     }
     yyparse();

@@ -12,20 +12,16 @@
 #include "ccngen/enum.h"
 #include "ccngen/trav.h"
 #include "ccngen/trav_data.h"
+#include <stdio.h>
 
 void SCOinit(void) {}
-void SCOfini(void) {}
 
-node_st *SCOprogram(node_st *node) {
-    TRAVdecls(node);
-
-    PROGRAM_ADD(node) = DATA_SCO_GET()->add;
-    PROGRAM_SUB(node) = DATA_SCO_GET()->sub;
-    PROGRAM_MUL(node) = DATA_SCO_GET()->mul;
-    PROGRAM_DIV(node) = DATA_SCO_GET()->div;
-    PROGRAM_MOD(node) = DATA_SCO_GET()->mod;
-
-    return node;
+void SCOfini(void) {
+    printf("%d additions\n", DATA_SCO_GET()->add);
+    printf("%d subtractions\n", DATA_SCO_GET()->sub);
+    printf("%d multiplications\n", DATA_SCO_GET()->mul);
+    printf("%d divisions\n", DATA_SCO_GET()->div);
+    printf("%d modulos\n", DATA_SCO_GET()->mod);
 }
 
 node_st *SCObinop(node_st *node) {

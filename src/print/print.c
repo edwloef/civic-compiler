@@ -25,7 +25,7 @@ char *fmt_BasicType(enum BasicType ty) {
     case TY_void:
         return "void";
     default:
-        DBUG_ASSERT(false, "unknown basic type detected!");
+        DBUG_ASSERT(false, "Unknown basic type detected.");
         return NULL;
     }
 }
@@ -39,7 +39,7 @@ char *fmt_MonOpKind(enum MonOpKind bo) {
     case MO_not:
         return "!";
     default:
-        DBUG_ASSERT(false, "unknown binop detected!");
+        DBUG_ASSERT(false, "Unknown monop detected.");
         return NULL;
     }
 }
@@ -68,24 +68,18 @@ char *fmt_BinOpKind(enum BinOpKind bo) {
         return "==";
     case BO_ne:
         return "!=";
-    case BO_or:
-        return "||";
     case BO_and:
         return "&&";
+    case BO_or:
+        return "||";
     default:
-        DBUG_ASSERT(false, "unknown binop detected!");
+        DBUG_ASSERT(false, "Unknown binop detected.");
         return NULL;
     }
 }
 
 node_st *PRTprogram(node_st *node) {
     TRAVdecls(node);
-
-    printf("%d additions\n%d subtractions\n%d multiplications\n%d "
-           "divisions\n%d modulos\n",
-           PROGRAM_ADD(node), PROGRAM_SUB(node), PROGRAM_MUL(node),
-           PROGRAM_DIV(node), PROGRAM_MOD(node));
-
     return node;
 }
 
