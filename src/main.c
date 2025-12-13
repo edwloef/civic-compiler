@@ -75,7 +75,7 @@ static int ProcessArgs(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
     }
-    if (optind == argc - 1) {
+    if (optind < argc) {
         global.input_file = argv[optind];
     } else {
         Usage(argv[0]);
