@@ -18,6 +18,8 @@ extern FILE *yyin;
 
 %}
 
+%define parse.trace
+
 %union {
     bool cbool;
     int cint;
@@ -40,9 +42,9 @@ extern FILE *yyin;
 %token <cfloat> LIT_FLOAT
 %token <cstr> ID
 
-%type <node> decls stmts comma_sep_exprs comma_sep_arrexprs comma_sep_ids comma_sep_paramtypes
-%type <node> program decl stmt expr arrexpr paramtype block varref id
-%type <node> vardecl vardecls fundecl fundef fundefs funheader
+%type <node> decls stmts exprs arrexprs id_exprs params
+%type <node> program decl stmt expr arrexpr block varref id
+%type <node> vardecl vardecls fundef fundefs funheader
 %type <basic_type> basictype
 
 %left OR
@@ -52,6 +54,8 @@ extern FILE *yyin;
 %left PLUS MINUS
 %left STAR SLASH PERCENT
 %right MONOP CAST
+
+%define parse.trace
 
 %start program
 
@@ -83,7 +87,7 @@ decl: KW_EXTERN funheader SEMICOLON
         $$ = ASTvardecl(ASTtype(NULL, $2), $3, NULL);
         VARDECL_EXTERNAL($$) = true;
       }
-    | KW_EXTERN basictype BRACKET_L comma_sep_exprs BRACKET_R id SEMICOLON
+    | KW_EXTERN basictype BRACKET_L exprs BRACKET_R id SEMICOLON
       {
         $$ = ASTvardecl(ASTtype($4, $2), $6, NULL);
         VARDECL_EXTERNAL($$) = true;
@@ -156,15 +160,15 @@ stmt: varref ASSIGN arrexpr SEMICOLON
       }
     ;
 
-comma_sep_exprs: expr COMMA comma_sep_exprs
-                 {
-                   $$ = ASTexprs($1, $3);
-                 }
-               | expr
-                 {
-                   $$ = ASTexprs($1, NULL);
-                 }
-               ;
+exprs: expr COMMA exprs
+       {
+         $$ = ASTexprs($1, $3);
+       }
+     | expr
+       {
+         $$ = ASTexprs($1, NULL);
+       }
+     ;
 
 expr: PAREN_L basictype PAREN_R expr %prec CAST
       {
@@ -234,7 +238,7 @@ expr: PAREN_L basictype PAREN_R expr %prec CAST
       {
         $$ = ASTbinop($1, $3, BO_or);
       }
-    | id PAREN_L comma_sep_exprs PAREN_R SEMICOLON
+    | id PAREN_L exprs PAREN_R SEMICOLON
       {
         $$ = ASTcall($1, $3);
       }
@@ -256,21 +260,21 @@ expr: PAREN_L basictype PAREN_R expr %prec CAST
       }
     ;
 
-comma_sep_arrexprs: arrexpr COMMA comma_sep_arrexprs
-                    {
-                      $$ = ASTarrexprs($1, $3);
-                    }
-                  | arrexpr
-                    {
-                      $$ = ASTarrexprs($1, NULL);
-                    }
-                  ;
+arrexprs: arrexpr COMMA arrexprs
+          {
+            $$ = ASTarrexprs($1, $3);
+          }
+        | arrexpr
+          {
+            $$ = ASTarrexprs($1, NULL);
+          }
+        ;
 
 arrexpr: expr
          {
            $$ = $1;
          }
-       | BRACKET_L comma_sep_arrexprs BRACKET_R
+       | BRACKET_L arrexprs BRACKET_R
          {
            $$ = $2;
          }
@@ -290,27 +294,17 @@ vardecl: basictype id SEMICOLON
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, NULL);
          }
-       | basictype BRACKET_L comma_sep_exprs BRACKET_R id SEMICOLON
+       | basictype BRACKET_L exprs BRACKET_R id SEMICOLON
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, NULL);
-        }
-       | basictype id EQ expr SEMICOLON
+         }
+       | basictype id ASSIGN expr SEMICOLON
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, $4);
          }
-      | basictype BRACKET_L comma_sep_exprs BRACKET_R id EQ arrexpr SEMICOLON
+      | basictype BRACKET_L exprs BRACKET_R id ASSIGN arrexpr SEMICOLON
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, $7);
-        }
-       ;
-
-fundecl: funheader SEMICOLON
-         {
-           $$ = $1;
-         }
-       | fundef
-         {
-           $$ = $1;
          }
        ;
 
@@ -331,11 +325,11 @@ fundef: funheader BRACE_L vardecls fundefs stmts BRACE_R
         }
       ;
 
-funheader: basictype id PAREN_L comma_sep_paramtypes PAREN_R
+funheader: basictype id PAREN_L params PAREN_R
            {
              $$ = ASTfundecl($2, $4, $1);
            }
-         | TY_VOID id PAREN_L comma_sep_paramtypes PAREN_R
+         | TY_VOID id PAREN_L params PAREN_R
            {
              $$ = ASTfundecl($2, $4, TY_void);
            }
@@ -359,7 +353,7 @@ block: stmt
        }
      ;
 
-varref: id BRACKET_L comma_sep_exprs BRACKET_R
+varref: id BRACKET_L exprs BRACKET_R
         {
           $$ = ASTvarref($1, $3);
         }
@@ -369,41 +363,39 @@ varref: id BRACKET_L comma_sep_exprs BRACKET_R
         }
       ;
 
-comma_sep_ids: id COMMA comma_sep_exprs
-               {
-                 $$ = ASTexprs($1, $3);
-               }
-             | id
-               {
-                 $$ = ASTexprs($1, NULL);
-               }
-             ;
-
 id: ID
     {
       $$ = ASTid($1);
     }
   ;
 
-comma_sep_paramtypes: paramtype COMMA comma_sep_exprs
-                      {
-                        $$ = ASTexprs($1, $3);
-                      }
-                    | paramtype
-                      {
-                        $$ = ASTexprs($1, NULL);
-                      }
-                    ;
+params: basictype COMMA exprs
+        {
+          $$ = ASTexprs(ASTtype(NULL, $1), $3);
+        }
+      | basictype BRACKET_L id_exprs BRACKET_R COMMA exprs
+        {
+          $$ = ASTexprs(ASTtype($3, $1), $6);
+        }
+      | basictype COMMA
+        {
+          $$ = ASTexprs(ASTtype(NULL, $1), NULL);
+        }
+      | basictype BRACKET_L id_exprs BRACKET_R
+        {
+          $$ = ASTexprs(ASTtype($3, $1), NULL);
+        }
+      ;
 
-paramtype: basictype
-           {
-             $$ = ASTtype(NULL, $1);
-           }
-         | basictype BRACKET_L comma_sep_ids BRACKET_R
-           {
-             $$ = ASTtype($3, $1);
-           }
-         ;
+id_exprs: id COMMA exprs
+          {
+            $$ = ASTexprs($1, $3);
+          }
+        | id
+          {
+            $$ = ASTexprs($1, NULL);
+          }
+        ;
 
 basictype: TY_BOOL
            {
