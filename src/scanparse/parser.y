@@ -370,15 +370,15 @@ id: ID
     }
   ;
 
-params: basictype COMMA exprs
+params: basictype COMMA params
         {
           $$ = ASTexprs(ASTtype(NULL, $1), $3);
         }
-      | basictype BRACKET_L id_exprs BRACKET_R COMMA exprs
+      | basictype BRACKET_L id_exprs BRACKET_R COMMA params
         {
           $$ = ASTexprs(ASTtype($3, $1), $6);
         }
-      | basictype COMMA
+      | basictype
         {
           $$ = ASTexprs(ASTtype(NULL, $1), NULL);
         }
