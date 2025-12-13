@@ -18,8 +18,6 @@ extern FILE *yyin;
 
 %}
 
-%define parse.trace
-
 %union {
     bool cbool;
     int cint;
@@ -29,6 +27,7 @@ extern FILE *yyin;
     node_st *node;
 }
 
+%define parse.trace
 %locations
 
 %token PAREN_L PAREN_R BRACKET_L BRACKET_R BRACE_L BRACE_R
@@ -54,8 +53,6 @@ extern FILE *yyin;
 %left PLUS MINUS
 %left STAR SLASH PERCENT
 %right MONOP CAST
-
-%define parse.trace
 
 %start program
 
@@ -170,7 +167,11 @@ exprs: expr COMMA exprs
        }
      ;
 
-expr: PAREN_L basictype PAREN_R expr %prec CAST
+expr: PAREN_L expr PAREN_R
+      {
+        $$ = $2;
+      }
+    | PAREN_L basictype PAREN_R expr %prec CAST
       {
         $$ = ASTcast($4, $2);
       }
