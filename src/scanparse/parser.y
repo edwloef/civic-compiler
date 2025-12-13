@@ -245,6 +245,10 @@ expr: PAREN_L basictype PAREN_R expr %prec "monop"
       {
         $$ = ASTcall($1, $3);
       }
+    | id PAREN_L PAREN_R
+      {
+        $$ = ASTcall($1, NULL);
+      }
     | varref
       {
         $$ = $1;
