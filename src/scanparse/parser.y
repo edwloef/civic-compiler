@@ -52,7 +52,7 @@ extern FILE *yyin;
 %left LT LE GT GE
 %left PLUS MINUS
 %left STAR SLASH PERCENT
-%right MONOP CAST
+%right MONOP
 
 %start program
 
@@ -167,11 +167,7 @@ exprs: expr COMMA exprs
        }
      ;
 
-expr: PAREN_L expr PAREN_R
-      {
-        $$ = $2;
-      }
-    | PAREN_L basictype PAREN_R expr %prec CAST
+expr: PAREN_L basictype PAREN_R expr %prec MONOP
       {
         $$ = ASTcast($4, $2);
       }
@@ -239,7 +235,11 @@ expr: PAREN_L expr PAREN_R
       {
         $$ = ASTbinop($1, $3, BO_or);
       }
-    | id PAREN_L exprs PAREN_R SEMICOLON
+    | PAREN_L expr PAREN_R
+      {
+        $$ = $2;
+      }
+    | id PAREN_L exprs PAREN_R
       {
         $$ = ASTcall($1, $3);
       }
