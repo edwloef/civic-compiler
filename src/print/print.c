@@ -164,10 +164,9 @@ node_st *PRTvardecl(node_st *node) {
     TRAVty(node);
     printf(" ");
     TRAVid(node);
-    if (VARDECL_EXPR(node)) {
+    if (VARDECL_EXPR(node))
         printf(" = ");
-        TRAVexpr(node);
-    }
+    TRAVexpr(node);
     printf("\n");
     return node;
 }
@@ -241,10 +240,9 @@ node_st *PRTfor(node_st *node) {
 
 node_st *PRTreturn(node_st *node) {
     printf("return");
-    if (RETURN_EXPR(node)) {
+    if (RETURN_EXPR(node))
         printf(" ");
-        TRAVexpr(node);
-    }
+    TRAVexpr(node);
     printf("\n");
     return node;
 }
