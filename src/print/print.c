@@ -157,9 +157,9 @@ node_st *PRTvardecls(node_st *node) {
 }
 
 node_st *PRTvardecl(node_st *node) {
-    if (FUNDECL_EXPORTED(node))
+    if (VARDECL_EXPORTED(node))
         printf("export ");
-    if (FUNDECL_EXTERNAL(node))
+    if (VARDECL_EXTERNAL(node))
         printf("extern ");
     TRAVty(node);
     printf(" ");

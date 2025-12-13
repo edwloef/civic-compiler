@@ -41,8 +41,8 @@ extern FILE *yyin;
 %token <cstr> ID
 
 %type <node> decls stmts comma_sep_exprs comma_sep_arrexprs comma_sep_ids comma_sep_paramtypes
-%type <node> program decl stmt expr arrexpr type paramtype block varref id
-%type <node> vardecl vardecls fundecl fundecls fundef fundefs funheader
+%type <node> program decl stmt expr arrexpr paramtype block varref id
+%type <node> vardecl vardecls fundecl fundef fundefs funheader
 %type <basic_type> basictype
 
 %left OR
@@ -78,9 +78,14 @@ decl: KW_EXTERN funheader SEMICOLON
         $$ = $2;
         FUNDECL_EXTERNAL($$) = true;
       }
-    | KW_EXTERN type id SEMICOLON
+    | KW_EXTERN basictype id SEMICOLON
       {
-        $$ = ASTvardecl($2, $3, NULL);
+        $$ = ASTvardecl(ASTtype(NULL, $2), $3, NULL);
+        VARDECL_EXTERNAL($$) = true;
+      }
+    | KW_EXTERN basictype BRACKET_L comma_sep_exprs BRACKET_R id SEMICOLON
+      {
+        $$ = ASTvardecl(ASTtype($4, $2), $6, NULL);
         VARDECL_EXTERNAL($$) = true;
       }
     | KW_EXPORT fundef
@@ -281,25 +286,23 @@ vardecls: vardecl vardecls
           }
         ;
 
-vardecl: type id SEMICOLON
+vardecl: basictype id SEMICOLON
          {
-           $$ = ASTvardecl($1, $2, NULL);
+           $$ = ASTvardecl(ASTtype(NULL, $1), $2, NULL);
          }
-       | type id EQ arrexpr SEMICOLON
+       | basictype BRACKET_L comma_sep_exprs BRACKET_R id SEMICOLON
          {
-           $$ = ASTvardecl($1, $2, $4);
+           $$ = ASTvardecl(ASTtype($3, $1), $5, NULL);
+        }
+       | basictype id EQ expr SEMICOLON
+         {
+           $$ = ASTvardecl(ASTtype(NULL, $1), $2, $4);
          }
+      | basictype BRACKET_L comma_sep_exprs BRACKET_R id EQ arrexpr SEMICOLON
+         {
+           $$ = ASTvardecl(ASTtype($3, $1), $5, $7);
+        }
        ;
-
-fundecls: fundecl fundecls
-          {
-            $$ = ASTfundecls($1, $2);
-          }
-        | fundecl
-          {
-            $$ = ASTfundecls($1, NULL);
-          }
-        ;
 
 fundecl: funheader SEMICOLON
          {
@@ -381,16 +384,6 @@ id: ID
       $$ = ASTid($1);
     }
   ;
-
-type: basictype
-      {
-        $$ = ASTtype(NULL, $1);
-      }
-    | basictype BRACKET_L comma_sep_exprs BRACKET_R
-      {
-        $$ = ASTtype($3, $1);
-      }
-    ;
 
 comma_sep_paramtypes: paramtype COMMA comma_sep_exprs
                       {
