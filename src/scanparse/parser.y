@@ -46,13 +46,15 @@ extern FILE *yyin;
 %type <node> vardecl vardecls fundef fundefs funheader
 %type <basic_type> basictype
 
+%nonassoc "then"
+%nonassoc KW_ELSE
 %left OR
 %left AND
 %left EQ NE
 %left LT LE GT GE
 %left PLUS MINUS
 %left STAR SLASH PERCENT
-%right MONOP
+%right "monop"
 
 %start program
 
@@ -123,7 +125,7 @@ stmt: varref ASSIGN arrexpr SEMICOLON
       {
         $$ = ASTassign($1, $3);
       }
-    | KW_IF PAREN_L expr PAREN_R block
+    | KW_IF PAREN_L expr PAREN_R block %prec "then"
       {
         $$ = ASTifelse($3, $5, NULL);
       }
@@ -167,19 +169,19 @@ exprs: expr COMMA exprs
        }
      ;
 
-expr: PAREN_L basictype PAREN_R expr %prec MONOP
+expr: PAREN_L basictype PAREN_R expr %prec "monop"
       {
         $$ = ASTcast($4, $2);
       }
-    | PLUS expr %prec MONOP
+    | PLUS expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_pos);
       }
-    | MINUS expr %prec MONOP
+    | MINUS expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_neg);
       }
-    | BANG expr %prec MONOP
+    | BANG expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_not);
       }
