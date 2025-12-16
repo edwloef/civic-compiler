@@ -9,7 +9,7 @@
 void SCIinit(void) { DATA_SCI_GET()->count = HTnew_String(256); }
 
 void SCIfini(void) {
-    htable_stptr count = DATA_SCI_GET()->count;
+    htable_st_ptr count = DATA_SCI_GET()->count;
 
     for (htable_iter_st *iter = HTiterate(count); iter != NULL;
          iter = HTiterateNext(iter)) {
@@ -25,7 +25,7 @@ void SCIfini(void) {
 
 node_st *SCIid(node_st *node) {
     char *name = ID_VAL(node);
-    htable_stptr count = DATA_SCI_GET()->count;
+    htable_st_ptr count = DATA_SCI_GET()->count;
 
     int *already = HTlookup(count, name);
     if (already == NULL) {

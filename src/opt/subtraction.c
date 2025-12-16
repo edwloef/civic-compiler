@@ -1,12 +1,3 @@
-/**
- * @file
- *
- * This file contains the code for the Subtraction traversal.
- * The traversal has the uid: OS
- *
- *
- */
-
 #include "ccn/ccn.h"
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"

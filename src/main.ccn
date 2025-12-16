@@ -1,28 +1,14 @@
 start phase RootPhase {
     actions {
-        pass SPdoScanParse;
-        Stats;
+        pass ScanParse;
         Print;
+        Stats;
         Opt;
     }
 };
 
 traversal Print {
     uid = PRT
-};
-
-phase Opt {
-    actions {
-        traversal Subtraction {
-            uid = OS,
-            nodes = { Binop }
-        };
-
-        traversal StrengthReduction {
-            uid = OSR,
-            nodes = { BinOp }
-        };
-    }
 };
 
 phase Stats {
@@ -43,8 +29,34 @@ phase Stats {
             uid = SCI,
             nodes = { Id },
             travdata {
-                user htable_stptr count
+                user htable_st_ptr count
             }
+        };
+    }
+};
+
+phase LexicalAnalysis {
+    actions {
+        traversal CollectFunctions {
+            uid = LACF,
+            nodes = { Program, FunDecl, FunBody },
+            travdata {
+                user funtable_ptr funtable
+            }
+        };
+    }
+};
+
+phase Opt {
+    actions {
+        traversal Subtraction {
+            uid = OS,
+            nodes = { Binop }
+        };
+
+        traversal StrengthReduction {
+            uid = OSR,
+            nodes = { BinOp }
         };
     }
 };
@@ -75,6 +87,10 @@ enum BinOpKind {
 root node Program {
     children {
         Decls decls { constructor, mandatory }
+    },
+
+    attributes {
+      user funtable_ptr funtable
     }
 };
 
@@ -140,6 +156,10 @@ node FunBody {
         VarDecls var_decls { constructor },
         FunDecls fun_decls { constructor },
         Stmts stmts { constructor }
+    },
+
+    attributes {
+        user funtable_ptr funtable
     }
 };
 

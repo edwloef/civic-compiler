@@ -428,7 +428,7 @@ int yyerror(char *error)
     return 0;
 }
 
-node_st *SPdoScanParse(node_st *root)
+node_st *ScanParse(node_st *root)
 {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
     yyin = fopen(global.input_file, "r");
