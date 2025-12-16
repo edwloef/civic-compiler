@@ -33,7 +33,6 @@ node_st *LACFfundecl(node_st *node) {
     next->name = ID_VAL(FUNDECL_ID(node));
     next->arity = count_decls(FUNDECL_DECLS(node));
     next->prev = prev;
-    prev->next = next;
     DATA_LACF_GET()->funtable = next;
 
     TRAVchildren(node);

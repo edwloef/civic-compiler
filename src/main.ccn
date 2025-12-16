@@ -98,7 +98,7 @@ root node Program {
     },
 
     attributes {
-      user funtable_ptr funtable
+        user funtable_ptr funtable
     }
 };
 
