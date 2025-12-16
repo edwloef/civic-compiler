@@ -44,10 +44,11 @@ extern FILE *yyin;
 %type <node> decls stmts exprs arrexprs id_exprs params
 %type <node> program decl stmt expr arrexpr block varref id
 %type <node> vardecl vardecls fundef fundefs funheader
+%type <node> maybe_fundefs maybe_stmts maybe_vardecls
 %type <basic_type> basictype
 
-%nonassoc "then"
-%nonassoc KW_ELSE
+%nonassoc "none"
+%nonassoc "some"
 %left OR
 %left AND
 %left EQ NE
@@ -121,15 +122,25 @@ stmts: stmt stmts
        }
      ;
 
+maybe_stmts: %empty %prec "none"
+             {
+               $$ = NULL;
+             }
+           | stmts %prec "some"
+             {
+               $$ = $1;
+             }
+           ;
+
 stmt: varref ASSIGN arrexpr SEMICOLON
       {
         $$ = ASTassign($1, $3);
       }
-    | KW_IF PAREN_L expr PAREN_R block %prec "then"
+    | KW_IF PAREN_L expr PAREN_R block %prec "none"
       {
         $$ = ASTifelse($3, $5, NULL);
       }
-    | KW_IF PAREN_L expr PAREN_R block KW_ELSE block
+    | KW_IF PAREN_L expr PAREN_R block KW_ELSE block %prec "some"
       {
         $$ = ASTifelse($3, $5, $7);
       }
@@ -297,6 +308,16 @@ vardecls: vardecl vardecls
           }
         ;
 
+maybe_vardecls: %empty %prec "none"
+                {
+                  $$ = NULL;
+                }
+              | vardecls %prec "some"
+                {
+                  $$ = $1;
+                }
+              ;
+
 vardecl: basictype id SEMICOLON
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, NULL);
@@ -315,6 +336,16 @@ vardecl: basictype id SEMICOLON
          }
        ;
 
+maybe_fundefs: %empty %prec "none"
+               {
+                 $$ = NULL;
+               }
+             | fundefs %prec "some"
+               {
+                 $$ = $1;
+               }
+             ;
+
 fundefs: fundef fundefs
          {
            $$ = ASTfundecls($1, $2);
@@ -325,7 +356,7 @@ fundefs: fundef fundefs
          }
        ;
 
-fundef: funheader BRACE_L vardecls fundefs stmts BRACE_R
+fundef: funheader BRACE_L maybe_vardecls maybe_fundefs maybe_stmts BRACE_R
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, $4, $5);
