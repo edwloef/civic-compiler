@@ -17,7 +17,7 @@ node_st *LACFprogram(node_st *node) {
     return node;
 }
 
-int arity(node_st *next) {
+int count_decls(node_st *next) {
     int arity = 0;
     while (next) {
         arity++;
@@ -31,7 +31,7 @@ node_st *LACFfundecl(node_st *node) {
 
     funtable_ptr next = MEMmalloc(sizeof(funtable));
     next->name = ID_VAL(FUNDECL_ID(node));
-    next->arity = arity(FUNDECL_DECLS(node));
+    next->arity = count_decls(FUNDECL_DECLS(node));
     next->prev = prev;
     prev->next = next;
     DATA_LACF_GET()->funtable = next;

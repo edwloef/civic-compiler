@@ -44,6 +44,14 @@ phase LexicalAnalysis {
                 user funtable_ptr funtable
             }
         };
+
+        traversal ResolveFunctions {
+            uid = LARF,
+            nodes = { Program, Call, FunBody },
+            travdata {
+                user funtable_ptr funtable
+            }
+        };
     }
 };
 
