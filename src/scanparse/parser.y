@@ -47,7 +47,7 @@ extern FILE *yyin;
 %type <basic_type> basictype
 
 %nonassoc "none"
-%nonassoc "some"
+%nonassoc KW_ELSE
 %left OR
 %left AND
 %left EQ NE
@@ -129,7 +129,7 @@ stmt: varref ASSIGN arrexpr SEMICOLON
       {
         $$ = ASTifelse($3, $5, NULL);
       }
-    | KW_IF PAREN_L expr PAREN_R block KW_ELSE block %prec "some"
+    | KW_IF PAREN_L expr PAREN_R block KW_ELSE block
       {
         $$ = ASTifelse($3, $5, $7);
       }
