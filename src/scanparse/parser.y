@@ -44,7 +44,6 @@ extern FILE *yyin;
 %type <node> decls stmts exprs arrexprs id_exprs params
 %type <node> program decl stmt expr arrexpr block varref id
 %type <node> vardecl vardecls fundef fundefs funheader
-%type <node> maybe_fundefs maybe_stmts maybe_vardecls
 %type <basic_type> basictype
 
 %nonassoc "none"
@@ -121,16 +120,6 @@ stmts: stmt stmts
          $$ = ASTstmts($1, NULL);
        }
      ;
-
-maybe_stmts: %empty %prec "none"
-             {
-               $$ = NULL;
-             }
-           | stmts %prec "some"
-             {
-               $$ = $1;
-             }
-           ;
 
 stmt: varref ASSIGN arrexpr SEMICOLON
       {
@@ -308,16 +297,6 @@ vardecls: vardecl vardecls
           }
         ;
 
-maybe_vardecls: %empty %prec "none"
-                {
-                  $$ = NULL;
-                }
-              | vardecls %prec "some"
-                {
-                  $$ = $1;
-                }
-              ;
-
 vardecl: basictype id SEMICOLON
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, NULL);
@@ -336,16 +315,6 @@ vardecl: basictype id SEMICOLON
          }
        ;
 
-maybe_fundefs: %empty %prec "none"
-               {
-                 $$ = NULL;
-               }
-             | fundefs %prec "some"
-               {
-                 $$ = $1;
-               }
-             ;
-
 fundefs: fundef fundefs
          {
            $$ = ASTfundecls($1, $2);
@@ -356,7 +325,42 @@ fundefs: fundef fundefs
          }
        ;
 
-fundef: funheader BRACE_L maybe_vardecls maybe_fundefs maybe_stmts BRACE_R
+fundef: funheader BRACE_L BRACE_R
+        {
+          $$ = $1;
+          FUNDECL_BODY($$) = ASTfunbody(NULL, NULL, NULL);
+        }
+      | funheader BRACE_L vardecls BRACE_R
+        {
+          $$ = $1;
+          FUNDECL_BODY($$) = ASTfunbody($3, NULL, NULL);
+        }
+      | funheader BRACE_L fundefs BRACE_R
+        {
+          $$ = $1;
+          FUNDECL_BODY($$) = ASTfunbody(NULL, $3, NULL);
+        }
+      | funheader BRACE_L stmts BRACE_R
+        {
+          $$ = $1;
+          FUNDECL_BODY($$) = ASTfunbody(NULL, NULL, $3);
+        }
+      | funheader BRACE_L vardecls fundefs BRACE_R
+        {
+          $$ = $1;
+          FUNDECL_BODY($$) = ASTfunbody($3, $4, NULL);
+        }
+      | funheader BRACE_L vardecls stmts BRACE_R
+        {
+          $$ = $1;
+          FUNDECL_BODY($$) = ASTfunbody($3, NULL, $4);
+        }
+      | funheader BRACE_L fundefs stmts BRACE_R
+        {
+          $$ = $1;
+          FUNDECL_BODY($$) = ASTfunbody(NULL, $3, $4);
+        }
+      | funheader BRACE_L vardecls fundefs stmts BRACE_R
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, $4, $5);
