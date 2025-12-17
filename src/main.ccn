@@ -3,7 +3,7 @@ start phase RootPhase {
         pass ScanParse;
         Print;
         // Stats;
-        // LexicalAnalysis;
+        LexicalAnalysis;
         Opt;
     }
 };
@@ -47,11 +47,13 @@ phase LexicalAnalysis {
             }
         };
 
-        traversal ResolveFunctions {
-            uid = LARF,
-            nodes = { Program, Call, FunBody },
+        traversal Resolve {
+            uid = LAR,
+            nodes = { Program, VarDecl, Param, FunDecl, FunBody, For, Call, VarRef },
             travdata {
-                user funtable_ptr funtable
+                user funtable_ptr funtable,
+                user symtable_ptr symtable,
+                int level
             }
         };
     }
@@ -150,14 +152,15 @@ node FunDecls {
 node FunDecl {
     children {
         Id id { constructor, mandatory },
-        VarDecls decls { constructor },
+        Params params { constructor },
         FunBody body { }
     },
 
     attributes {
         BasicType ty { constructor },
         bool external,
-        bool exported
+        bool exported,
+        user symtable_ptr symtable
     }
 };
 
@@ -190,6 +193,24 @@ node VarDecl {
     attributes {
         bool external,
         bool exported
+    }
+};
+
+node Params {
+    children {
+        Param param { constructor, mandatory },
+        Params next { constructor }
+    }
+};
+
+node Param {
+    children {
+        Id id { constructor, mandatory },
+        Ids ids { constructor }
+    },
+
+    attributes {
+        BasicType ty { constructor }
     }
 };
 
@@ -280,6 +301,13 @@ node VarRef {
     children {
         Id id { constructor, mandatory },
         Exprs exprs { constructor }
+    }
+};
+
+node Ids {
+    children {
+        Id id { constructor, mandatory },
+        Ids next { constructor }
     }
 };
 

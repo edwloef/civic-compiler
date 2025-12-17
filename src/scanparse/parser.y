@@ -41,7 +41,7 @@ extern FILE *yyin;
 %token <cfloat> LIT_FLOAT
 %token <cstr> ID
 
-%type <node> decls stmts exprs arrexprs id_exprs params
+%type <node> decls stmts exprs arrexprs ids params
 %type <node> program decl stmt expr arrexpr block varref id
 %type <node> vardecl vardecls fundef fundefs funheader
 %type <basic_type> basictype
@@ -425,31 +425,31 @@ id: ID
 
 params: basictype id COMMA params
         {
-          $$ = ASTvardecls(ASTvardecl(ASTtype(NULL, $1), $2, NULL), $4);
+          $$ = ASTparams(ASTparam($2, NULL, $1), $4);
         }
-      | basictype BRACKET_L id_exprs BRACKET_R id COMMA params
+      | basictype BRACKET_L ids BRACKET_R id COMMA params
         {
-          $$ = ASTvardecls(ASTvardecl(ASTtype($3, $1), $5, NULL), $7);
+          $$ = ASTparams(ASTparam($5, $3, $1), $7);
         }
       | basictype id
         {
-          $$ = ASTvardecls(ASTvardecl(ASTtype(NULL, $1), $2, NULL), NULL);
+          $$ = ASTparams(ASTparam($2, NULL, $1), NULL);
         }
-      | basictype BRACKET_L id_exprs BRACKET_R id
+      | basictype BRACKET_L ids BRACKET_R id
         {
-          $$ = ASTvardecls(ASTvardecl(ASTtype($3, $1), $5, NULL), NULL);
+          $$ = ASTparams(ASTparam($5, $3, $1), NULL);
         }
       ;
 
-id_exprs: id COMMA exprs
-          {
-            $$ = ASTexprs(ASTvarref($1, NULL), $3);
-          }
-        | id
-          {
-            $$ = ASTexprs(ASTvarref($1, NULL), NULL);
-          }
-        ;
+ids: id COMMA ids
+     {
+       $$ = ASTids($1, $3);
+     }
+   | id
+     {
+       $$ = ASTids($1, NULL);
+     }
+   ;
 
 basictype: TY_BOOL
            {

@@ -20,17 +20,17 @@ node_st *LACFprogram(node_st *node) {
 }
 
 node_st *LACFfundecl(node_st *node) {
-    node_st *arg = FUNDECL_DECLS(node);
+    node_st *arg = FUNDECL_PARAMS(node);
     int arity = 0;
     while (arg) {
         arity++;
-        arg = DECLS_NEXT(arg);
+        arg = PARAMS_NEXT(arg);
     }
 
     char *name = ID_VAL(FUNDECL_ID(node));
     funtable_ptr entry = DATA_LACF_GET()->funtable;
-    while (entry && entry->level != DATA_LACF_GET()->level &&
-           entry->arity != arity && !STReq(name, entry->name))
+    while (entry && !(entry->level == DATA_LACF_GET()->level &&
+                      entry->arity == arity && STReq(name, entry->name)))
         entry = entry->prev;
 
     if (entry != NULL) {

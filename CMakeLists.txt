@@ -32,7 +32,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/global/globals.c
     src/global/globals.h
     src/lexical_analysis/collect_functions.c
-    src/lexical_analysis/resolve_functions.c
+    src/lexical_analysis/resolve.c
     src/opt/strength_reduction.c
     src/opt/subtraction.c
     src/print/print.c

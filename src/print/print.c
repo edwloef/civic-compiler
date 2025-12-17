@@ -4,6 +4,7 @@
 #include "ccngen/enum.h"
 #include "ccngen/trav.h"
 #include "palm/dbug.h"
+#include <stdio.h>
 
 char *fmt_BasicType(enum BasicType ty) {
     switch (ty) {
@@ -120,10 +121,7 @@ node_st *PRTfundecl(node_st *node) {
     printf("%s ", fmt_BasicType(FUNDECL_TY(node)));
     TRAVid(node);
     printf("(");
-    if (FUNDECL_DECLS(node)) {
-        printf("\n");
-        TRAVdecls(node);
-    }
+    TRAVopt(FUNDECL_PARAMS(node));
     printf(")");
     if (FUNDECL_BODY(node)) {
         printf(" {\n");
@@ -163,6 +161,27 @@ node_st *PRTvardecl(node_st *node) {
     }
     printf(";\n");
     return node;
+}
+
+node_st *PRTparams(node_st *node) {
+	TRAVparam(node);
+    if (PARAMS_NEXT(node)) {
+        printf(", ");
+        TRAVnext(node);
+    }
+	return node;
+}
+
+node_st *PRTparam(node_st *node) {
+	printf("%s", fmt_BasicType(PARAM_TY(node)));
+	if (PARAM_IDS(node)) {
+		printf("[");
+		TRAVids(node);
+		printf("]");
+	}
+	printf(" ");
+	TRAVid(node);
+	return node;
 }
 
 node_st *PRTassign(node_st *node) {
@@ -259,6 +278,15 @@ node_st *PRTcast(node_st *node) {
     printf("(%s) ", fmt_BasicType(CAST_TY(node)));
     TRAVexpr(node);
     return node;
+}
+
+node_st *PRTids(node_st *node) {
+	TRAVid(node);
+	if (IDS_NEXT(node)) {
+		printf(", ");
+		TRAVnext(node);
+	}
+	return node;
 }
 
 node_st *PRTid(node_st *node) {

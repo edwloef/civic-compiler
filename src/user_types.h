@@ -12,3 +12,11 @@ struct funtable {
     int level;
     funtable_ptr prev;
 };
+
+typedef struct symtable symtable;
+typedef symtable *symtable_ptr;
+struct symtable {
+    char *name;
+    int level;
+    symtable_ptr prev;
+};
