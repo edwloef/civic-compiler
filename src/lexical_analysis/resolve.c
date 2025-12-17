@@ -1,13 +1,13 @@
 #include "ccn/ccn.h"
 #include "ccn/dynamic_core.h"
 #include "ccngen/ast.h"
+#include "ccngen/enum.h"
 #include "ccngen/trav.h"
 #include "ccngen/trav_data.h"
 #include "palm/ctinfo.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 #include "user_types.h"
-#include <stdio.h>
 
 void LARinit(void) {}
 
@@ -21,7 +21,7 @@ node_st *LARprogram(node_st *node) {
     return node;
 }
 
-void LARtrydeclaresym(char *name) {
+void LARtrydeclaresym(char *name, enum BasicType ty, int dims) {
     symtable_ptr entry = DATA_LAR_GET()->symtable;
     while (entry &&
            !(entry->level == DATA_LAR_GET()->level && STReq(name, entry->name)))
@@ -34,6 +34,8 @@ void LARtrydeclaresym(char *name) {
 
     symtable_ptr next = MEMmalloc(sizeof(symtable));
     next->name = name;
+    next->ty = ty;
+    next->dims = dims;
     next->level = DATA_LAR_GET()->level;
     next->prev = DATA_LAR_GET()->symtable;
     DATA_LAR_GET()->symtable = next;
@@ -42,19 +44,28 @@ void LARtrydeclaresym(char *name) {
 node_st *LARvardecl(node_st *node) {
     TRAVopt(VARDECL_EXPR(node));
 
-    LARtrydeclaresym(ID_VAL(VARDECL_ID(node)));
+    int dims = 0;
+    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
+    while (expr) {
+        dims++;
+        expr = EXPRS_NEXT(expr);
+    }
+
+    LARtrydeclaresym(ID_VAL(VARDECL_ID(node)), TYPE_TY(VARDECL_TY(node)), dims);
 
     return node;
 }
 
 node_st *LARparam(node_st *node) {
-    LARtrydeclaresym(ID_VAL(PARAM_ID(node)));
-
+    int dims = 0;
     node_st *id = PARAM_IDS(node);
     while (id) {
-        LARtrydeclaresym(ID_VAL(IDS_ID(id)));
+        dims++;
+        LARtrydeclaresym(ID_VAL(IDS_ID(id)), TY_int, 0);
         id = IDS_NEXT(id);
     }
+
+    LARtrydeclaresym(ID_VAL(PARAM_ID(node)), PARAM_TY(node), dims);
 
     return node;
 }

@@ -42,6 +42,7 @@ node_st *LACFfundecl(node_st *node) {
     funtable_ptr next = MEMmalloc(sizeof(funtable));
     next->name = name;
     next->arity = arity;
+    next->ret_ty = FUNDECL_TY(node);
     next->level = DATA_LACF_GET()->level;
     next->prev = DATA_LACF_GET()->funtable;
     DATA_LACF_GET()->funtable = next;
