@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "ccn/dynamic_core.h"
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"
 #include "ccngen/trav.h"
@@ -70,27 +71,26 @@ char *fmt_BinOpKind(enum BinOpKind bo) {
 }
 
 node_st *PRTprogram(node_st *node) {
-    TRAVdecls(node);
+    TRAVchildren(node);
     return node;
 }
 
 node_st *PRTdecls(node_st *node) {
-    TRAVdecl(node);
-    TRAVnext(node);
+    TRAVchildren(node);
     return node;
 }
 
 node_st *PRTstmts(node_st *node) {
-    TRAVstmt(node);
-    TRAVnext(node);
+    TRAVchildren(node);
     return node;
 }
 
 node_st *PRTexprs(node_st *node) {
     TRAVexpr(node);
-    if (EXPRS_NEXT(node))
+    if (EXPRS_NEXT(node)) {
         printf(", ");
-    TRAVnext(node);
+        TRAVnext(node);
+    }
     return node;
 }
 
@@ -101,15 +101,15 @@ node_st *PRTarrexprs(node_st *node) {
         printf("]");
     } else
         TRAVexpr(node);
-    if (ARREXPRS_NEXT(node))
+    if (ARREXPRS_NEXT(node)) {
         printf(", ");
-    TRAVnext(node);
+        TRAVnext(node);
+    }
     return node;
 }
 
 node_st *PRTfundecls(node_st *node) {
-    TRAVdecl(node);
-    TRAVnext(node);
+    TRAVchildren(node);
     return node;
 }
 
@@ -121,10 +121,13 @@ node_st *PRTfundecl(node_st *node) {
     printf("%s ", fmt_BasicType(FUNDECL_TY(node)));
     TRAVid(node);
     printf("(");
-    TRAVdecls(node);
+    if (FUNDECL_DECLS(node)) {
+        printf("\n");
+        TRAVdecls(node);
+    }
     printf(")");
     if (FUNDECL_BODY(node)) {
-        printf(" {");
+        printf(" {\n");
         TRAVbody(node);
         printf("}");
     }
@@ -133,17 +136,12 @@ node_st *PRTfundecl(node_st *node) {
 }
 
 node_st *PRTfunbody(node_st *node) {
-    TRAVvar_decls(node);
-    TRAVfun_decls(node);
-    TRAVstmts(node);
+    TRAVchildren(node);
     return node;
 }
 
 node_st *PRTvardecls(node_st *node) {
-    TRAVdecl(node);
-    if (VARDECLS_NEXT(node))
-        printf(", ");
-    TRAVnext(node);
+    TRAVchildren(node);
     return node;
 }
 
@@ -155,10 +153,11 @@ node_st *PRTvardecl(node_st *node) {
     TRAVty(node);
     printf(" ");
     TRAVid(node);
-    if (VARDECL_EXPR(node))
+    if (VARDECL_EXPR(node)) {
         printf(" = ");
-    TRAVexpr(node);
-    printf("\n");
+        TRAVexpr(node);
+    }
+    printf(";\n");
     return node;
 }
 
@@ -171,7 +170,7 @@ node_st *PRTassign(node_st *node) {
         printf("]");
     } else
         TRAVexpr(node);
-    printf("\n");
+    printf(";\n");
     return node;
 }
 
@@ -186,11 +185,10 @@ node_st *PRTcall(node_st *node) {
 node_st *PRTifelse(node_st *node) {
     printf("if (");
     TRAVexpr(node);
-    printf(")\n{\n");
-    TRAVstmts(node);
-    if (IFELSE_ELSE_BLOCK(node))
-        printf("} else {\n");
-    TRAVelse_block(node);
+    printf(") {\n");
+    TRAVopt(IFELSE_IF_BLOCK(node));
+    printf("} else {\n");
+    TRAVopt(IFELSE_ELSE_BLOCK(node));
     printf("}\n");
     return node;
 }
@@ -199,14 +197,14 @@ node_st *PRTwhile(node_st *node) {
     printf("while (");
     TRAVexpr(node);
     printf(") {\n");
-    TRAVstmts(node);
+    TRAVopt(WHILE_STMTS(node));
     printf("}\n");
     return node;
 }
 
 node_st *PRTdowhile(node_st *node) {
     printf("do {\n");
-    TRAVstmts(node);
+    TRAVopt(DOWHILE_STMTS(node));
     printf("} while (");
     TRAVexpr(node);
     printf(")\n");
@@ -220,21 +218,21 @@ node_st *PRTfor(node_st *node) {
     TRAVloop_start(node);
     printf(", ");
     TRAVloop_end(node);
-    if (FOR_LOOP_STEP(node))
-        printf(", ");
+    printf(", ");
     TRAVloop_step(node);
     printf(") {\n");
-    TRAVstmts(node);
+    TRAVopt(FOR_STMTS(node));
     printf("}\n");
     return node;
 }
 
 node_st *PRTreturn(node_st *node) {
     printf("return");
-    if (RETURN_EXPR(node))
+    if (RETURN_EXPR(node)) {
         printf(" ");
-    TRAVexpr(node);
-    printf("\n");
+        TRAVexpr(node);
+    }
+    printf(";\n");
     return node;
 }
 

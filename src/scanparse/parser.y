@@ -125,6 +125,14 @@ stmt: varref ASSIGN arrexpr SEMICOLON
       {
         $$ = ASTassign($1, $3);
       }
+    | id PAREN_L exprs PAREN_R SEMICOLON
+      {
+        $$ = ASTcall($1, $3);
+      }
+    | id PAREN_L PAREN_R SEMICOLON
+      {
+        $$ = ASTcall($1, NULL);
+      }
     | KW_IF PAREN_L expr PAREN_R block %prec "none"
       {
         $$ = ASTifelse($3, $5, NULL);
@@ -143,7 +151,7 @@ stmt: varref ASSIGN arrexpr SEMICOLON
       }
     | KW_FOR PAREN_L TY_INT id ASSIGN expr COMMA expr PAREN_R block
       {
-        $$ = ASTfor($4, $6, $8, NULL, $10);
+        $$ = ASTfor($4, $6, $8, ASTint(1), $10);
       }
     | KW_FOR PAREN_L TY_INT id ASSIGN expr COMMA expr COMMA expr PAREN_R block
       {
@@ -393,6 +401,10 @@ block: stmt
        {
          $$ = $2;
        }
+     | BRACE_L BRACE_R
+       {
+         $$ = NULL;
+       }
      ;
 
 varref: id BRACKET_L exprs BRACKET_R
@@ -411,31 +423,31 @@ id: ID
     }
   ;
 
-params: basictype COMMA params
+params: basictype id COMMA params
         {
-          $$ = ASTexprs(ASTtype(NULL, $1), $3);
+          $$ = ASTvardecls(ASTvardecl(ASTtype(NULL, $1), $2, NULL), $4);
         }
-      | basictype BRACKET_L id_exprs BRACKET_R COMMA params
+      | basictype BRACKET_L id_exprs BRACKET_R id COMMA params
         {
-          $$ = ASTexprs(ASTtype($3, $1), $6);
+          $$ = ASTvardecls(ASTvardecl(ASTtype($3, $1), $5, NULL), $7);
         }
-      | basictype
+      | basictype id
         {
-          $$ = ASTexprs(ASTtype(NULL, $1), NULL);
+          $$ = ASTvardecls(ASTvardecl(ASTtype(NULL, $1), $2, NULL), NULL);
         }
-      | basictype BRACKET_L id_exprs BRACKET_R
+      | basictype BRACKET_L id_exprs BRACKET_R id
         {
-          $$ = ASTexprs(ASTtype($3, $1), NULL);
+          $$ = ASTvardecls(ASTvardecl(ASTtype($3, $1), $5, NULL), NULL);
         }
       ;
 
 id_exprs: id COMMA exprs
           {
-            $$ = ASTexprs($1, $3);
+            $$ = ASTexprs(ASTvarref($1, NULL), $3);
           }
         | id
           {
-            $$ = ASTexprs($1, NULL);
+            $$ = ASTexprs(ASTvarref($1, NULL), NULL);
           }
         ;
 

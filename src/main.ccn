@@ -2,7 +2,7 @@ start phase RootPhase {
     actions {
         pass ScanParse;
         Print;
-        Stats;
+        // Stats;
         Opt;
     }
 };
@@ -118,7 +118,7 @@ node Stmts {
     }
 };
 
-nodeset Stmt = { Assign, IfElse, While, DoWhile, For, Return };
+nodeset Stmt = { Assign, Call, IfElse, While, DoWhile, For, Return };
 
 node Exprs {
     children {
@@ -208,7 +208,7 @@ node IfElse {
 
 node While {
     children {
-        Expr expr { constructor, mandatory },
+        Expr expr { constructor },
         Stmts stmts { constructor }
     }
 };
@@ -216,7 +216,7 @@ node While {
 node DoWhile {
     children {
         Stmts stmts { constructor },
-        Expr expr { constructor, mandatory }
+        Expr expr { constructor }
     }
 };
 
@@ -225,8 +225,8 @@ node For {
         Id id { constructor, mandatory },
         Expr loop_start { constructor, mandatory },
         Expr loop_end { constructor, mandatory },
-        Expr loop_step { constructor },
-        Stmts stmts { constructor, mandatory }
+        Expr loop_step { constructor, mandatory },
+        Stmts stmts { constructor }
     }
 };
 
