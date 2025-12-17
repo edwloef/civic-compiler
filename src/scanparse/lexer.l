@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"
@@ -76,13 +77,18 @@ extern int yyerror(char *err);
                                                            FILTER(LIT_BOOL);
                                                          }
 
-[0-9]+                                                   {
-                                                           yylval.cint = atoi(yytext);
+(0[xX])?[0-9]+                                           {
+                                                           long val = strtol(yytext, NULL, 0);
+                                                           if (errno == ERANGE || val < INT_MIN || val > INT_MAX)
+                                                               yyerror("integer literal out of range");
+                                                           yylval.cint = val;
                                                            FILTER(LIT_INT);
                                                          }
 
 (([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+))([Ee][+-]?[0-9]+)? {
-                                                           yylval.cfloat = atof(yytext);
+                                                           yylval.cfloat = strtof(yytext, NULL);
+                                                           if (errno == ERANGE)
+                                                               yyerror("floating point literal out of range");
                                                            FILTER(LIT_FLOAT);
                                                          }
 
