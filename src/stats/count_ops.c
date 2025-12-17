@@ -1,9 +1,10 @@
+#include <stdio.h>
+
 #include "ccn/ccn.h"
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"
 #include "ccngen/trav.h"
 #include "ccngen/trav_data.h"
-#include <stdio.h>
 
 void SCOinit(void) {}
 

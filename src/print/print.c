@@ -1,10 +1,11 @@
+#include <stdio.h>
+
 #include "ccn/ccn.h"
 #include "ccn/dynamic_core.h"
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"
 #include "ccngen/trav.h"
 #include "palm/dbug.h"
-#include <stdio.h>
 
 char *fmt_BasicType(enum BasicType ty) {
     switch (ty) {

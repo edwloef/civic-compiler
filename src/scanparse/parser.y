@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "palm/memory.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
@@ -475,7 +476,7 @@ int yyerror(char *error)
     return 0;
 }
 
-node_st *ScanParse(node_st *root)
+node_st *scanparse(node_st *root)
 {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
     yyin = fopen(global.input_file, "r");

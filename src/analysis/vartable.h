@@ -1,0 +1,37 @@
+#pragma once
+
+#include <stdbool.h>
+
+#include "ccngen/enum.h"
+
+typedef struct {
+    enum BasicType ty;
+    int dims;
+} vartype;
+
+typedef struct {
+    char *name;
+    vartype ty;
+    bool valid;
+} vartable_entry;
+
+typedef struct vartable vartable;
+struct vartable {
+    int len;
+    int cap;
+    vartable_entry *buf;
+    vartable *parent;
+};
+
+typedef struct {
+    int n;
+    int l;
+} vartable_ref;
+
+vartable *vartable_new(vartable *parent);
+
+void vartable_insert(vartable *self, vartable_entry e);
+
+vartable_ref vartable_resolve(vartable *self, char *name);
+
+void vartable_free(vartable *self);

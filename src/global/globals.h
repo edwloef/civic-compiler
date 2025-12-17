@@ -13,4 +13,5 @@ struct globals {
 };
 
 extern struct globals global;
+
 extern void GLBinitializeGlobals(void);

@@ -2,10 +2,6 @@
 
 struct globals global;
 
-/*
- * Initialize global variables from globals.mac
- */
-
 void GLBinitializeGlobals(void) {
   global.col = 0;
   global.line = 0;

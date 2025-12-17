@@ -1,9 +1,9 @@
 start phase RootPhase {
     actions {
-        pass ScanParse;
+        pass scanparse;
         Print;
         // Stats;
-        LexicalAnalysis;
+        Analysis;
         Opt;
     }
 };
@@ -36,10 +36,10 @@ phase Stats {
     }
 };
 
-phase LexicalAnalysis {
+phase Analysis {
     actions {
-        traversal CollectFunctions {
-            uid = LACF,
+        traversal Collect {
+            uid = AC,
             nodes = { Program, FunDecl, FunBody },
             travdata {
                 user funtable_ptr funtable,
@@ -48,13 +48,18 @@ phase LexicalAnalysis {
         };
 
         traversal Resolve {
-            uid = LAR,
+            uid = AR,
             nodes = { Program, VarDecl, Param, FunDecl, FunBody, For, Call, VarRef },
             travdata {
                 user funtable_ptr funtable,
-                user symtable_ptr symtable,
+                user vartable_ptr vartable,
                 int level
             }
+        };
+
+        traversal Free {
+            uid = AF,
+            nodes = { Program, Fundecl, Funbody }
         };
     }
 };
@@ -102,7 +107,8 @@ root node Program {
     },
 
     attributes {
-        user funtable_ptr funtable
+        user funtable_ptr funtable,
+        user vartable_ptr vartable
     }
 };
 
@@ -160,7 +166,7 @@ node FunDecl {
         BasicType ty { constructor },
         bool external,
         bool exported,
-        user symtable_ptr symtable
+        user vartable_ptr vartable
     }
 };
 
@@ -294,6 +300,11 @@ node Call {
     children {
         Id id { constructor, mandatory },
         Exprs exprs { constructor }
+    },
+
+    attributes {
+        int n,
+        int l
     }
 };
 
@@ -301,6 +312,11 @@ node VarRef {
     children {
         Id id { constructor, mandatory },
         Exprs exprs { constructor }
+    },
+
+    attributes {
+        int n,
+        int l
     }
 };
 

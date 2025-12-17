@@ -1,10 +1,11 @@
+#include <stdio.h>
+
 #include "ccn/ccn.h"
 #include "ccngen/ast.h"
 #include "ccngen/trav_data.h"
 #include "palm/hash_table.h"
 #include "palm/memory.h"
 #include "palm/str.h"
-#include <stdio.h>
 
 void SCIinit(void) { DATA_SCI_GET()->count = HTnew_String(256); }
 
