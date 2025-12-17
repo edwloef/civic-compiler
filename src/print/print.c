@@ -164,24 +164,24 @@ node_st *PRTvardecl(node_st *node) {
 }
 
 node_st *PRTparams(node_st *node) {
-	TRAVparam(node);
+    TRAVparam(node);
     if (PARAMS_NEXT(node)) {
         printf(", ");
         TRAVnext(node);
     }
-	return node;
+    return node;
 }
 
 node_st *PRTparam(node_st *node) {
-	printf("%s", fmt_BasicType(PARAM_TY(node)));
-	if (PARAM_IDS(node)) {
-		printf("[");
-		TRAVids(node);
-		printf("]");
-	}
-	printf(" ");
-	TRAVid(node);
-	return node;
+    printf("%s", fmt_BasicType(PARAM_TY(node)));
+    if (PARAM_IDS(node)) {
+        printf("[");
+        TRAVids(node);
+        printf("]");
+    }
+    printf(" ");
+    TRAVid(node);
+    return node;
 }
 
 node_st *PRTassign(node_st *node) {
@@ -201,7 +201,7 @@ node_st *PRTcall(node_st *node) {
     TRAVid(node);
     printf("(");
     TRAVexprs(node);
-    printf(")\n");
+    printf(")");
     return node;
 }
 
@@ -281,12 +281,12 @@ node_st *PRTcast(node_st *node) {
 }
 
 node_st *PRTids(node_st *node) {
-	TRAVid(node);
-	if (IDS_NEXT(node)) {
-		printf(", ");
-		TRAVnext(node);
-	}
-	return node;
+    TRAVid(node);
+    if (IDS_NEXT(node)) {
+        printf(", ");
+        TRAVnext(node);
+    }
+    return node;
 }
 
 node_st *PRTid(node_st *node) {

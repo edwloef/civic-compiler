@@ -21,7 +21,7 @@ node_st *LARprogram(node_st *node) {
     return node;
 }
 
-void LARtrydeclaresym(char *name, enum BasicType ty, int dims) {
+void LARtrydeclaresym(char *name, type ty) {
     symtable_ptr entry = DATA_LAR_GET()->symtable;
     while (entry &&
            !(entry->level == DATA_LAR_GET()->level && STReq(name, entry->name)))
@@ -35,7 +35,6 @@ void LARtrydeclaresym(char *name, enum BasicType ty, int dims) {
     symtable_ptr next = MEMmalloc(sizeof(symtable));
     next->name = name;
     next->ty = ty;
-    next->dims = dims;
     next->level = DATA_LAR_GET()->level;
     next->prev = DATA_LAR_GET()->symtable;
     DATA_LAR_GET()->symtable = next;
@@ -51,7 +50,8 @@ node_st *LARvardecl(node_st *node) {
         expr = EXPRS_NEXT(expr);
     }
 
-    LARtrydeclaresym(ID_VAL(VARDECL_ID(node)), TYPE_TY(VARDECL_TY(node)), dims);
+    type ty = {TYPE_TY(VARDECL_TY(node)), dims};
+    LARtrydeclaresym(ID_VAL(VARDECL_ID(node)), ty);
 
     return node;
 }
@@ -61,11 +61,13 @@ node_st *LARparam(node_st *node) {
     node_st *id = PARAM_IDS(node);
     while (id) {
         dims++;
-        LARtrydeclaresym(ID_VAL(IDS_ID(id)), TY_int, 0);
+        type ty = {TY_int, 0};
+        LARtrydeclaresym(ID_VAL(IDS_ID(id)), ty);
         id = IDS_NEXT(id);
     }
 
-    LARtrydeclaresym(ID_VAL(PARAM_ID(node)), PARAM_TY(node), dims);
+    type ty = {PARAM_TY(node), dims};
+    LARtrydeclaresym(ID_VAL(PARAM_ID(node)), ty);
 
     return node;
 }
@@ -116,20 +118,21 @@ node_st *LARfor(node_st *node) {
 
 node_st *LARcall(node_st *node) {
     node_st *arg = CALL_EXPRS(node);
-    int arity = 0;
+    int param_count = 0;
     while (arg) {
-        arity++;
+        param_count++;
         arg = EXPRS_NEXT(arg);
     }
 
     char *name = ID_VAL(CALL_ID(node));
     funtable_ptr entry = DATA_LAR_GET()->funtable;
-    while (entry && !(entry->arity == arity && STReq(name, entry->name)))
+    while (entry &&
+           !(entry->param_count == param_count && STReq(name, entry->name)))
         entry = entry->prev;
 
     if (entry == NULL) {
         CTI(CTI_ERROR, true, "couldn't resolve function '%s' with arity %d",
-            name, arity);
+            name, param_count);
         CTIabortOnError();
     }
 
