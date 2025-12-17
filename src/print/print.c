@@ -155,7 +155,12 @@ node_st *PRTvardecl(node_st *node) {
     TRAVid(node);
     if (VARDECL_EXPR(node)) {
         printf(" = ");
-        TRAVexpr(node);
+        if (NODE_TYPE(VARDECL_EXPR(node)) == NT_ARREXPRS) {
+            printf("[");
+            TRAVexpr(node);
+            printf("]");
+        } else
+            TRAVexpr(node);
     }
     printf(";\n");
     return node;
