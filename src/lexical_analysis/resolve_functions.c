@@ -5,7 +5,6 @@
 #include "palm/ctinfo.h"
 #include "palm/str.h"
 #include "user_types.h"
-#include <stdbool.h>
 
 void LARFinit(void) {}
 
@@ -19,30 +18,21 @@ node_st *LARFprogram(node_st *node) {
     return node;
 }
 
-int count_exprs(node_st *next) {
-    int arity = 0;
-    while (next) {
-        arity++;
-        next = EXPRS_NEXT(next);
-    }
-    return arity;
-}
-
-bool resolve(char *name, int arity) {
-    funtable_ptr prev = DATA_LARF_GET()->funtable;
-    while (prev && prev->arity != arity && !STReq(name, prev->name))
-        prev = prev->prev;
-    return prev != NULL;
-}
-
 node_st *LARFcall(node_st *node) {
+    node_st *arg = CALL_EXPRS(node);
+    int arity = 0;
+    while (arg) {
+        arity++;
+        arg = EXPRS_NEXT(arg);
+    }
+
     char *name = ID_VAL(CALL_ID(node));
-    int arity = count_exprs(CALL_EXPRS(node));
+    funtable_ptr entry = DATA_LARF_GET()->funtable;
+    while (entry && entry->arity != arity && !STReq(name, entry->name))
+        entry = entry->prev;
 
-    bool resolved = resolve(name, arity);
-
-    if (!resolved) {
-        CTI(CTI_ERROR, true, "couldn't resolve function '%s' with arity '%d'",
+    if (entry == NULL) {
+        CTI(CTI_ERROR, true, "couldn't resolve function '%s' with arity %d",
             name, arity);
         CTIabortOnError();
     }

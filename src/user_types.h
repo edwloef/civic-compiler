@@ -9,5 +9,6 @@ typedef funtable *funtable_ptr;
 struct funtable {
     char *name;
     int arity;
+    int level;
     funtable_ptr prev;
 };

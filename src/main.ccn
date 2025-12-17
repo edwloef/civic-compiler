@@ -3,6 +3,7 @@ start phase RootPhase {
         pass ScanParse;
         Print;
         // Stats;
+        // LexicalAnalysis;
         Opt;
     }
 };
@@ -41,7 +42,8 @@ phase LexicalAnalysis {
             uid = LACF,
             nodes = { Program, FunDecl, FunBody },
             travdata {
-                user funtable_ptr funtable
+                user funtable_ptr funtable,
+                int level
             }
         };
 

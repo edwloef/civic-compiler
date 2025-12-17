@@ -4,7 +4,6 @@
 #include "ccngen/enum.h"
 #include "ccngen/trav.h"
 #include "palm/dbug.h"
-#include <stdio.h>
 
 char *fmt_BasicType(enum BasicType ty) {
     switch (ty) {
