@@ -1,22 +1,22 @@
 %{
 
+#include <limits.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <limits.h>
 
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"
-#include "parser.h"
-#include "palm/str.h"
-#include "global/globals.h"
+#include "globals/globals.h"
 #include "palm/ctinfo.h"
+#include "palm/str.h"
+#include "parser.h"
 
-extern int yyerror(char *err);
+int yyerror(char *err);
 
 #define FILTER(token) \
-    global.col += yyleng; \
+    globals.col += yyleng; \
     return(token);
 
 %}
@@ -98,26 +98,26 @@ extern int yyerror(char *err);
                                                          }
 
 \r?\n.*                                                  {
-                                                           global.line += 1;
-                                                           global.col = 0;
+                                                           globals.line += 1;
+                                                           globals.col = 0;
                                                            yyless(1);
                                                          }
 
-[ \t]                                                    { global.col += yyleng; }
+[ \t]                                                    { globals.col += yyleng; }
 
-"//".*                                                   { global.col += yyleng; }
+"//".*                                                   { globals.col += yyleng; }
 "/*"                                                     {
-                                                           global.col += yyleng;
+                                                           globals.col += yyleng;
                                                            BEGIN(comment);
                                                          }
-<comment>([^*]|\*[^/])*                                  { global.col += yyleng; }
+<comment>([^*]|\*[^/])*                                  { globals.col += yyleng; }
 <comment>"*/"                                            {
-                                                           global.col += yyleng;
+                                                           globals.col += yyleng;
                                                            BEGIN(INITIAL);
                                                          }
 <comment>\r?\n.*                                         {
-                                                           global.line += 1;
-                                                           global.col = 0;
+                                                           globals.line += 1;
+                                                           globals.col = 0;
                                                            yyless(1);
                                                          }
 

@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "ccn/ccn.h"
-#include "global/globals.h"
+#include "globals/globals.h"
 
 static void Usage(char *program) {
     char *program_bin = strrchr(program, '/');
@@ -27,7 +27,6 @@ static void Usage(char *program) {
         "that will replace a multiplication in the strength reduction pass.\n");
 }
 
-/* Parse command lines. Usages the globals struct to store data. */
 static int ProcessArgs(int argc, char *argv[]) {
     static struct option long_options[] = {
         {"verbose", no_argument, 0, 'v'},
@@ -48,7 +47,7 @@ static int ProcessArgs(int argc, char *argv[]) {
 
         switch (c) {
         case 'v':
-            global.verbose = 1;
+            globals.verbose = 1;
             CCNsetVerbosity(PD_V_MEDIUM);
             break;
         case 'b':
@@ -62,10 +61,10 @@ static int ProcessArgs(int argc, char *argv[]) {
             CCNshowTree();
             break;
         case 'o':
-            global.output_file = optarg;
+            globals.output_file = optarg;
             break;
         case 'r':
-            global.strength_reduction_limit = atoi(optarg);
+            globals.strength_reduction_limit = atoi(optarg);
             break;
         case 'h':
             Usage(argv[0]);
@@ -76,7 +75,7 @@ static int ProcessArgs(int argc, char *argv[]) {
         }
     }
     if (optind < argc) {
-        global.input_file = argv[optind];
+        globals.input_file = argv[optind];
     } else {
         Usage(argv[0]);
         exit(EXIT_FAILURE);
@@ -90,10 +89,7 @@ void BreakpointHandler(node_st *root) {
 }
 
 int main(int argc, char **argv) {
-    GLBinitializeGlobals();
-
     ProcessArgs(argc, argv);
-
     CCNrun(NULL);
     return 0;
 }

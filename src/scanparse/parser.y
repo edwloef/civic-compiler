@@ -1,19 +1,19 @@
 %{
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "palm/memory.h"
-#include "palm/ctinfo.h"
-#include "palm/dbug.h"
-#include "palm/str.h"
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"
-#include "global/globals.h"
+#include "globals/globals.h"
+#include "palm/ctinfo.h"
+#include "palm/dbug.h"
+#include "palm/memory.h"
+#include "palm/str.h"
 
 static node_st *parseresult = NULL;
-extern int yylex();
+int yylex();
 int yyerror(char *errname);
 extern FILE *yyin;
 
@@ -468,20 +468,18 @@ basictype: TY_BOOL
 
 %%
 
-int yyerror(char *error)
-{
-    CTI(CTI_ERROR, true, "%s:%d:%d: %s\n", global.input_file, global.line + 1,
-        global.col + 1, error);
+int yyerror(char *error) {
+    CTI(CTI_ERROR, true, "%s:%d:%d: %s\n", globals.input_file, globals.line + 1,
+        globals.col + 1, error);
     CTIabortOnError();
     return 0;
 }
 
-node_st *scanparse(node_st *root)
-{
+node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
-    yyin = fopen(global.input_file, "r");
+    yyin = fopen(globals.input_file, "r");
     if (yyin == NULL) {
-        CTI(CTI_ERROR, true, "couldn't read '%s'", global.input_file);
+        CTI(CTI_ERROR, true, "couldn't read '%s'", globals.input_file);
         CTIabortOnError();
     }
     yyparse();

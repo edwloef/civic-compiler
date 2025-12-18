@@ -76,8 +76,6 @@ phase Opt {
     }
 };
 
-/*** AST ***/
-
 enum BasicType {
     prefix = TY,
     values {

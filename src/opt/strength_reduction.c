@@ -2,7 +2,7 @@
 #include "ccngen/ast.h"
 #include "ccngen/enum.h"
 #include "ccngen/trav.h"
-#include "global/globals.h"
+#include "globals/globals.h"
 
 node_st *strength_reduce(node_st *base, int count) {
     node_st *res = CCNcopy(base);
@@ -23,7 +23,7 @@ node_st *OSRbinop(node_st *node) {
             if (val == 0) {
                 node = CCNfree(node);
                 node = ASTint(0);
-            } else if (val >= 1 && val <= global.strength_reduction_limit) {
+            } else if (val >= 1 && val <= globals.strength_reduction_limit) {
                 node_st *res = strength_reduce(BINOP_LEFT(node), val);
                 node = CCNfree(node);
                 node = res;
@@ -34,7 +34,7 @@ node_st *OSRbinop(node_st *node) {
             if (val == 0) {
                 node = CCNfree(node);
                 node = ASTint(0);
-            } else if (val >= 1 && val <= global.strength_reduction_limit) {
+            } else if (val >= 1 && val <= globals.strength_reduction_limit) {
                 node_st *res = strength_reduce(BINOP_RIGHT(node), val);
                 node = CCNfree(node);
                 node = res;
