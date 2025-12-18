@@ -33,8 +33,8 @@ funtable *funtable_new(funtable *parent) {
 }
 
 void funtable_insert(funtable *self, funtable_entry e) {
-    for (int i = 0; i < self->len; i++) {
-        funtable_entry entry = self->buf[i];
+    for (int l = self->len - 1; l >= 0; l--) {
+        funtable_entry entry = self->buf[l];
         if (entry.ty.len == e.ty.len && STReq(entry.name, e.name)) {
             CTI(CTI_ERROR, true,
                 "couldn't re-declare function '%s' with arity %d", e.name,
@@ -58,7 +58,7 @@ void funtable_push(funtable *self, funtable_entry e) {
 funtable_ref funtable_resolve(funtable *self, char *name, int param_count) {
     int n = 0;
     while (self) {
-        for (int l = 0; l < self->len; l++) {
+        for (int l = self->len - 1; l >= 0; l--) {
             funtable_entry entry = self->buf[l];
             if (entry.ty.len == param_count && STReq(entry.name, name)) {
                 funtable_ref r = {n, l};
