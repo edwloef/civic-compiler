@@ -98,26 +98,25 @@ node_st *ARparam(node_st *node) {
 }
 
 node_st *ARfundecl(node_st *node) {
-    enum BasicType old = DATA_AR_GET()->ret_ty;
+    enum BasicType prev = DATA_AR_GET()->ret_ty;
     DATA_AR_GET()->ret_ty = FUNDECL_TY(node);
     DATA_AR_GET()->vartable = vartable_new(DATA_AR_GET()->vartable);
 
     TRAVchildren(node);
     FUNDECL_VARTABLE(node) = DATA_AR_GET()->vartable;
 
-    DATA_AR_GET()->ret_ty = old;
+    DATA_AR_GET()->ret_ty = prev;
     DATA_AR_GET()->vartable = DATA_AR_GET()->vartable->parent;
 
     return node;
 }
 
 node_st *ARfunbody(node_st *node) {
-    funtable_ptr prev = DATA_AR_GET()->funtable;
     DATA_AR_GET()->funtable = FUNBODY_FUNTABLE(node);
 
     TRAVchildren(node);
 
-    DATA_AR_GET()->funtable = prev;
+    DATA_AR_GET()->funtable = DATA_AR_GET()->funtable->parent;
 
     return node;
 }
