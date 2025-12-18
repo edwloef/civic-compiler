@@ -42,8 +42,7 @@ phase Analysis {
             uid = AC,
             nodes = { Program, FunDecl, FunBody },
             travdata {
-                user funtable_ptr funtable,
-                int level
+                user funtable_ptr funtable
             }
         };
 
@@ -52,8 +51,7 @@ phase Analysis {
             nodes = { Program, VarDecl, Param, FunDecl, FunBody, For, Call, VarRef },
             travdata {
                 user funtable_ptr funtable,
-                user vartable_ptr vartable,
-                int level
+                user vartable_ptr vartable
             }
         };
 
