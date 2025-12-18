@@ -6,6 +6,7 @@ set(TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/test")
 set(COMPILER "${CMAKE_CURRENT_BINARY_DIR}/civicc")
 
 option(DISABLE_ASAN "Disable address sanitizer")
+option(DISABLE_UBSAN "Disable undefined behavior sanitizer")
 
 # These will only work after you received the testing framework from us.
 enable_testing()
@@ -56,6 +57,17 @@ if(NOT DISABLE_ASAN)
 
     target_link_options(civicc PRIVATE
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<CONFIG:Debug>:-fsanitize=address>>
+    )
+endif()
+
+# Enable undefined behavior sanitizer
+if(NOT DISABLE_UBSAN)
+    target_compile_options(civicc PRIVATE
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<CONFIG:Debug>:-fsanitize=undefined>>
+    )
+
+    target_link_options(civicc PRIVATE
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<CONFIG:Debug>:-fsanitize=undefined>>
     )
 endif()
 

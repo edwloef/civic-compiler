@@ -25,7 +25,7 @@ clean:
 	rm -f *.tar*
 	rm -rf build*/
 
-check: debug
+check:
 	@cd test; \
 	CIVAS=../$(TEST_CIVAS) \
 	CIVVM=../$(TEST_CIVVM) \
