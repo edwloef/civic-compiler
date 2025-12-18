@@ -47,15 +47,15 @@ extern FILE *yyin;
 %type <node> vardecl vardecls fundef fundefs funheader
 %type <basic_type> basictype
 
-%nonassoc "none"
-%nonassoc KW_ELSE
+%precedence "none"
+%precedence KW_ELSE
 %left OR
 %left AND
 %left EQ NE
 %left LT LE GT GE
 %left PLUS MINUS
 %left STAR SLASH PERCENT
-%right "monop"
+%precedence "monop"
 
 %start program
 
