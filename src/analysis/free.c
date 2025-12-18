@@ -31,6 +31,15 @@ node_st *AFfunbody(node_st *node) {
     return node;
 }
 
+node_st *AFarrexprs(node_st *node) {
+    TRAVchildren(node);
+
+    MEMfree(ARREXPRS_RESOLVED_TY(node));
+    ARREXPRS_RESOLVED_TY(node) = NULL;
+
+    return node;
+}
+
 node_st *AFmonop(node_st *node) {
     TRAVchildren(node);
 
