@@ -9,6 +9,8 @@ typedef struct {
     int dims;
 } vartype;
 
+void vartype_check_equal(vartype *self, vartype *other);
+
 typedef struct {
     char *name;
     vartype ty;
@@ -35,5 +37,7 @@ void vartable_insert(vartable *self, vartable_entry e);
 void vartable_push(vartable *self, vartable_entry e);
 
 vartable_ref vartable_resolve(vartable *self, char *name);
+
+vartable_entry vartable_get(vartable *self, vartable_ref e);
 
 void vartable_free(vartable *self);

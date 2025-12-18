@@ -91,13 +91,11 @@ decl: KW_EXTERN funheader SEMICOLON
       }
     | KW_EXTERN basictype id SEMICOLON
       {
-        $$ = ASTvardecl(ASTtype(NULL, $2), $3, NULL);
-        VARDECL_EXTERNAL($$) = true;
+        $$ = ASTparam($3, NULL, $2);
       }
-    | KW_EXTERN basictype BRACKET_L exprs BRACKET_R id SEMICOLON
+    | KW_EXTERN basictype BRACKET_L ids BRACKET_R id SEMICOLON
       {
-        $$ = ASTvardecl(ASTtype($4, $2), $6, NULL);
-        VARDECL_EXTERNAL($$) = true;
+        $$ = ASTparam($6, $4, $2);
       }
     | KW_EXPORT fundef
       {

@@ -47,16 +47,17 @@ phase Analysis {
 
         traversal Resolve {
             uid = AR,
-            nodes = { Program, VarDecl, Param, FunDecl, FunBody, For, Call, VarRef },
+            nodes = { Program, VarDecl, Param, FunDecl, FunBody, For, Assign, Return, ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
             travdata {
                 user funtable_ptr funtable,
-                user vartable_ptr vartable
+                user vartable_ptr vartable,
+                BasicType ret_ty
             }
         };
 
         traversal Free {
             uid = AF,
-            nodes = { Program, Fundecl, Funbody }
+            nodes = { Program, Fundecl, Funbody, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool }
         };
     }
 };
@@ -100,7 +101,7 @@ node Decls {
     }
 };
 
-nodeset Decl = { FunDecl, VarDecl };
+nodeset Decl = { FunDecl, VarDecl, Param };
 
 node Stmts {
     children {
@@ -127,7 +128,12 @@ node ArrExprs {
     }
 };
 
-nodeset ArrExpr = Expr | { ArrExprs };
+nodeset ArrExpr {
+    nodes = Expr | { ArrExprs },
+    attributes {
+        user vartype_ptr resolved_ty
+    }
+};
 
 node FunDecls {
     children {
@@ -140,7 +146,7 @@ node FunDecl {
     children {
         Id id { constructor, mandatory },
         Params params { constructor },
-        FunBody body { }
+        FunBody body
     },
 
     attributes {
@@ -178,7 +184,6 @@ node VarDecl {
     },
 
     attributes {
-        bool external,
         bool exported
     }
 };

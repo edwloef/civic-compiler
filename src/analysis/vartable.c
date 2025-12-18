@@ -2,6 +2,22 @@
 #include "palm/ctinfo.h"
 #include "palm/memory.h"
 #include "palm/str.h"
+#include "print/print.h"
+
+void vartype_check_equal(vartype *self, vartype *other) {
+    if (self->ty != other->ty) {
+        CTI(CTI_ERROR, true, "expected type '%s', found type '%s'",
+            fmt_BasicType(self->ty), fmt_BasicType(other->ty));
+        CTIabortOnError();
+    }
+
+    if (self->dims != other->dims) {
+        CTI(CTI_ERROR, true,
+            "expected array with %d dimensions, found array with %d dimensions",
+            self->dims, other->dims);
+        CTIabortOnError();
+    }
+}
 
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));
@@ -45,11 +61,18 @@ vartable_ref vartable_resolve(vartable *self, char *name) {
         }
 
         self = self->parent;
+        n++;
     }
 
     CTI(CTI_ERROR, true, "couldn't resolve variable '%s'", name);
     CTIabortOnError();
     exit(EXIT_FAILURE);
+}
+
+vartable_entry vartable_get(vartable *self, vartable_ref e) {
+    for (int i = 0; i < e.n; i++)
+        self = self->parent;
+    return self->buf[e.l];
 }
 
 void vartable_free(vartable *self) {

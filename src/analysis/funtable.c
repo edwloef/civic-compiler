@@ -67,12 +67,19 @@ funtable_ref funtable_resolve(funtable *self, char *name, int param_count) {
         }
 
         self = self->parent;
+        n++;
     }
 
     CTI(CTI_ERROR, true, "couldn't resolve function '%s' with arity %d", name,
         param_count);
     CTIabortOnError();
     exit(EXIT_FAILURE);
+}
+
+funtable_entry funtable_get(funtable *self, funtable_ref e) {
+    for (int i = 0; i < e.n; i++)
+        self = self->parent;
+    return self->buf[e.l];
 }
 
 void funtable_free(funtable *self) {
