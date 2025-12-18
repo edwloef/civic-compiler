@@ -1,10 +1,9 @@
 start phase RootPhase {
     actions {
         pass scanparse;
-        Print;
+        // Print;
         // Stats;
         Analysis;
-        Opt;
     }
 };
 
@@ -58,20 +57,6 @@ phase Analysis {
         traversal Free {
             uid = AF,
             nodes = { Program, Fundecl, Funbody }
-        };
-    }
-};
-
-phase Opt {
-    actions {
-        traversal Subtraction {
-            uid = OS,
-            nodes = { Binop }
-        };
-
-        traversal StrengthReduction {
-            uid = OSR,
-            nodes = { BinOp }
         };
     }
 };

@@ -1,13 +1,19 @@
 #pragma once
 
 #include "analysis/vartable.h"
-#include "ccngen/enum.h"
 
 typedef struct {
+    int len;
+    int cap;
+    vartype *buf;
     enum BasicType ret_ty;
-    int param_count;
-    vartype *param_tys;
 } funtype;
+
+funtype funtype_new(enum BasicType);
+
+void funtype_push(funtype *self, vartype e);
+
+void funtype_free(funtype self);
 
 typedef struct {
     char *name;
@@ -30,6 +36,8 @@ typedef struct {
 funtable *funtable_new(funtable *parent);
 
 void funtable_insert(funtable *self, funtable_entry e);
+
+void funtable_push(funtable *self, funtable_entry e);
 
 funtable_ref funtable_resolve(funtable *self, char *name, int param_count);
 

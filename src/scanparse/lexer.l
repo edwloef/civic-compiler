@@ -1,15 +1,9 @@
 %{
 
 #include <limits.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include "ccngen/ast.h"
-#include "ccngen/enum.h"
+#include "ccn/ccn.h"
 #include "globals/globals.h"
-#include "palm/ctinfo.h"
 #include "palm/str.h"
 #include "parser.h"
 
@@ -78,6 +72,7 @@ int yyerror(char *err);
                                                          }
 
 (0[xX])?[0-9]+                                           {
+                                                           errno = 0;
                                                            long val = strtol(yytext, NULL, 0);
                                                            if (errno == ERANGE || val < INT_MIN || val > INT_MAX)
                                                                yyerror("integer literal out of range");
@@ -86,6 +81,7 @@ int yyerror(char *err);
                                                          }
 
 (([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+))([Ee][+-]?[0-9]+)? {
+                                                           errno = 0;
                                                            yylval.cfloat = strtof(yytext, NULL);
                                                            if (errno == ERANGE)
                                                                yyerror("floating point literal out of range");

@@ -1,16 +1,9 @@
 %{
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "ccngen/ast.h"
-#include "ccngen/enum.h"
+#include "ccn/ccn.h"
 #include "globals/globals.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
-#include "palm/memory.h"
-#include "palm/str.h"
 
 static node_st *parseresult = NULL;
 int yylex();

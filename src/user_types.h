@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ccngen/enum.h"
 #include "analysis/funtable.h"
 #include "analysis/vartable.h"
 #include "palm/hash_table.h"

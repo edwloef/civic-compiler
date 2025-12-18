@@ -1,12 +1,5 @@
-#include "analysis/funtable.h"
-#include "analysis/vartable.h"
 #include "ccn/ccn.h"
-#include "ccn/dynamic_core.h"
-#include "ccngen/ast.h"
-#include "ccngen/enum.h"
 #include "ccngen/trav.h"
-#include "ccngen/trav_data.h"
-#include "user_types.h"
 
 void ARinit(void) { DATA_AR_GET()->vartable = vartable_new(NULL); }
 
@@ -86,7 +79,7 @@ node_st *ARfor(node_st *node) {
 
     vartype ty = {TY_int, 0};
     vartable_entry e = {ID_VAL(FOR_ID(node)), ty, true};
-    vartable_insert(DATA_AR_GET()->vartable, e);
+    vartable_push(DATA_AR_GET()->vartable, e);
 
     int idx = DATA_AR_GET()->vartable->len - 1;
 

@@ -36,10 +36,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/analysis/resolve.c
     src/analysis/vartable.c;
     src/globals/globals.c
-    src/opt/strength_reduction.c
-    src/opt/subtraction.c
     src/print/print.c
-    src/scanparse/scanparse.c
     src/stats/count_ops.c
     src/stats/count_ids.c
     src/main.c

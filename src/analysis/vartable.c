@@ -21,6 +21,10 @@ void vartable_insert(vartable *self, vartable_entry e) {
         }
     }
 
+    vartable_push(self, e);
+}
+
+void vartable_push(vartable *self, vartable_entry e) {
     if (self->len == self->cap) {
         self->cap = self->cap ? self->cap * 2 : 4;
         self->buf = MEMrealloc(self->buf, self->cap * sizeof(vartable_entry));
@@ -45,7 +49,7 @@ vartable_ref vartable_resolve(vartable *self, char *name) {
 
     CTI(CTI_ERROR, true, "couldn't resolve variable '%s'", name);
     CTIabortOnError();
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 void vartable_free(vartable *self) {
