@@ -11,11 +11,19 @@ total_tests=0
 failed_tests=0
 
 function echo_success {
-    echo -e '\E[27;32m'"\033[1mok\033[0m"
+    if [[ -t 1 ]]; then
+        echo -e '\E[27;32m'"\033[1mok\033[0m"
+    else
+        echo "ok"
+    fi
 }
 
 function echo_failed {
-    echo -e '\E[27;31m'"\033[1mfailed\033[0m"
+    if [[ -t 1 ]]; then
+        echo -e '\E[27;31m'"\033[1mfailed\033[0m"
+    else
+        echo "failed"
+    fi
 }
 
 # The real tests: compile a file, run it, and compare the output to the
