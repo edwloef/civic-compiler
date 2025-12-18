@@ -273,6 +273,12 @@ node_st *ARbinop(node_st *node) {
     vartype *ty = MEMmalloc(sizeof(vartype));
     *ty = *left_ty;
     switch (BINOP_OP(node)) {
+    case BO_lt:
+    case BO_le:
+    case BO_gt:
+    case BO_ge:
+        ty->ty = TY_bool;
+        // fallthrough
     case BO_sub:
     case BO_div:
     case BO_mod:
@@ -281,16 +287,10 @@ node_st *ARbinop(node_st *node) {
                 fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty->ty));
         }
         break;
-    case BO_lt:
-    case BO_le:
-    case BO_gt:
-    case BO_ge:
-        if (left_ty->ty != TY_int && left_ty->ty != TY_float) {
-            CTI(CTI_ERROR, true, "can't apply binop '%s' to value of type '%s'",
-                fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty->ty));
-        }
+    case BO_eq:
+    case BO_ne:
         ty->ty = TY_bool;
-        break;
+        // fallthrough
     case BO_add:
     case BO_mul:
         if (left_ty->ty != TY_int && left_ty->ty != TY_float &&
@@ -299,22 +299,13 @@ node_st *ARbinop(node_st *node) {
                 fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty->ty));
         }
         break;
-    case BO_eq:
-    case BO_ne:
-        if (left_ty->ty != TY_int && left_ty->ty != TY_float &&
-            left_ty->ty != TY_bool) {
-            CTI(CTI_ERROR, true, "can't apply binop '%s' to value of type '%s'",
-                fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty->ty));
-        }
-        ty->ty = TY_bool;
-        break;
     case BO_and:
     case BO_or:
+        ty->ty = TY_bool;
         if (left_ty->ty != TY_bool) {
             CTI(CTI_ERROR, true, "can't apply binop '%s' to value of type '%s'",
                 fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty->ty));
         }
-        ty->ty = TY_bool;
         break;
     default:
         DBUG_ASSERT(false, "Unknown binop detected.");
