@@ -263,8 +263,9 @@ node_st *PRTbinop(node_st *node) {
 }
 
 node_st *PRTmonop(node_st *node) {
-    printf("%s", fmt_MonOpKind(MONOP_OP(node)));
+    printf("(%s", fmt_MonOpKind(MONOP_OP(node)));
     TRAVexpr(node);
+    printf(")");
     return node;
 }
 
