@@ -57,7 +57,7 @@ phase Analysis {
 
         traversal Free {
             uid = AF,
-            nodes = { Program, Fundecl, Funbody, ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool }
+            nodes = { Program, Fundecl, Funbody }
         };
     }
 };
@@ -131,7 +131,8 @@ node ArrExprs {
 nodeset ArrExpr {
     nodes = Expr | { ArrExprs },
     attributes {
-        user vartype_ptr resolved_ty
+        BasicType resolved_ty,
+        int resolved_dims
     }
 };
 
