@@ -39,7 +39,7 @@ void funtable_insert(funtable *self, funtable_entry e) {
             CTI(CTI_ERROR, true,
                 "couldn't re-declare function '%s' with arity %d", e.name,
                 e.ty.len);
-            CTIabortOnError();
+            return;
         }
     }
 

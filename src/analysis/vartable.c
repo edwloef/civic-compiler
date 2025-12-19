@@ -4,21 +4,6 @@
 #include "palm/str.h"
 #include "print/print.h"
 
-void vartype_check_equal(vartype *self, vartype *other) {
-    if (self->ty != other->ty) {
-        CTI(CTI_ERROR, true, "expected type '%s', found type '%s'",
-            fmt_BasicType(self->ty), fmt_BasicType(other->ty));
-        CTIabortOnError();
-    }
-
-    if (self->dims != other->dims) {
-        CTI(CTI_ERROR, true,
-            "expected array with %d dimensions, found array with %d dimensions",
-            self->dims, other->dims);
-        CTIabortOnError();
-    }
-}
-
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));
     n->len = 0;
@@ -33,7 +18,7 @@ void vartable_insert(vartable *self, vartable_entry e) {
         vartable_entry entry = self->buf[l];
         if (entry.valid && STReq(entry.name, e.name)) {
             CTI(CTI_ERROR, true, "couldn't re-declare variable '%s'", e.name);
-            CTIabortOnError();
+            return;
         }
     }
 

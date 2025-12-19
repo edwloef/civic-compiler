@@ -9,8 +9,6 @@ typedef struct {
     int dims;
 } vartype;
 
-void vartype_check_equal(vartype *self, vartype *other);
-
 typedef struct {
     char *name;
     vartype ty;

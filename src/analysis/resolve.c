@@ -38,18 +38,16 @@ void ARcheckassign(vartype from, vartype to) {
         } else {
             CTI(CTI_ERROR, true,
                 "can't assign %d-dimensional array of type '%s' to "
-                "%d-dimensional array "
-                "of type '%s'",
+                "%d-dimensional array of type '%s'",
                 from.dims, fmt_BasicType(from.ty), to.dims,
                 fmt_BasicType(to.ty));
         }
     }
-    CTIabortOnError();
 }
 
 void ARinit(void) { DATA_AR_GET()->vartable = vartable_new(NULL); }
 
-void ARfini(void) {}
+void ARfini(void) { CTIabortOnError(); }
 
 node_st *ARprogram(node_st *node) {
     DATA_AR_GET()->funtable = PROGRAM_FUNTABLE(node);
@@ -158,15 +156,14 @@ node_st *ARreturn(node_st *node) {
 
         if (resolved_ty.dims != 0) {
             CTI(CTI_ERROR, true,
-                "can't return %d-dimensional array of '%s' from function "
-                "returning value of "
-                "'%s'",
+                "can't return %d-dimensional array of type '%s' from function "
+                "returning value of type '%s'",
                 resolved_ty.dims, fmt_BasicType(resolved_ty.ty),
                 fmt_BasicType(DATA_AR_GET()->ret_ty));
         } else if (DATA_AR_GET()->ret_ty != resolved_ty.ty) {
             CTI(CTI_ERROR, true,
-                "can't return value of '%s' from function returning value of "
-                "'%s'",
+                "can't return value of type '%s' from function returning value "
+                "of type '%s'",
                 fmt_BasicType(resolved_ty.ty),
                 fmt_BasicType(DATA_AR_GET()->ret_ty));
         }
@@ -178,7 +175,6 @@ node_st *ARreturn(node_st *node) {
                 fmt_BasicType(DATA_AR_GET()->ret_ty));
         }
     }
-    CTIabortOnError();
 
     return node;
 }
@@ -191,14 +187,39 @@ node_st *ARarrexprs(node_st *node) {
     while (inner) {
         vartype resolved_ty = RESOLVED_TY(ARREXPRS_EXPR(inner));
 
-        if (ty.dims != resolved_ty.dims) {
-            CTI(CTI_ERROR, true,
-                "encountered inconsistent dimensions in array expression");
-        } else if (ty.ty != resolved_ty.ty) {
-            CTI(CTI_ERROR, true,
-                "encountered inconsistent types in array expression");
+        if (ty.dims != resolved_ty.dims || ty.ty != resolved_ty.ty) {
+            if (ty.dims == 0) {
+                if (resolved_ty.dims == 0) {
+                    CTI(CTI_ERROR, true,
+                        "encountered inconsistent array expression containing "
+                        "value of type '%s' and value of type '%s'",
+                        fmt_BasicType(ty.ty), fmt_BasicType(resolved_ty.ty));
+                } else {
+                    CTI(CTI_ERROR, true,
+                        "encountered inconsistent array expression containing "
+                        "value of type '%s' and %d-dimensional array of type "
+                        "'%s'",
+                        fmt_BasicType(ty.ty), resolved_ty.dims,
+                        fmt_BasicType(resolved_ty.ty));
+                }
+            } else {
+                if (resolved_ty.dims == 0) {
+                    CTI(CTI_ERROR, true,
+                        "encountered inconsistent array expression containing "
+                        "%d-dimensional array of type '%s' and value of type "
+                        "'%s'",
+                        ty.dims, fmt_BasicType(ty.ty),
+                        fmt_BasicType(resolved_ty.ty));
+                } else {
+                    CTI(CTI_ERROR, true,
+                        "encountered inconsistent array expression containing "
+                        "%d-dimensional array of type '%s' and %d-dimensional "
+                        "array of type '%s'",
+                        ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
+                        fmt_BasicType(resolved_ty.ty));
+                }
+            }
         }
-        CTIabortOnError();
 
         inner = ARREXPRS_NEXT(inner);
     }
@@ -219,21 +240,22 @@ node_st *ARmonop(node_st *node) {
             "can't apply monop '%s' to %d-dimensional array of type '%s'",
             fmt_MonOpKind(MONOP_OP(node)), resolved_ty.dims,
             fmt_BasicType(resolved_ty.ty));
-        CTIabortOnError();
     }
+    CTIabortOnError();
 
+    enum BasicType ty = resolved_ty.ty;
     switch (MONOP_OP(node)) {
     case MO_pos:
     case MO_neg:
-        if (resolved_ty.ty != TY_int && resolved_ty.ty != TY_float) {
+        if (ty != TY_int && ty != TY_float) {
             CTI(CTI_ERROR, true, "can't apply monop '%s' to value of type '%s'",
-                fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(resolved_ty.ty));
+                fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(ty));
         }
         break;
     case MO_not:
-        if (resolved_ty.ty != TY_bool) {
+        if (ty != TY_bool) {
             CTI(CTI_ERROR, true, "can't apply monop '%s' to value of type '%s'",
-                fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(resolved_ty.ty));
+                fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(ty));
         }
         break;
     default:
@@ -242,8 +264,8 @@ node_st *ARmonop(node_st *node) {
     }
     CTIabortOnError();
 
-    MONOP_RESOLVED_TY(node) = resolved_ty.ty;
-    MONOP_RESOLVED_DIMS(node) = resolved_ty.dims;
+    MONOP_RESOLVED_TY(node) = ty;
+    MONOP_RESOLVED_DIMS(node) = 0;
 
     return node;
 }
@@ -266,7 +288,7 @@ node_st *ARbinop(node_st *node) {
             fmt_BasicType(right_ty.ty));
     } else if (left_ty.ty != right_ty.ty) {
         CTI(CTI_ERROR, true,
-            "can't apply binop '%s' to nonequal types '%s' and '%s'",
+            "can't apply binop '%s' to values of nonequal types '%s' and '%s'",
             fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty),
             fmt_BasicType(right_ty.ty));
     }
@@ -284,7 +306,8 @@ node_st *ARbinop(node_st *node) {
     case BO_div:
     case BO_mod:
         if (left_ty.ty != TY_int && left_ty.ty != TY_float) {
-            CTI(CTI_ERROR, true, "can't apply binop '%s' to value of type '%s'",
+            CTI(CTI_ERROR, true,
+                "can't apply binop '%s' to values of type '%s'",
                 fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
         }
         break;
@@ -296,15 +319,16 @@ node_st *ARbinop(node_st *node) {
     case BO_mul:
         if (left_ty.ty != TY_int && left_ty.ty != TY_float &&
             left_ty.ty != TY_bool) {
-            CTI(CTI_ERROR, true, "can't apply binop '%s' to value of type '%s'",
+            CTI(CTI_ERROR, true,
+                "can't apply binop '%s' to values of type '%s'",
                 fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
         }
         break;
     case BO_and:
     case BO_or:
-        ty = TY_bool;
         if (left_ty.ty != TY_bool) {
-            CTI(CTI_ERROR, true, "can't apply binop '%s' to value of type '%s'",
+            CTI(CTI_ERROR, true,
+                "can't apply binop '%s' to values of type '%s'",
                 fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
         }
         break;
@@ -337,7 +361,6 @@ node_st *ARcast(node_st *node) {
             "can't cast value of type '%s' to value of type '%s'",
             fmt_BasicType(resolved_ty.ty), fmt_BasicType(CAST_TY(node)));
     }
-    CTIabortOnError();
 
     CAST_RESOLVED_TY(node) = CAST_TY(node);
     CAST_RESOLVED_DIMS(node) = 0;
@@ -397,7 +420,6 @@ node_st *ARcall(node_st *node) {
                         resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
                 }
             }
-            CTIabortOnError();
         }
 
         arg = EXPRS_NEXT(arg);
@@ -427,18 +449,18 @@ node_st *ARvarref(node_st *node) {
     }
 
     if (count > ty.dims) {
-        if (ty.dims > 0) {
+        if (ty.dims == 0) {
+            CTI(CTI_ERROR, true, "can't index into value of type '%s'",
+                fmt_BasicType(ty.ty));
+        } else {
             CTI(CTI_ERROR, true,
                 "can't index %d times into %d-dimensional array of type '%s'",
                 count, ty.dims, fmt_BasicType(ty.ty));
-        } else {
-            CTI(CTI_ERROR, true, "can't index into value of type '%s'",
-                fmt_BasicType(ty.ty));
         }
-        CTIabortOnError();
+        ty.dims = 0;
+    } else {
+        ty.dims -= count;
     }
-
-    ty.dims -= count;
 
     VARREF_RESOLVED_TY(node) = ty.ty;
     VARREF_RESOLVED_DIMS(node) = ty.dims;
