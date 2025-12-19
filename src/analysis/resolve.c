@@ -155,6 +155,7 @@ node_st *ARreturn(node_st *node) {
 
     if (RETURN_EXPR(node)) {
         vartype resolved_ty = RESOLVED_TY(RETURN_EXPR(node));
+
         if (resolved_ty.dims != 0) {
             CTI(CTI_ERROR, true,
                 "can't return %d-dimensional array of '%s' from function "
@@ -186,11 +187,10 @@ node_st *ARarrexprs(node_st *node) {
     TRAVchildren(node);
 
     vartype ty = RESOLVED_TY(ARREXPRS_EXPR(node));
-    ty.dims++;
-
     node_st *inner = ARREXPRS_NEXT(node);
     while (inner) {
         vartype resolved_ty = RESOLVED_TY(ARREXPRS_EXPR(inner));
+
         if (ty.dims != resolved_ty.dims) {
             CTI(CTI_ERROR, true,
                 "encountered inconsistent dimensions in array expression");
@@ -199,10 +199,12 @@ node_st *ARarrexprs(node_st *node) {
                 "encountered inconsistent types in array expression");
         }
         CTIabortOnError();
+
+        inner = ARREXPRS_NEXT(inner);
     }
 
     ARREXPRS_RESOLVED_TY(node) = ty.ty;
-    ARREXPRS_RESOLVED_DIMS(node) = ty.dims;
+    ARREXPRS_RESOLVED_DIMS(node) = ty.dims + 1;
 
     return node;
 }
