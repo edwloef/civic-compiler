@@ -188,9 +188,9 @@ node_st *ARarrexprs(node_st *node) {
     *ty = *ARREXPR_RESOLVED_TY(ARREXPRS_EXPR(node));
     ty->dims++;
 
-    node = ARREXPRS_NEXT(node);
-    while (node) {
-        vartype *resolved_ty = ARREXPR_RESOLVED_TY(ARREXPRS_EXPR(node));
+    node_st *inner = ARREXPRS_NEXT(node);
+    while (inner) {
+        vartype *resolved_ty = ARREXPR_RESOLVED_TY(ARREXPRS_EXPR(inner));
         if (ty->dims != resolved_ty->dims) {
             CTI(CTI_ERROR, true,
                 "encountered inconsistent dimensions in array expression");
