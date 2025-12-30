@@ -12,10 +12,12 @@ vartype RESOLVED_TY(node_st *node) {
 void ARcheckassign(vartype from, vartype to) {
     if (to.dims != 0 && from.dims != to.dims) {
         if (from.dims == 0) {
-            CTI(CTI_ERROR, true,
-                "can't assign %d-dimensional array of type '%s' to value of "
-                "type '%s'",
-                from.dims, fmt_BasicType(from.ty), fmt_BasicType(to.ty));
+            if (from.ty != to.ty) {
+                CTI(CTI_ERROR, true,
+                    "can't spread value of type '%s' into %d-dimensional array "
+                    "of type '%s'",
+                    fmt_BasicType(from.ty), to.dims, fmt_BasicType(to.ty));
+            }
         } else {
             CTI(CTI_ERROR, true,
                 "can't assign %d-dimensional array of type '%s' to "
@@ -448,18 +450,17 @@ node_st *ARvarref(node_st *node) {
         expr = EXPRS_NEXT(expr);
     }
 
-    if (count > ty.dims) {
-        if (ty.dims == 0) {
-            CTI(CTI_ERROR, true, "can't index into value of type '%s'",
-                fmt_BasicType(ty.ty));
-        } else {
-            CTI(CTI_ERROR, true,
-                "can't index %d times into %d-dimensional array of type '%s'",
-                count, ty.dims, fmt_BasicType(ty.ty));
-        }
+    if (count == 0) {
+    } else if (count == ty.dims) {
         ty.dims = 0;
+    } else if (ty.dims == 0) {
+        CTI(CTI_ERROR, true, "can't index into value of type '%s'",
+            fmt_BasicType(ty.ty));
     } else {
-        ty.dims -= count;
+        CTI(CTI_ERROR, true,
+            "can't index %d times into %d-dimensional array of type '%s'",
+            count, ty.dims, fmt_BasicType(ty.ty));
+        ty.dims = 0;
     }
 
     VARREF_RESOLVED_TY(node) = ty.ty;
