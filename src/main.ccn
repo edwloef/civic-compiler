@@ -194,7 +194,8 @@ node VarDecl {
     },
 
     attributes {
-        bool exported
+        bool exported,
+        int l
     }
 };
 

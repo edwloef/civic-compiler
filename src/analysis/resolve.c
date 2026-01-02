@@ -30,6 +30,8 @@ node_st *ARvardecl(node_st *node) {
     vartable_entry e = {ID_VAL(VARDECL_ID(node)), ty, true};
     vartable_insert(DATA_AR_GET()->vartable, e);
 
+    VARDECL_L(node) = DATA_AR_GET()->vartable->len - 1;
+
     return node;
 }
 

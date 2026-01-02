@@ -62,18 +62,34 @@ node_st *ATCprogram(node_st *node) {
 node_st *ATCvardecl(node_st *node) {
     TRAVchildren(node);
 
-    if (VARDECL_EXPR(node)) {
-        int dims = 0;
-        node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
-        while (expr) {
-            dims++;
-            expr = EXPRS_NEXT(expr);
+    vartable_ref r = {0, VARDECL_L(node)};
+    vartable_entry e = vartable_get(DATA_ATC_GET()->vartable, r);
+    vartype ty = e.ty;
+
+    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
+    while (expr) {
+        vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
+        if (resolved_ty.dims == 0) {
+            if (resolved_ty.ty != TY_int) {
+                CTI(CTI_ERROR, true,
+                    "can't declare %d-dimensional array of type '%s' with "
+                    "length of value of type '%s'",
+                    ty.dims, fmt_BasicType(ty.ty),
+                    fmt_BasicType(resolved_ty.ty));
+            }
+        } else {
+            CTI(CTI_ERROR, true,
+                "can't declare %d-dimensional array of type '%s' with length "
+                "of %d-dimensional array of type '%s'",
+                ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
+                fmt_BasicType(resolved_ty.ty));
         }
 
-        vartype ty = {TYPE_TY(VARDECL_TY(node)), dims};
-
-        ATCcheckassign(RESOLVED_TY(VARDECL_EXPR(node)), ty);
+        expr = EXPRS_NEXT(expr);
     }
+
+    if (VARDECL_EXPR(node))
+        ATCcheckassign(RESOLVED_TY(VARDECL_EXPR(node)), ty);
 
     return node;
 }
