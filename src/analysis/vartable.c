@@ -2,7 +2,6 @@
 #include "palm/ctinfo.h"
 #include "palm/memory.h"
 #include "palm/str.h"
-#include "print/print.h"
 
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));
@@ -50,8 +49,8 @@ vartable_ref vartable_resolve(vartable *self, char *name) {
     }
 
     CTI(CTI_ERROR, true, "couldn't resolve variable '%s'", name);
-    CTIabortOnError();
-    exit(EXIT_FAILURE);
+    vartable_ref r = {-1, -1};
+    return r;
 }
 
 vartable_entry vartable_get(vartable *self, vartable_ref e) {

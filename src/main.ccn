@@ -47,7 +47,16 @@ phase Analysis {
 
         traversal Resolve {
             uid = AR,
-            nodes = { Program, VarDecl, Param, FunDecl, FunBody, For, Assign, Return, ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
+            nodes = { Program, VarDecl, Param, FunDecl, FunBody, For, Call, VarRef },
+            travdata {
+                user funtable_ptr funtable,
+                user vartable_ptr vartable
+            }
+        };
+
+        traversal TypeCheck {
+            uid = ATC,
+            nodes = { Program, VarDecl, FunDecl, FunBody, Assign, Return, ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
