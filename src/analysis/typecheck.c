@@ -392,6 +392,26 @@ node_st *ATCvarref(node_st *node) {
     node_st *expr = VARREF_EXPRS(node);
     while (expr) {
         count++;
+
+        if (ty.dims != 0) {
+            vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
+            if (resolved_ty.dims == 0) {
+                if (resolved_ty.ty != TY_int) {
+                    CTI(CTI_ERROR, true,
+                        "can't index into %d-dimensional array of type '%s' "
+                        "with value of type '%s'",
+                        ty.dims, fmt_BasicType(ty.ty),
+                        fmt_BasicType(resolved_ty.ty));
+                }
+            } else {
+                CTI(CTI_ERROR, true,
+                    "can't index into %d-dimensional array of type '%s' with "
+                    "%d-dimensional array of type '%s'",
+                    ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
+                    fmt_BasicType(resolved_ty.ty));
+            }
+        }
+
         expr = EXPRS_NEXT(expr);
     }
 
