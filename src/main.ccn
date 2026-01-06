@@ -4,6 +4,7 @@ start phase RootPhase {
         // Print;
         // Stats;
         Analysis;
+        Free;
     }
 };
 
@@ -63,12 +64,12 @@ phase Analysis {
                 BasicType ret_ty
             }
         };
-
-        traversal Free {
-            uid = AF,
-            nodes = { Program, Fundecl, Funbody }
-        };
     }
+};
+
+traversal Free {
+    uid = F,
+    nodes = { Program, Fundecl, Funbody }
 };
 
 enum BasicType {
