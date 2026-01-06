@@ -120,6 +120,12 @@ node_st *ATCfunbody(node_st *node) {
 node_st *ATCassign(node_st *node) {
     TRAVchildren(node);
 
+    vartable_ref r = {VARREF_N(ASSIGN_REF(node)), VARREF_L(ASSIGN_REF(node))};
+    vartable_entry e = vartable_get(DATA_ATC_GET()->vartable, r);
+
+    if (e.loopvar)
+        CTI(CTI_ERROR, true, "can't assign to loop variable");
+
     ATCcheckassign(RESOLVED_TY(ASSIGN_EXPR(node)),
                    RESOLVED_TY(ASSIGN_REF(node)));
 

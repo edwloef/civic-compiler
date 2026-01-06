@@ -27,7 +27,7 @@ node_st *ARvardecl(node_st *node) {
     }
 
     vartype ty = {TYPE_TY(VARDECL_TY(node)), dims};
-    vartable_entry e = {ID_VAL(VARDECL_ID(node)), ty, true};
+    vartable_entry e = {ID_VAL(VARDECL_ID(node)), ty, false, true};
     vartable_insert(DATA_AR_GET()->vartable, e);
 
     VARDECL_L(node) = DATA_AR_GET()->vartable->len - 1;
@@ -41,13 +41,13 @@ node_st *ARparam(node_st *node) {
     while (id) {
         dims++;
         vartype ty = {TY_int, 0};
-        vartable_entry e = {ID_VAL(IDS_ID(id)), ty, true};
+        vartable_entry e = {ID_VAL(IDS_ID(id)), ty, false, true};
         vartable_insert(DATA_AR_GET()->vartable, e);
         id = IDS_NEXT(id);
     }
 
     vartype ty = {PARAM_TY(node), dims};
-    vartable_entry e = {ID_VAL(PARAM_ID(node)), ty, true};
+    vartable_entry e = {ID_VAL(PARAM_ID(node)), ty, false, true};
     vartable_insert(DATA_AR_GET()->vartable, e);
 
     return node;
@@ -80,7 +80,7 @@ node_st *ARfor(node_st *node) {
     TRAVloop_step(node);
 
     vartype ty = {TY_int, 0};
-    vartable_entry e = {ID_VAL(FOR_ID(node)), ty, true};
+    vartable_entry e = {ID_VAL(FOR_ID(node)), ty, true, true};
     vartable_push(DATA_AR_GET()->vartable, e);
 
     int idx = DATA_AR_GET()->vartable->len - 1;
