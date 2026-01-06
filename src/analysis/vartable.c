@@ -15,7 +15,7 @@ vartable *vartable_new(vartable *parent) {
 void vartable_insert(vartable *self, vartable_entry e) {
     for (int l = self->len - 1; l >= 0; l--) {
         vartable_entry entry = self->buf[l];
-        if (entry.valid && STReq(entry.name, e.name)) {
+        if (!entry.loopvar && STReq(entry.name, e.name)) {
             CTI(CTI_ERROR, true, "couldn't re-declare variable '%s'", e.name);
             return;
         }
@@ -38,7 +38,7 @@ vartable_ref vartable_resolve(vartable *self, char *name) {
     while (self) {
         for (int l = self->len - 1; l >= 0; l--) {
             vartable_entry entry = self->buf[l];
-            if (entry.valid && STReq(entry.name, name)) {
+            if (!entry.loopvar && STReq(entry.name, name)) {
                 vartable_ref r = {n, l};
                 return r;
             }
