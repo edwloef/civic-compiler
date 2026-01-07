@@ -4,6 +4,7 @@ start phase RootPhase {
         // Print;
         // Stats;
         Analysis;
+        Opt;
         Free;
     }
 };
@@ -63,6 +64,15 @@ phase Analysis {
                 user vartable_ptr vartable,
                 BasicType ret_ty
             }
+        };
+    }
+};
+
+phase Opt {
+    actions {
+        traversal ConstFold {
+            uid = OCF,
+            nodes = { Monop, Binop, Cast }
         };
     }
 };
