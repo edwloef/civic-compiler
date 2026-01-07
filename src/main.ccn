@@ -85,7 +85,7 @@ traversal Free {
 enum BasicType {
     prefix = TY,
     values {
-        bool, int, float, void
+        bool, int, float, void, error
     }
 };
 
