@@ -141,19 +141,20 @@ node_st *ATCreturn(node_st *node) {
 
     if (RETURN_EXPR(node)) {
         vartype resolved_ty = RESOLVED_TY(RETURN_EXPR(node));
-        if (resolved_ty.ty != TY_error) {
+        if (DATA_ATC_GET()->ret_ty == TY_void) {
+            CTI(CTI_ERROR, true,
+                "can't return value from function without return value");
+        } else if (resolved_ty.ty != TY_error) {
             if (resolved_ty.dims != 0) {
                 CTI(CTI_ERROR, true,
                     "can't return %d-dimensional array of type '%s' from "
-                    "function "
-                    "returning value of type '%s'",
+                    "function returning value of type '%s'",
                     resolved_ty.dims, fmt_BasicType(resolved_ty.ty),
                     fmt_BasicType(DATA_ATC_GET()->ret_ty));
             } else if (DATA_ATC_GET()->ret_ty != resolved_ty.ty) {
                 CTI(CTI_ERROR, true,
                     "can't return value of type '%s' from function returning "
-                    "value "
-                    "of type '%s'",
+                    "value of type '%s'",
                     fmt_BasicType(resolved_ty.ty),
                     fmt_BasicType(DATA_ATC_GET()->ret_ty));
             }
