@@ -437,9 +437,8 @@ node_st *ATCvarref(node_st *node) {
         expr = EXPRS_NEXT(expr);
     }
 
-    if (count == 0) {
-    } else if (count == ty.dims) {
-        ty.dims = 0;
+    if (count <= ty.dims) {
+        ty.dims -= count;
     } else if (ty.dims == 0) {
         CTI(CTI_ERROR, true, "can't index into value of type '%s'",
             fmt_BasicType(ty.ty));
