@@ -17,6 +17,7 @@ int yyerror(char *err);
 
 %option noyywrap
 %option nounput
+%option noinput
 
 %x comment
 
