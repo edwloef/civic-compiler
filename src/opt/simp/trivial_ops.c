@@ -155,20 +155,31 @@ node_st *OSTOstmts(node_st *node) {
         }
     } break;
     case NT_WHILE:
-        if (NODE_TYPE(WHILE_EXPR(stmt)) == NT_BOOL &&
-            BOOL_VAL(WHILE_EXPR(stmt)) == false) {
-            CCNfree(stmt);
-
-            node = OSTOinlinestmts(node, NULL);
+        if (NODE_TYPE(WHILE_EXPR(stmt)) == NT_BOOL) {
+            if (BOOL_VAL(WHILE_EXPR(stmt)) == true) {
+                CCNfree(STMTS_NEXT(node));
+                STMTS_NEXT(node) = NULL;
+                CCNcycleNotify();
+            } else {
+                CCNfree(stmt);
+                node = OSTOinlinestmts(node, NULL);
+            }
         }
         break;
     case NT_DOWHILE:
-        if (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL &&
-            BOOL_VAL(DOWHILE_EXPR(stmt)) == false) {
-            node_st *stmts = DOWHILE_STMTS(stmt);
-            DOWHILE_STMTS(stmt) = NULL;
-
-            node = OSTOinlinestmts(node, stmts);
+        if (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL) {
+            if (BOOL_VAL(DOWHILE_EXPR(stmt)) == true) {
+                STMTS_STMT(node) =
+                    ASTwhile(DOWHILE_EXPR(stmt), DOWHILE_STMTS(stmt));
+                DOWHILE_EXPR(stmt) = NULL;
+                DOWHILE_STMTS(stmt) = NULL;
+                CCNfree(stmt);
+                CCNcycleNotify();
+            } else {
+                node_st *stmts = DOWHILE_STMTS(stmt);
+                DOWHILE_STMTS(stmt) = NULL;
+                node = OSTOinlinestmts(node, stmts);
+            }
         }
         break;
     default:

@@ -125,7 +125,8 @@ node_st *PRTfundecl(node_st *node) {
         printf(" {\n");
         TRAVbody(node);
         printf("}");
-    }
+    } else
+        printf(";");
     printf("\n");
     return node;
 }
@@ -226,7 +227,7 @@ node_st *PRTdowhile(node_st *node) {
     TRAVopt(DOWHILE_STMTS(node));
     printf("} while (");
     TRAVexpr(node);
-    printf(")\n");
+    printf(");\n");
     return node;
 }
 
