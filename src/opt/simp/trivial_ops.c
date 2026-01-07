@@ -182,6 +182,10 @@ node_st *OSTOstmts(node_st *node) {
             }
         }
         break;
+    case NT_RETURN:
+        CCNfree(STMTS_NEXT(node));
+        STMTS_NEXT(node) = NULL;
+        CCNcycleNotify();
     default:
         break;
     }
