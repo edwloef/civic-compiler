@@ -10,11 +10,14 @@
     } constval;                                                                \
     body;                                                                      \
     intval:                                                                    \
+    CCNcycleNotify();                                                          \
     CCNfree(node);                                                             \
     return ASTint(constval.intval);                                            \
     floatval:                                                                  \
+    CCNcycleNotify();                                                          \
     CCNfree(node);                                                             \
     return ASTfloat(constval.floatval);                                        \
+    CCNcycleNotify();                                                          \
     boolval:                                                                   \
     CCNfree(node);                                                             \
     return ASTbool(constval.boolval);
@@ -23,17 +26,17 @@
     constval.intval = op;                                                      \
     goto intval;
 #define CONST_FLOAT(op)                                                        \
-    constval.intval = op;                                                      \
+    constval.floatval = op;                                                      \
     goto floatval;
 #define CONST_BOOL(op)                                                         \
-    constval.intval = op;                                                      \
+    constval.boolval = op;                                                      \
     goto boolval;
 
 #define INT_MONOP(op) op INT_VAL(MONOP_EXPR(node))
 #define FLOAT_MONOP(op) op FLOAT_VAL(MONOP_EXPR(node))
 #define BOOL_MONOP(op) op BOOL_VAL(MONOP_EXPR(node))
 
-node_st *OCFmonop(node_st *node){CONST_SCOPE({
+node_st *OSCFmonop(node_st *node){CONST_SCOPE({
     switch (MONOP_OP(node)) {
     case MO_pos:
         switch (NODE_TYPE(MONOP_EXPR(node))) {
@@ -71,7 +74,7 @@ node_st *OCFmonop(node_st *node){CONST_SCOPE({
     FLOAT_VAL(BINOP_LEFT(node)) op FLOAT_VAL(BINOP_RIGHT(node))
 #define BOOL_BINOP(op) BOOL_VAL(BINOP_LEFT(node)) op BOOL_VAL(BINOP_RIGHT(node))
 
-node_st *OCFbinop(node_st *node){CONST_SCOPE({
+node_st *OSCFbinop(node_st *node){CONST_SCOPE({
     if (NODE_TYPE(BINOP_LEFT(node)) != NODE_TYPE(BINOP_RIGHT(node)))
         return node;
 
@@ -211,7 +214,7 @@ node_st *OCFbinop(node_st *node){CONST_SCOPE({
     }
 })}
 
-node_st *OCFcast(node_st *node) {CONST_SCOPE({
+node_st *OSCFcast(node_st *node) {CONST_SCOPE({
     switch (CAST_TY(node)) {
     case TY_int:
         switch (NODE_TYPE(CAST_EXPR(node))) {

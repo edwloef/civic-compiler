@@ -3,7 +3,7 @@
 #include "palm/dbug.h"
 #include "print/print.h"
 
-vartype RESOLVED_TY(node_st *node) {
+static vartype RESOLVED_TY(node_st *node) {
     vartype ty = {ARREXPR_RESOLVED_TY(node), ARREXPR_RESOLVED_DIMS(node)};
     return ty;
 }
