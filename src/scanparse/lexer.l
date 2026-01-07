@@ -94,10 +94,9 @@ int yyerror(char *err);
                                                            FILTER(ID);
                                                          }
 
-\r?\n.*                                                  {
+\r?\n                                                    {
                                                            globals.line += 1;
                                                            globals.col = 0;
-                                                           yyless(1);
                                                          }
 
 [ \t]                                                    { globals.col += yyleng; }
@@ -112,10 +111,9 @@ int yyerror(char *err);
                                                            globals.col += yyleng;
                                                            BEGIN(INITIAL);
                                                          }
-<comment>\r?\n.*                                         {
+<comment>\r?\n                                           {
                                                            globals.line += 1;
                                                            globals.col = 0;
-                                                           yyless(1);
                                                          }
 
 %%
