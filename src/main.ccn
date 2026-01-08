@@ -71,20 +71,20 @@ phase Analysis {
 
 phase Opt {
     actions {
-        cycle Simp {
+        cycle Canonicalize {
             actions {
-                traversal ConstFold {
-                    uid = OSCF,
+                traversal ScalarConstFold {
+                    uid = OCSCF,
                     nodes = { Monop, Binop, Cast }
                 };
 
-                traversal DeadCode {
-                    uid = OSDC,
+                traversal ControlFlow {
+                    uid = OCCF,
                     nodes = { Stmts }
                 };
 
                 traversal Identities {
-                    uid = OSI,
+                    uid = OCI,
                     nodes = { Monop, Binop, Cast }
                 };
             }

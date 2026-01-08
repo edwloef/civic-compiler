@@ -23,7 +23,7 @@ static vartype RESOLVED_TY(node_st *node) {
         CCNcycleNotify();                                                      \
     }
 
-node_st *OSImonop(node_st *node) {
+node_st *OCImonop(node_st *node) {
     TRAVchildren(node);
 
     switch (MONOP_OP(node)) {
@@ -85,7 +85,7 @@ node_st *OSImonop(node_st *node) {
     return node;
 }
 
-node_st *OSIbinop(node_st *node) {
+node_st *OCIbinop(node_st *node) {
     TRAVchildren(node);
 
     switch (BINOP_OP(node)) {
@@ -182,7 +182,7 @@ node_st *OSIbinop(node_st *node) {
     return node;
 }
 
-node_st *OSIcast(node_st *node) {
+node_st *OCIcast(node_st *node) {
     TRAVchildren(node);
 
     if (CAST_TY(node) == RESOLVED_TY(CAST_EXPR(node)).ty)

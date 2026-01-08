@@ -37,9 +37,9 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/analysis/vartable.c
     src/free/free.c
     src/globals/globals.c
-    src/opt/simp/constfold.c
-    src/opt/simp/deadcode.c
-    src/opt/simp/identities.c
+    src/opt/controlflow.c
+    src/opt/identities.c
+    src/opt/scalarconstfold.c
     src/print/print.c
     src/stats/count_ops.c
     src/stats/count_ids.c
