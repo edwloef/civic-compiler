@@ -160,7 +160,7 @@ node_st *OSCFbinop(node_st *node) {
         case NT_FLOAT:
             CONST_FLOAT(FLOAT_BINOP(+));
         case NT_BOOL:
-            CONST_BOOL(BOOL_BINOP(|));
+            CONST_BOOL(BOOL_BINOP(||));
         default:
             return node;
         }
@@ -171,7 +171,7 @@ node_st *OSCFbinop(node_st *node) {
         case NT_FLOAT:
             CONST_FLOAT(FLOAT_BINOP(*));
         case NT_BOOL:
-            CONST_BOOL(BOOL_BINOP(&));
+            CONST_BOOL(BOOL_BINOP(&&));
         default:
             return node;
         }

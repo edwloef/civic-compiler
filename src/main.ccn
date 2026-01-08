@@ -58,7 +58,7 @@ phase Analysis {
 
         traversal TypeCheck {
             uid = ATC,
-            nodes = { Program, VarDecl, FunDecl, FunBody, Assign, Return, ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
+            nodes = { Program, Stmts, IfElse, VarDecl, FunDecl, FunBody, Assign, Return, ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
@@ -136,6 +136,10 @@ node Stmts {
     children {
         Stmt stmt { constructor, mandatory },
         Stmts next { constructor }
+    },
+
+    attributes {
+        bool always_returns
     }
 };
 
@@ -249,6 +253,10 @@ node IfElse {
         Expr expr { constructor, mandatory },
         Stmts if_block { constructor },
         Stmts else_block { constructor }
+    },
+
+    attributes {
+        bool always_returns
     }
 };
 

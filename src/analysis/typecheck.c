@@ -63,6 +63,29 @@ node_st *ATCprogram(node_st *node) {
     return node;
 }
 
+node_st *ATCstmts(node_st *node) {
+    TRAVchildren(node);
+
+    STMTS_ALWAYS_RETURNS(node) =
+        NODE_TYPE(STMTS_STMT(node)) == NT_RETURN ||
+        (NODE_TYPE(STMTS_STMT(node)) == NT_IFELSE &&
+         IFELSE_ALWAYS_RETURNS(STMTS_STMT(node))) ||
+        (STMTS_NEXT(node) != NULL && STMTS_ALWAYS_RETURNS(STMTS_NEXT(node)));
+
+    return node;
+}
+
+node_st *ATCifelse(node_st *node) {
+    TRAVchildren(node);
+
+    IFELSE_ALWAYS_RETURNS(node) = IFELSE_IF_BLOCK(node) != NULL &&
+                                  STMTS_ALWAYS_RETURNS(IFELSE_IF_BLOCK(node)) &&
+                                  IFELSE_ELSE_BLOCK(node) != NULL &&
+                                  STMTS_ALWAYS_RETURNS(IFELSE_ELSE_BLOCK(node));
+
+    return node;
+}
+
 node_st *ATCvardecl(node_st *node) {
     TRAVchildren(node);
 
@@ -107,6 +130,15 @@ node_st *ATCfundecl(node_st *node) {
 
     DATA_ATC_GET()->ret_ty = prev;
     DATA_ATC_GET()->vartable = DATA_ATC_GET()->vartable->parent;
+
+    if (!FUNDECL_EXTERNAL(node) && FUNDECL_TY(node) != TY_void &&
+        (!FUNDECL_BODY(node) || !FUNBODY_STMTS(FUNDECL_BODY(node)) ||
+         !STMTS_ALWAYS_RETURNS(FUNBODY_STMTS(FUNDECL_BODY(node))))) {
+        CTI(CTI_ERROR, true,
+            "function '%s' returning value of type '%s' doesn't return in all "
+            "paths",
+            ID_VAL(FUNDECL_ID(node)), fmt_BasicType(FUNDECL_TY(node)));
+    }
 
     return node;
 }
