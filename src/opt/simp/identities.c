@@ -34,6 +34,13 @@ node_st *OSImonop(node_st *node) {
         if (NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
             MONOP_OP(MONOP_EXPR(node)) == MO_neg) {
             TAKE(MONOP_EXPR(MONOP_EXPR(node)));
+        } else if (NODE_TYPE(MONOP_EXPR(node)) == NT_BINOP &&
+                   BINOP_OP(MONOP_EXPR(node)) == BO_sub &&
+                   NODE_TYPE(BINOP_LEFT(MONOP_EXPR(node))) == NT_MONOP &&
+                   MONOP_OP(BINOP_LEFT(MONOP_EXPR(node))) == MO_neg) {
+            TAKE(MONOP_EXPR(node));
+            SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
+            BINOP_OP(node) = BO_add;
         }
         break;
     case MO_not:
