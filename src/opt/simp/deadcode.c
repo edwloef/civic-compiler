@@ -57,11 +57,8 @@ node_st *OSDCstmts(node_st *node) {
     case NT_DOWHILE:
         if (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL) {
             if (BOOL_VAL(DOWHILE_EXPR(stmt)) == true) {
-                STMTS_STMT(node) =
-                    ASTwhile(DOWHILE_EXPR(stmt), DOWHILE_STMTS(stmt));
-                DOWHILE_EXPR(stmt) = NULL;
-                DOWHILE_STMTS(stmt) = NULL;
-                CCNfree(stmt);
+                CCNfree(STMTS_NEXT(node));
+                STMTS_NEXT(node) = NULL;
                 CCNcycleNotify();
             } else {
                 node_st *stmts = DOWHILE_STMTS(stmt);
