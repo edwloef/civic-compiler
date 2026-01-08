@@ -2,41 +2,22 @@
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
 
-#define CONST_SCOPE(body)                                                      \
-    union {                                                                    \
-        int intval;                                                            \
-        float floatval;                                                        \
-        bool boolval;                                                          \
-    } constval;                                                                \
-    body;                                                                      \
-    intval:                                                                    \
-    CCNcycleNotify();                                                          \
-    CCNfree(node);                                                             \
-    return ASTint(constval.intval);                                            \
-    floatval:                                                                  \
-    CCNcycleNotify();                                                          \
-    CCNfree(node);                                                             \
-    return ASTfloat(constval.floatval);                                        \
-    CCNcycleNotify();                                                          \
-    boolval:                                                                   \
-    CCNfree(node);                                                             \
-    return ASTbool(constval.boolval);
-
-#define CONST_INT(op)                                                          \
-    constval.intval = op;                                                      \
-    goto intval;
-#define CONST_FLOAT(op)                                                        \
-    constval.floatval = op;                                                    \
-    goto floatval;
-#define CONST_BOOL(op)                                                         \
-    constval.boolval = op;                                                     \
-    goto boolval;
+#define CONST_INT(val) CONST_RETURN(ASTint(val))
+#define CONST_FLOAT(val) CONST_RETURN(ASTfloat(val))
+#define CONST_BOOL(val) CONST_RETURN(ASTbool(val))
+#define CONST_RETURN(val)                                                      \
+    {                                                                          \
+        node_st *constval = val;                                               \
+        CCNcycleNotify();                                                      \
+        CCNfree(node);                                                         \
+        return constval;                                                       \
+    }
 
 #define INT_MONOP(op) op INT_VAL(MONOP_EXPR(node))
 #define FLOAT_MONOP(op) op FLOAT_VAL(MONOP_EXPR(node))
 #define BOOL_MONOP(op) op BOOL_VAL(MONOP_EXPR(node))
 
-node_st *OSCFmonop(node_st *node){CONST_SCOPE({
+node_st *OSCFmonop(node_st *node) {
     switch (MONOP_OP(node)) {
     case MO_pos:
         switch (NODE_TYPE(MONOP_EXPR(node))) {
@@ -67,14 +48,14 @@ node_st *OSCFmonop(node_st *node){CONST_SCOPE({
         DBUG_ASSERT(false, "Unknown monop detected.");
         return node;
     }
-})}
+}
 
 #define INT_BINOP(op) INT_VAL(BINOP_LEFT(node)) op INT_VAL(BINOP_RIGHT(node))
 #define FLOAT_BINOP(op)                                                        \
     FLOAT_VAL(BINOP_LEFT(node)) op FLOAT_VAL(BINOP_RIGHT(node))
 #define BOOL_BINOP(op) BOOL_VAL(BINOP_LEFT(node)) op BOOL_VAL(BINOP_RIGHT(node))
 
-node_st *OSCFbinop(node_st *node){CONST_SCOPE({
+node_st *OSCFbinop(node_st *node) {
     if (NODE_TYPE(BINOP_LEFT(node)) != NODE_TYPE(BINOP_RIGHT(node)))
         return node;
 
@@ -212,9 +193,9 @@ node_st *OSCFbinop(node_st *node){CONST_SCOPE({
         DBUG_ASSERT(false, "Unknown binop detected.");
         return node;
     }
-})}
+}
 
-node_st *OSCFcast(node_st *node) {CONST_SCOPE({
+node_st *OSCFcast(node_st *node) {
     switch (CAST_TY(node)) {
     case TY_int:
         switch (NODE_TYPE(CAST_EXPR(node))) {
@@ -253,4 +234,4 @@ node_st *OSCFcast(node_st *node) {CONST_SCOPE({
         DBUG_ASSERT(false, "Unknown basic type detected.");
         return node;
     };
-})}
+}
