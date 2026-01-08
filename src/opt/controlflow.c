@@ -28,7 +28,7 @@ node_st *OCCFstmts(node_st *node) {
 
     node_st *stmt = STMTS_STMT(node);
     switch (NODE_TYPE(stmt)) {
-    case NT_IFELSE: {
+    case NT_IFELSE:
         if (NODE_TYPE(IFELSE_EXPR(stmt)) == NT_BOOL) {
             node_st *stmts;
             if (BOOL_VAL(IFELSE_EXPR(stmt)) == true) {
@@ -51,7 +51,7 @@ node_st *OCCFstmts(node_st *node) {
             IFELSE_IF_BLOCK(node) = IFELSE_ELSE_BLOCK(node);
             IFELSE_ELSE_BLOCK(node) = tmp;
         }
-    } break;
+        break;
     case NT_WHILE:
         if (NODE_TYPE(WHILE_EXPR(stmt)) == NT_BOOL) {
             if (BOOL_VAL(WHILE_EXPR(stmt)) == true) {

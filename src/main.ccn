@@ -59,7 +59,7 @@ phase Analysis {
 
         traversal TypeCheck {
             uid = ATC,
-            nodes = { Program, Stmts, IfElse, FunDecl, FunBody, VarDecl, Assign, Return, ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
+            nodes = { Program, Stmts, ArrExprs, FunDecl, FunBody, VarDecl, Assign, IfElse, While, DoWhile, For, Return, MonOp, BinOp, Cast, Call, VarRef, Int, Float, Bool },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
@@ -294,6 +294,16 @@ node Return {
     }
 };
 
+node Monop {
+    children {
+        Expr expr { constructor, mandatory }
+    },
+
+    attributes {
+        MonOpKind op { constructor }
+    }
+};
+
 node Binop {
     children {
         Expr left { constructor, mandatory },
@@ -302,16 +312,6 @@ node Binop {
 
     attributes {
         BinOpKind op { constructor }
-    }
-};
-
-node Monop {
-    children {
-        Expr expr { constructor, mandatory }
-    },
-
-    attributes {
-        MonOpKind op { constructor }
     }
 };
 

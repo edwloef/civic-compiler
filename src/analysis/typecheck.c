@@ -1,5 +1,4 @@
 #include "ccn/ccn.h"
-#include "ccngen/enum.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
 #include "print/print.h"
@@ -76,13 +75,68 @@ node_st *ATCstmts(node_st *node) {
     return node;
 }
 
-node_st *ATCifelse(node_st *node) {
-    TRAVchildren(node);
+node_st *ATCarrexprs(node_st *node) {
+    bool error = false;
+    vartype self_ty = {TY_void, 0};
 
-    IFELSE_ALWAYS_RETURNS(node) = IFELSE_IF_BLOCK(node) != NULL &&
-                                  STMTS_ALWAYS_RETURNS(IFELSE_IF_BLOCK(node)) &&
-                                  IFELSE_ELSE_BLOCK(node) != NULL &&
-                                  STMTS_ALWAYS_RETURNS(IFELSE_ELSE_BLOCK(node));
+    for (node_st *inner = node; inner; inner = ARREXPRS_NEXT(inner)) {
+        vartype resolved_ty = RESOLVED_TY(TRAVdo(ARREXPRS_EXPR(inner)));
+
+        if (resolved_ty.ty == TY_error) {
+            error = true;
+            continue;
+        }
+
+        if (self_ty.ty == TY_void) {
+            self_ty = resolved_ty;
+            continue;
+        }
+
+        if (self_ty.dims == resolved_ty.dims && self_ty.ty == resolved_ty.ty) {
+            continue;
+        }
+
+        if (self_ty.dims == 0) {
+            if (resolved_ty.dims == 0) {
+                CTI(CTI_ERROR, true,
+                    "encountered inconsistent array expression containing "
+                    "value of type '%s' and value of type '%s'",
+                    fmt_BasicType(self_ty.ty), fmt_BasicType(resolved_ty.ty));
+            } else {
+                CTI(CTI_ERROR, true,
+                    "encountered inconsistent array expression containing "
+                    "value of type '%s' and %d-dimensional array of type "
+                    "'%s'",
+                    fmt_BasicType(self_ty.ty), resolved_ty.dims,
+                    fmt_BasicType(resolved_ty.ty));
+            }
+        } else {
+            if (resolved_ty.dims == 0) {
+                CTI(CTI_ERROR, true,
+                    "encountered inconsistent array expression containing "
+                    "%d-dimensional array of type '%s' and value of type "
+                    "'%s'",
+                    self_ty.dims, fmt_BasicType(self_ty.ty),
+                    fmt_BasicType(resolved_ty.ty));
+            } else {
+                CTI(CTI_ERROR, true,
+                    "encountered inconsistent array expression containing "
+                    "%d-dimensional array of type '%s' and %d-dimensional "
+                    "array of type '%s'",
+                    self_ty.dims, fmt_BasicType(self_ty.ty), resolved_ty.dims,
+                    fmt_BasicType(resolved_ty.ty));
+            }
+        }
+
+        error = true;
+    }
+
+    if (error) {
+        ARREXPRS_RESOLVED_TY(node) = TY_error;
+    } else {
+        ARREXPRS_RESOLVED_TY(node) = self_ty.ty;
+    }
+    ARREXPRS_RESOLVED_DIMS(node) = self_ty.dims + 1;
 
     return node;
 }
@@ -167,6 +221,138 @@ node_st *ATCassign(node_st *node) {
     return node;
 }
 
+node_st *ATCifelse(node_st *node) {
+    TRAVchildren(node);
+
+    vartype resolved_ty = RESOLVED_TY(IFELSE_EXPR(node));
+    if (resolved_ty.ty != TY_bool) {
+        if (resolved_ty.dims == 0) {
+            CTI(CTI_ERROR, true,
+                "expected value of type 'bool' as if-condition, found value of "
+                "type '%s'",
+                fmt_BasicType(resolved_ty.ty));
+        } else {
+            CTI(CTI_ERROR, true,
+                "expected value of type 'bool' as if-condition, found "
+                "%d-dimensional array of type '%s'",
+                resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+        }
+    }
+
+    IFELSE_ALWAYS_RETURNS(node) = IFELSE_IF_BLOCK(node) != NULL &&
+                                  STMTS_ALWAYS_RETURNS(IFELSE_IF_BLOCK(node)) &&
+                                  IFELSE_ELSE_BLOCK(node) != NULL &&
+                                  STMTS_ALWAYS_RETURNS(IFELSE_ELSE_BLOCK(node));
+
+    return node;
+}
+
+node_st *ATCwhile(node_st *node) {
+    TRAVchildren(node);
+
+    vartype resolved_ty = RESOLVED_TY(WHILE_EXPR(node));
+    if (resolved_ty.ty != TY_error) {
+        if (resolved_ty.ty != TY_bool) {
+            if (resolved_ty.dims == 0) {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'bool' as while-condition, found "
+                    "value "
+                    "of type '%s'",
+                    fmt_BasicType(resolved_ty.ty));
+            } else {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'bool' as while-condition, found "
+                    "%d-dimensional array of type '%s'",
+                    resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+            }
+        }
+    }
+
+    return node;
+}
+
+node_st *ATCdowhile(node_st *node) {
+    TRAVchildren(node);
+
+    vartype resolved_ty = RESOLVED_TY(DOWHILE_EXPR(node));
+    if (resolved_ty.ty != TY_error) {
+        if (resolved_ty.ty != TY_bool) {
+            if (resolved_ty.dims == 0) {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'bool' as do-while-condition, "
+                    "found "
+                    "value of type '%s'",
+                    fmt_BasicType(resolved_ty.ty));
+            } else {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'bool' as do-while-condition, "
+                    "found "
+                    "%d-dimensional array of type '%s'",
+                    resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+            }
+        }
+    }
+
+    return node;
+}
+
+node_st *ATCfor(node_st *node) {
+    TRAVchildren(node);
+
+    vartype start_ty = RESOLVED_TY(FOR_LOOP_START(node));
+    if (start_ty.ty != TY_error) {
+        if (start_ty.ty != TY_int) {
+            if (start_ty.dims == 0) {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'int' as for-loop start value, "
+                    "found value of type '%s'",
+                    fmt_BasicType(start_ty.ty));
+            } else {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'int' as for-loop start value, "
+                    "found %d-dimensional array of type '%s'",
+                    start_ty.dims, fmt_BasicType(start_ty.ty));
+            }
+        }
+    }
+
+    vartype end_ty = RESOLVED_TY(FOR_LOOP_END(node));
+    if (end_ty.ty != TY_error) {
+        if (end_ty.ty != TY_int) {
+            if (end_ty.dims == 0) {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'int' as for-loop end value, "
+                    "found value of type '%s'",
+                    fmt_BasicType(end_ty.ty));
+            } else {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'int' as for-loop end value, "
+                    "found %d-dimensional array of type '%s'",
+                    end_ty.dims, fmt_BasicType(end_ty.ty));
+            }
+        }
+    }
+
+    vartype step_ty = RESOLVED_TY(FOR_LOOP_STEP(node));
+    if (step_ty.ty != TY_error) {
+        if (step_ty.ty != TY_int) {
+            if (step_ty.dims == 0) {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'int' as for-loop step value, "
+                    "found value of type '%s'",
+                    fmt_BasicType(step_ty.ty));
+            } else {
+                CTI(CTI_ERROR, true,
+                    "expected value of type 'int' as for-loop step value, "
+                    "found %d-dimensional array of type '%s'",
+                    step_ty.dims, fmt_BasicType(step_ty.ty));
+            }
+        }
+    }
+
+    return node;
+}
+
 node_st *ATCreturn(node_st *node) {
     TRAVchildren(node);
 
@@ -198,72 +384,6 @@ node_st *ATCreturn(node_st *node) {
                 fmt_BasicType(DATA_ATC_GET()->ret_ty));
         }
     }
-
-    return node;
-}
-
-node_st *ATCarrexprs(node_st *node) {
-    bool error = false;
-    vartype self_ty = {TY_void, 0};
-
-    for (node_st *inner = node; inner; inner = ARREXPRS_NEXT(inner)) {
-        vartype resolved_ty = RESOLVED_TY(TRAVdo(ARREXPRS_EXPR(inner)));
-
-        if (resolved_ty.ty == TY_error) {
-            error = true;
-            continue;
-        }
-
-        if (self_ty.ty == TY_void) {
-            self_ty = resolved_ty;
-            continue;
-        }
-
-        if (self_ty.dims == resolved_ty.dims && self_ty.ty == resolved_ty.ty) {
-            continue;
-        }
-
-        if (self_ty.dims == 0) {
-            if (resolved_ty.dims == 0) {
-                CTI(CTI_ERROR, true,
-                    "encountered inconsistent array expression containing "
-                    "value of type '%s' and value of type '%s'",
-                    fmt_BasicType(self_ty.ty), fmt_BasicType(resolved_ty.ty));
-            } else {
-                CTI(CTI_ERROR, true,
-                    "encountered inconsistent array expression containing "
-                    "value of type '%s' and %d-dimensional array of type "
-                    "'%s'",
-                    fmt_BasicType(self_ty.ty), resolved_ty.dims,
-                    fmt_BasicType(resolved_ty.ty));
-            }
-        } else {
-            if (resolved_ty.dims == 0) {
-                CTI(CTI_ERROR, true,
-                    "encountered inconsistent array expression containing "
-                    "%d-dimensional array of type '%s' and value of type "
-                    "'%s'",
-                    self_ty.dims, fmt_BasicType(self_ty.ty),
-                    fmt_BasicType(resolved_ty.ty));
-            } else {
-                CTI(CTI_ERROR, true,
-                    "encountered inconsistent array expression containing "
-                    "%d-dimensional array of type '%s' and %d-dimensional "
-                    "array of type '%s'",
-                    self_ty.dims, fmt_BasicType(self_ty.ty), resolved_ty.dims,
-                    fmt_BasicType(resolved_ty.ty));
-            }
-        }
-
-        error = true;
-    }
-
-    if (error) {
-        ARREXPRS_RESOLVED_TY(node) = TY_error;
-    } else {
-        ARREXPRS_RESOLVED_TY(node) = self_ty.ty;
-    }
-    ARREXPRS_RESOLVED_DIMS(node) = self_ty.dims + 1;
 
     return node;
 }
