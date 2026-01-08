@@ -159,6 +159,9 @@ node_st *OSIbinop(node_st *node) {
             (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
              BOOL_VAL(BINOP_RIGHT(node)) == true)) {
             TAKE(BINOP_LEFT(node));
+        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
+                   BOOL_VAL(BINOP_LEFT(node)) == true) {
+            TAKE(BINOP_RIGHT(node));
         }
         break;
     case BO_or:
@@ -167,6 +170,9 @@ node_st *OSIbinop(node_st *node) {
             (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
              BOOL_VAL(BINOP_RIGHT(node)) == false)) {
             TAKE(BINOP_LEFT(node));
+        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
+                   BOOL_VAL(BINOP_LEFT(node)) == false) {
+            TAKE(BINOP_RIGHT(node));
         }
         break;
     default:
