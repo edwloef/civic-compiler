@@ -23,7 +23,7 @@ static vartype RESOLVED_TY(node_st *node) {
         CCNcycleNotify();                                                      \
     }
 
-node_st *OSTOmonop(node_st *node) {
+node_st *OSImonop(node_st *node) {
     TRAVchildren(node);
 
     if (MONOP_OP(node) == MO_pos) {
@@ -40,11 +40,10 @@ node_st *OSTOmonop(node_st *node) {
     return node;
 }
 
-node_st *OSTObinop(node_st *node) {
+node_st *OSIbinop(node_st *node) {
     TRAVchildren(node);
 
     switch (BINOP_OP(node)) {
-
     case BO_sub:
         if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
              INT_VAL(BINOP_LEFT(node)) == 0) ||
@@ -148,7 +147,7 @@ node_st *OSTObinop(node_st *node) {
     return node;
 }
 
-node_st *OSTOcast(node_st *node) {
+node_st *OSIcast(node_st *node) {
     TRAVchildren(node);
 
     if (CAST_TY(node) == RESOLVED_TY(CAST_EXPR(node)).ty)
@@ -157,7 +156,7 @@ node_st *OSTOcast(node_st *node) {
     return node;
 }
 
-node_st *OSTOinlinestmts(node_st *node, node_st *stmts) {
+node_st *OSIinlinestmts(node_st *node, node_st *stmts) {
     TAKE(STMTS_NEXT(node));
 
     if (stmts) {
@@ -171,7 +170,7 @@ node_st *OSTOinlinestmts(node_st *node, node_st *stmts) {
     }
 }
 
-node_st *OSTOstmts(node_st *node) {
+node_st *OSIstmts(node_st *node) {
     TRAVchildren(node);
 
     node_st *stmt = STMTS_STMT(node);
@@ -187,7 +186,7 @@ node_st *OSTOstmts(node_st *node) {
                 IFELSE_ELSE_BLOCK(stmt) = NULL;
             }
 
-            node = OSTOinlinestmts(node, stmts);
+            node = OSIinlinestmts(node, stmts);
         }
     } break;
     case NT_WHILE:
@@ -198,7 +197,7 @@ node_st *OSTOstmts(node_st *node) {
                 CCNcycleNotify();
             } else {
                 CCNfree(stmt);
-                node = OSTOinlinestmts(node, NULL);
+                node = OSIinlinestmts(node, NULL);
             }
         }
         break;
@@ -214,7 +213,7 @@ node_st *OSTOstmts(node_st *node) {
             } else {
                 node_st *stmts = DOWHILE_STMTS(stmt);
                 DOWHILE_STMTS(stmt) = NULL;
-                node = OSTOinlinestmts(node, stmts);
+                node = OSIinlinestmts(node, stmts);
             }
         }
         break;

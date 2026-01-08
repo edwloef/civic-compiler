@@ -77,8 +77,8 @@ phase Opt {
                     nodes = { Monop, Binop, Cast }
                 };
 
-                traversal TrivialOps {
-                    uid = OSTO,
+                traversal Identities {
+                    uid = OSI,
                     nodes = { Monop, Binop, Cast, Stmts }
                 };
             }
