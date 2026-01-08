@@ -94,7 +94,7 @@ int yyerror(char *err);
                                                            FILTER(ID);
                                                          }
 
-\r?\n                                                    {
+\n                                                       {
                                                            globals.line += 1;
                                                            globals.col = 0;
                                                          }
@@ -106,14 +106,16 @@ int yyerror(char *err);
                                                            globals.col += yyleng;
                                                            BEGIN(comment);
                                                          }
-<comment>([^*]|\*[^/])*                                  { globals.col += yyleng; }
-<comment>"*/"                                            {
+<comment>{
+  ([^*\n]*)|("*"+[^*/\n]*)                               { globals.col += yyleng; }
+  "*/"                                                   {
                                                            globals.col += yyleng;
                                                            BEGIN(INITIAL);
                                                          }
-<comment>\r?\n                                           {
+  \n                                                     {
                                                            globals.line += 1;
                                                            globals.col = 0;
                                                          }
+}
 
 %%
