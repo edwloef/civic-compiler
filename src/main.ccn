@@ -77,9 +77,14 @@ phase Opt {
                     nodes = { Monop, Binop, Cast }
                 };
 
+                traversal DeadCode {
+                    uid = OSDC,
+                    nodes = { Stmts }
+                };
+
                 traversal Identities {
                     uid = OSI,
-                    nodes = { Monop, Binop, Cast, Stmts }
+                    nodes = { Monop, Binop, Cast }
                 };
             }
         };
