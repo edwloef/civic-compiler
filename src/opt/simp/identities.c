@@ -28,13 +28,44 @@ node_st *OSImonop(node_st *node) {
 
     if (MONOP_OP(node) == MO_pos) {
         TAKE(MONOP_EXPR(node));
-    } else if ((MONOP_OP(node) == MO_neg &&
-                NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
-                MONOP_OP(MONOP_EXPR(node)) == MO_neg) ||
-               (MONOP_OP(node) == MO_not &&
-                NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
-                MONOP_OP(MONOP_EXPR(node)) == MO_not)) {
+    } else if (MONOP_OP(node) == MO_neg &&
+               NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
+               MONOP_OP(MONOP_EXPR(node)) == MO_neg) {
         TAKE(MONOP_EXPR(MONOP_EXPR(node)))
+    } else if (MONOP_OP(node) == MO_not) {
+        if (NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
+            MONOP_OP(MONOP_EXPR(node)) == MO_not) {
+            TAKE(MONOP_EXPR(MONOP_EXPR(node)))
+        } else if (NODE_TYPE(MONOP_EXPR(node)) == NT_BINOP) {
+            switch (BINOP_OP(MONOP_EXPR(node))) {
+            case BO_lt:
+                TAKE(MONOP_EXPR(node));
+                BINOP_OP(node) = BO_ge;
+                break;
+            case BO_le:
+                TAKE(MONOP_EXPR(node));
+                BINOP_OP(node) = BO_gt;
+                break;
+            case BO_gt:
+                TAKE(MONOP_EXPR(node));
+                BINOP_OP(node) = BO_le;
+                break;
+            case BO_ge:
+                TAKE(MONOP_EXPR(node));
+                BINOP_OP(node) = BO_lt;
+                break;
+            case BO_eq:
+                TAKE(MONOP_EXPR(node));
+                BINOP_OP(node) = BO_ne;
+                break;
+            case BO_ne:
+                TAKE(MONOP_EXPR(node));
+                BINOP_OP(node) = BO_eq;
+                break;
+            default:
+                break;
+            }
+        }
     }
 
     return node;
