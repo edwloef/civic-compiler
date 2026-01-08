@@ -26,13 +26,17 @@ static vartype RESOLVED_TY(node_st *node) {
 node_st *OSImonop(node_st *node) {
     TRAVchildren(node);
 
-    if (MONOP_OP(node) == MO_pos) {
+    switch (MONOP_OP(node)) {
+    case MO_pos:
         TAKE(MONOP_EXPR(node));
-    } else if (MONOP_OP(node) == MO_neg &&
-               NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
-               MONOP_OP(MONOP_EXPR(node)) == MO_neg) {
-        TAKE(MONOP_EXPR(MONOP_EXPR(node)))
-    } else if (MONOP_OP(node) == MO_not) {
+        break;
+    case MO_neg:
+        if (NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
+            MONOP_OP(MONOP_EXPR(node)) == MO_neg) {
+            TAKE(MONOP_EXPR(MONOP_EXPR(node)));
+        }
+        break;
+    case MO_not:
         if (NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
             MONOP_OP(MONOP_EXPR(node)) == MO_not) {
             TAKE(MONOP_EXPR(MONOP_EXPR(node)))
@@ -66,6 +70,9 @@ node_st *OSImonop(node_st *node) {
                 break;
             }
         }
+        break;
+    default:
+        break;
     }
 
     return node;
