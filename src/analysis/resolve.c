@@ -1,53 +1,15 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 
-void ARinit(void) { DATA_AR_GET()->vartable = vartable_new(NULL); }
+void ARinit(void) {}
 
 void ARfini(void) {}
 
 node_st *ARprogram(node_st *node) {
     DATA_AR_GET()->funtable = PROGRAM_FUNTABLE(node);
+    DATA_AR_GET()->vartable = PROGRAM_VARTABLE(node);
 
     TRAVchildren(node);
-
-    PROGRAM_VARTABLE(node) = DATA_AR_GET()->vartable;
-
-    return node;
-}
-
-node_st *ARvardecl(node_st *node) {
-    TRAVchildren(node);
-
-    int dims = 0;
-    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
-    while (expr) {
-        dims++;
-        expr = EXPRS_NEXT(expr);
-    }
-
-    vartype ty = {TYPE_TY(VARDECL_TY(node)), dims};
-    vartable_entry e = {ID_VAL(VARDECL_ID(node)), ty, false};
-    vartable_insert(DATA_AR_GET()->vartable, e);
-
-    VARDECL_L(node) = DATA_AR_GET()->vartable->len - 1;
-
-    return node;
-}
-
-node_st *ARparam(node_st *node) {
-    int dims = 0;
-    node_st *id = PARAM_IDS(node);
-    while (id) {
-        dims++;
-        vartype ty = {TY_int, 0};
-        vartable_entry e = {ID_VAL(IDS_ID(id)), ty, false};
-        vartable_insert(DATA_AR_GET()->vartable, e);
-        id = IDS_NEXT(id);
-    }
-
-    vartype ty = {PARAM_TY(node), dims};
-    vartable_entry e = {ID_VAL(PARAM_ID(node)), ty, false};
-    vartable_insert(DATA_AR_GET()->vartable, e);
 
     return node;
 }
@@ -73,13 +35,51 @@ node_st *ARfunbody(node_st *node) {
     return node;
 }
 
+node_st *ARparam(node_st *node) {
+    int dims = 0;
+    node_st *expr = TYPE_EXPRS(PARAM_TY(node));
+    while (expr) {
+        dims++;
+        vartable_entry e = {
+            ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
+        vartable_insert(DATA_AR_GET()->vartable, e);
+        expr = EXPRS_NEXT(expr);
+    }
+
+    vartable_entry e = {
+        ID_VAL(PARAM_ID(node)), {TYPE_TY(PARAM_TY(node)), dims}, false};
+    vartable_insert(DATA_AR_GET()->vartable, e);
+
+    return node;
+}
+
+node_st *ARvardecl(node_st *node) {
+    TRAVchildren(node);
+
+    int dims = 0;
+    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
+    while (expr) {
+        dims++;
+        expr = EXPRS_NEXT(expr);
+    }
+
+    if (!VARDECL_GLOBAL(node)) {
+        vartable_entry e = {
+            ID_VAL(VARDECL_ID(node)), {TYPE_TY(VARDECL_TY(node)), dims}, false};
+        vartable_insert(DATA_AR_GET()->vartable, e);
+
+        VARDECL_L(node) = DATA_AR_GET()->vartable->len - 1;
+    }
+
+    return node;
+}
+
 node_st *ARfor(node_st *node) {
     TRAVloop_start(node);
     TRAVloop_end(node);
     TRAVloop_step(node);
 
-    vartype ty = {TY_int, 0};
-    vartable_entry e = {ID_VAL(FOR_ID(node)), ty, false};
+    vartable_entry e = {ID_VAL(FOR_ID(node)), {TY_int, 0}, false};
     vartable_push(DATA_AR_GET()->vartable, e);
 
     int idx = DATA_AR_GET()->vartable->len - 1;

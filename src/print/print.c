@@ -144,6 +144,8 @@ node_st *PRTvardecls(node_st *node) {
 node_st *PRTvardecl(node_st *node) {
     if (VARDECL_EXPORTED(node))
         printf("export ");
+    if (VARDECL_EXTERNAL(node))
+        printf("extern ");
     TRAVty(node);
     printf(" ");
     TRAVid(node);
@@ -170,12 +172,7 @@ node_st *PRTparams(node_st *node) {
 }
 
 node_st *PRTparam(node_st *node) {
-    printf("%s", fmt_BasicType(PARAM_TY(node)));
-    if (PARAM_IDS(node)) {
-        printf("[");
-        TRAVids(node);
-        printf("]");
-    }
+    TRAVty(node);
     printf(" ");
     TRAVid(node);
     return node;
@@ -276,15 +273,6 @@ node_st *PRTcast(node_st *node) {
     printf("((%s) ", fmt_BasicType(CAST_TY(node)));
     TRAVexpr(node);
     printf(")");
-    return node;
-}
-
-node_st *PRTids(node_st *node) {
-    TRAVid(node);
-    if (IDS_NEXT(node)) {
-        printf(", ");
-        TRAVnext(node);
-    }
     return node;
 }
 

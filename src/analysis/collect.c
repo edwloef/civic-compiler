@@ -1,6 +1,9 @@
 #include "ccn/ccn.h"
 
-void ACinit(void) { DATA_AC_GET()->funtable = funtable_new(NULL); }
+void ACinit(void) {
+    DATA_AC_GET()->funtable = funtable_new(NULL);
+    DATA_AC_GET()->vartable = vartable_new(NULL);
+}
 
 void ACfini(void) {}
 
@@ -8,6 +11,7 @@ node_st *ACprogram(node_st *node) {
     TRAVchildren(node);
 
     PROGRAM_FUNTABLE(node) = DATA_AC_GET()->funtable;
+    PROGRAM_VARTABLE(node) = DATA_AC_GET()->vartable;
 
     return node;
 }
@@ -17,13 +21,13 @@ node_st *ACfundecl(node_st *node) {
     node_st *arg = FUNDECL_PARAMS(node);
     while (arg) {
         int dims = 0;
-        node_st *id = PARAM_IDS(PARAMS_PARAM(arg));
+        node_st *id = TYPE_EXPRS(PARAM_TY(PARAMS_PARAM(arg)));
         while (id) {
             dims++;
-            id = IDS_NEXT(id);
+            id = EXPRS_NEXT(id);
         }
 
-        vartype e = {PARAM_TY(PARAMS_PARAM(arg)), dims};
+        vartype e = {TYPE_TY(PARAM_TY(PARAMS_PARAM(arg))), dims};
         funtype_push(&ty, e);
         arg = PARAMS_NEXT(arg);
     }
@@ -43,6 +47,30 @@ node_st *ACfunbody(node_st *node) {
     FUNBODY_FUNTABLE(node) = DATA_AC_GET()->funtable;
 
     DATA_AC_GET()->funtable = DATA_AC_GET()->funtable->parent;
+
+    return node;
+}
+
+node_st *ACvardecl(node_st *node) {
+    int dims = 0;
+    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
+    while (expr) {
+        dims++;
+        if (VARDECL_EXTERNAL(node)) {
+            vartable_entry e = {
+                ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
+            vartable_insert(DATA_AC_GET()->vartable, e);
+        }
+        expr = EXPRS_NEXT(expr);
+    }
+
+    if (VARDECL_GLOBAL(node)) {
+        vartable_entry e = {
+            ID_VAL(VARDECL_ID(node)), {TYPE_TY(VARDECL_TY(node)), dims}, false};
+        vartable_insert(DATA_AC_GET()->vartable, e);
+
+        VARDECL_L(node) = DATA_AC_GET()->vartable->len - 1;
+    }
 
     return node;
 }

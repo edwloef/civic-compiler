@@ -91,11 +91,15 @@ decl: KW_EXTERN funheader SEMICOLON
       }
     | KW_EXTERN basictype id SEMICOLON
       {
-        $$ = ASTparam($3, NULL, $2);
+        $$ = ASTvardecl(ASTtype(NULL, $2), $3, NULL);
+        VARDECL_EXTERNAL($$) = true;
+        VARDECL_GLOBAL($$) = true;
       }
     | KW_EXTERN basictype BRACKET_L ids BRACKET_R id SEMICOLON
       {
-        $$ = ASTparam($6, $4, $2);
+        $$ = ASTvardecl(ASTtype($4, $2), $6, NULL);
+        VARDECL_EXTERNAL($$) = true;
+        VARDECL_GLOBAL($$) = true;
       }
     | KW_EXPORT fundef
       {
@@ -106,6 +110,7 @@ decl: KW_EXTERN funheader SEMICOLON
       {
         $$ = $2;
         VARDECL_EXPORTED($$) = true;
+        VARDECL_GLOBAL($$) = true;
       }
     | fundef
       {
@@ -114,6 +119,7 @@ decl: KW_EXTERN funheader SEMICOLON
     | vardecl
       {
         $$ = $1;
+        VARDECL_GLOBAL($$) = true;
       }
     ;
 
@@ -431,29 +437,29 @@ id: ID
 
 params: basictype id COMMA params
         {
-          $$ = ASTparams(ASTparam($2, NULL, $1), $4);
+          $$ = ASTparams(ASTparam(ASTtype(NULL, $1), $2), $4);
         }
       | basictype BRACKET_L ids BRACKET_R id COMMA params
         {
-          $$ = ASTparams(ASTparam($5, $3, $1), $7);
+          $$ = ASTparams(ASTparam(ASTtype($3, $1), $5), $7);
         }
       | basictype id
         {
-          $$ = ASTparams(ASTparam($2, NULL, $1), NULL);
+          $$ = ASTparams(ASTparam(ASTtype(NULL, $1), $2), NULL);
         }
       | basictype BRACKET_L ids BRACKET_R id
         {
-          $$ = ASTparams(ASTparam($5, $3, $1), NULL);
+          $$ = ASTparams(ASTparam(ASTtype($3, $1), $5), NULL);
         }
       ;
 
 ids: id COMMA ids
      {
-       $$ = ASTids($1, $3);
+       $$ = ASTexprs(ASTvarref($1, NULL), $3);
      }
    | id
      {
-       $$ = ASTids($1, NULL);
+       $$ = ASTexprs(ASTvarref($1, NULL), NULL);
      }
    ;
 

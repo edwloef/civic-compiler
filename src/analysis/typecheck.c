@@ -86,6 +86,38 @@ node_st *ATCifelse(node_st *node) {
     return node;
 }
 
+node_st *ATCfundecl(node_st *node) {
+    enum BasicType prev = DATA_ATC_GET()->ret_ty;
+    DATA_ATC_GET()->ret_ty = FUNDECL_TY(node);
+    DATA_ATC_GET()->vartable = FUNDECL_VARTABLE(node);
+
+    TRAVchildren(node);
+
+    DATA_ATC_GET()->ret_ty = prev;
+    DATA_ATC_GET()->vartable = DATA_ATC_GET()->vartable->parent;
+
+    if (!FUNDECL_EXTERNAL(node) && FUNDECL_TY(node) != TY_void &&
+        (!FUNDECL_BODY(node) || !FUNBODY_STMTS(FUNDECL_BODY(node)) ||
+         !STMTS_ALWAYS_RETURNS(FUNBODY_STMTS(FUNDECL_BODY(node))))) {
+        CTI(CTI_ERROR, true,
+            "function '%s' returning value of type '%s' doesn't return in all "
+            "paths",
+            ID_VAL(FUNDECL_ID(node)), fmt_BasicType(FUNDECL_TY(node)));
+    }
+
+    return node;
+}
+
+node_st *ATCfunbody(node_st *node) {
+    DATA_ATC_GET()->funtable = FUNBODY_FUNTABLE(node);
+
+    TRAVchildren(node);
+
+    DATA_ATC_GET()->funtable = DATA_ATC_GET()->funtable->parent;
+
+    return node;
+}
+
 node_st *ATCvardecl(node_st *node) {
     TRAVchildren(node);
 
@@ -117,38 +149,6 @@ node_st *ATCvardecl(node_st *node) {
 
     if (VARDECL_EXPR(node))
         ATCcheckassign(RESOLVED_TY(VARDECL_EXPR(node)), ty);
-
-    return node;
-}
-
-node_st *ATCfundecl(node_st *node) {
-    enum BasicType prev = DATA_ATC_GET()->ret_ty;
-    DATA_ATC_GET()->ret_ty = FUNDECL_TY(node);
-    DATA_ATC_GET()->vartable = FUNDECL_VARTABLE(node);
-
-    TRAVchildren(node);
-
-    DATA_ATC_GET()->ret_ty = prev;
-    DATA_ATC_GET()->vartable = DATA_ATC_GET()->vartable->parent;
-
-    if (!FUNDECL_EXTERNAL(node) && FUNDECL_TY(node) != TY_void &&
-        (!FUNDECL_BODY(node) || !FUNBODY_STMTS(FUNDECL_BODY(node)) ||
-         !STMTS_ALWAYS_RETURNS(FUNBODY_STMTS(FUNDECL_BODY(node))))) {
-        CTI(CTI_ERROR, true,
-            "function '%s' returning value of type '%s' doesn't return in all "
-            "paths",
-            ID_VAL(FUNDECL_ID(node)), fmt_BasicType(FUNDECL_TY(node)));
-    }
-
-    return node;
-}
-
-node_st *ATCfunbody(node_st *node) {
-    DATA_ATC_GET()->funtable = FUNBODY_FUNTABLE(node);
-
-    TRAVchildren(node);
-
-    DATA_ATC_GET()->funtable = DATA_ATC_GET()->funtable->parent;
 
     return node;
 }
