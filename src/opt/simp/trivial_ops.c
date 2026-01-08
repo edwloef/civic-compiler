@@ -5,20 +5,37 @@ static vartype RESOLVED_TY(node_st *node) {
     return ty;
 }
 
-#define TAKE(e)                                                                \
+#define TAKE(n)                                                                \
     {                                                                          \
-        node_st *tmp = e;                                                      \
-        e = NULL;                                                              \
+        node_st *tmp = n;                                                      \
+        n = NULL;                                                              \
         CCNfree(node);                                                         \
         CCNcycleNotify();                                                      \
         node = tmp;                                                            \
     }
 
+#define SWAP(n, e)                                                             \
+    {                                                                          \
+        node_st *tmp = n;                                                      \
+        n = e;                                                                 \
+        e = NULL;                                                              \
+        CCNfree(tmp);                                                          \
+        CCNcycleNotify();                                                      \
+    }
+
 node_st *OSTOmonop(node_st *node) {
     TRAVchildren(node);
 
-    if (MONOP_OP(node) == MO_pos)
+    if (MONOP_OP(node) == MO_pos) {
         TAKE(MONOP_EXPR(node));
+    } else if ((MONOP_OP(node) == MO_neg &&
+                NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
+                MONOP_OP(MONOP_EXPR(node)) == MO_neg) ||
+               (MONOP_OP(node) == MO_not &&
+                NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
+                MONOP_OP(MONOP_EXPR(node)) == MO_not)) {
+        TAKE(MONOP_EXPR(MONOP_EXPR(node)))
+    }
 
     return node;
 }
@@ -40,6 +57,10 @@ node_st *OSTObinop(node_st *node) {
                     FLOAT_VAL(BINOP_RIGHT(node)) == 0.0)) {
             TAKE(BINOP_LEFT(node));
             node = ASTmonop(node, MO_neg);
+        } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
+            BINOP_OP(node) = BO_add;
+            SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
         }
         break;
     case BO_div:
@@ -65,6 +86,10 @@ node_st *OSTObinop(node_st *node) {
                    (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
                     BOOL_VAL(BINOP_RIGHT(node)) == false)) {
             TAKE(BINOP_LEFT(node));
+        } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
+            BINOP_OP(node) = BO_sub;
+            SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
         }
         break;
     case BO_mul:
@@ -90,6 +115,14 @@ node_st *OSTObinop(node_st *node) {
             (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
              BOOL_VAL(BINOP_RIGHT(node)) == true)) {
             TAKE(BINOP_LEFT(node));
+        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_LEFT(node)) == MO_not &&
+                   NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_RIGHT(node)) == MO_not) {
+            BINOP_OP(node) = BO_or;
+            SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
+            SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
+            node = ASTmonop(node, MO_not);
         }
         break;
     case BO_or:
@@ -98,6 +131,14 @@ node_st *OSTObinop(node_st *node) {
             (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
              BOOL_VAL(BINOP_RIGHT(node)) == false)) {
             TAKE(BINOP_LEFT(node));
+        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_LEFT(node)) == MO_not &&
+                   NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_RIGHT(node)) == MO_not) {
+            BINOP_OP(node) = BO_and;
+            SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
+            SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
+            node = ASTmonop(node, MO_not);
         }
         break;
     default:
@@ -116,22 +157,17 @@ node_st *OSTOcast(node_st *node) {
     return node;
 }
 
-node_st *OSTOinlinestmts(node_st *l, node_st *r) {
-    CCNcycleNotify();
+node_st *OSTOinlinestmts(node_st *node, node_st *stmts) {
+    TAKE(STMTS_NEXT(node));
 
-    node_st *tmp = STMTS_NEXT(l);
-    STMTS_NEXT(l) = NULL;
-    CCNfree(l);
-    l = tmp;
-
-    if (r) {
-        node_st *tmp = r;
+    if (stmts) {
+        node_st *tmp = stmts;
         while (STMTS_NEXT(tmp))
             tmp = STMTS_NEXT(tmp);
-        STMTS_NEXT(tmp) = l;
-        return r;
+        STMTS_NEXT(tmp) = node;
+        return stmts;
     } else {
-        return l;
+        return node;
     }
 }
 

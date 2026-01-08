@@ -203,9 +203,9 @@ node_st *PRTcall(node_st *node) {
 }
 
 node_st *PRTifelse(node_st *node) {
-    printf("if (");
+    printf("if ");
     TRAVexpr(node);
-    printf(") {\n");
+    printf(" {\n");
     TRAVopt(IFELSE_IF_BLOCK(node));
     printf("} else {\n");
     TRAVopt(IFELSE_ELSE_BLOCK(node));
@@ -214,9 +214,9 @@ node_st *PRTifelse(node_st *node) {
 }
 
 node_st *PRTwhile(node_st *node) {
-    printf("while (");
+    printf("while ");
     TRAVexpr(node);
-    printf(") {\n");
+    printf(" {\n");
     TRAVopt(WHILE_STMTS(node));
     printf("}\n");
     return node;
@@ -225,9 +225,9 @@ node_st *PRTwhile(node_st *node) {
 node_st *PRTdowhile(node_st *node) {
     printf("do {\n");
     TRAVopt(DOWHILE_STMTS(node));
-    printf("} while (");
+    printf("} while ");
     TRAVexpr(node);
-    printf(");\n");
+    printf(";\n");
     return node;
 }
 
