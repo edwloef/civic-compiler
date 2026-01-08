@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "ccngen/enum.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
 #include "print/print.h"
@@ -125,8 +126,8 @@ node_st *ATCvardecl(node_st *node) {
     vartable_entry e = vartable_get(DATA_ATC_GET()->vartable, r);
     vartype ty = e.ty;
 
-    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
-    while (expr) {
+    for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
+         expr = EXPRS_NEXT(expr)) {
         vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
         if (resolved_ty.dims == 0) {
             if (resolved_ty.ty != TY_int) {
@@ -143,8 +144,6 @@ node_st *ATCvardecl(node_st *node) {
                 ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
                 fmt_BasicType(resolved_ty.ty));
         }
-
-        expr = EXPRS_NEXT(expr);
     }
 
     if (VARDECL_EXPR(node))
@@ -435,37 +434,40 @@ node_st *ATCcall(node_st *node) {
     for (int i = 0; i < e.len; i++) {
         vartype expected_ty = e.buf[i];
         vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(arg));
-
-        if (resolved_ty.ty != TY_error &&
-            (expected_ty.dims != resolved_ty.dims ||
-             expected_ty.ty != resolved_ty.ty)) {
-            if (expected_ty.dims == 0) {
-                if (resolved_ty.dims == 0) {
-                    CTI(CTI_ERROR, true,
-                        "expected parameter of type '%s', found argument of "
-                        "type '%s'",
-                        fmt_BasicType(expected_ty.ty),
-                        fmt_BasicType(resolved_ty.ty));
+        if (resolved_ty.ty != TY_error) {
+            if ((expected_ty.dims != resolved_ty.dims ||
+                 expected_ty.ty != resolved_ty.ty)) {
+                if (expected_ty.dims == 0) {
+                    if (resolved_ty.dims == 0) {
+                        CTI(CTI_ERROR, true,
+                            "expected parameter of type '%s', found argument "
+                            "of "
+                            "type '%s'",
+                            fmt_BasicType(expected_ty.ty),
+                            fmt_BasicType(resolved_ty.ty));
+                    } else {
+                        CTI(CTI_ERROR, true,
+                            "expected parameter of type '%s', found "
+                            "%d-dimensional "
+                            "array of type '%s'",
+                            fmt_BasicType(expected_ty.ty), resolved_ty.dims,
+                            fmt_BasicType(resolved_ty.ty));
+                    }
                 } else {
-                    CTI(CTI_ERROR, true,
-                        "expected parameter of type '%s', found %d-dimensional "
-                        "array of type '%s'",
-                        fmt_BasicType(expected_ty.ty), resolved_ty.dims,
-                        fmt_BasicType(resolved_ty.ty));
-                }
-            } else {
-                if (resolved_ty.dims == 0) {
-                    CTI(CTI_ERROR, true,
-                        "expected %d-dimensional array of argument '%s', found "
-                        "argument of type '%s'",
-                        expected_ty.dims, fmt_BasicType(expected_ty.ty),
-                        fmt_BasicType(resolved_ty.ty));
-                } else {
-                    CTI(CTI_ERROR, true,
-                        "expected %d-dimensional array of type '%s', found "
-                        "%d-dimensional array of type '%s'",
-                        expected_ty.dims, fmt_BasicType(expected_ty.ty),
-                        resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+                    if (resolved_ty.dims == 0) {
+                        CTI(CTI_ERROR, true,
+                            "expected %d-dimensional array of argument '%s', "
+                            "found "
+                            "argument of type '%s'",
+                            expected_ty.dims, fmt_BasicType(expected_ty.ty),
+                            fmt_BasicType(resolved_ty.ty));
+                    } else {
+                        CTI(CTI_ERROR, true,
+                            "expected %d-dimensional array of type '%s', found "
+                            "%d-dimensional array of type '%s'",
+                            expected_ty.dims, fmt_BasicType(expected_ty.ty),
+                            resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+                    }
                 }
             }
         }
@@ -485,43 +487,46 @@ node_st *ATCvarref(node_st *node) {
     vartable_ref r = {VARREF_N(node), VARREF_L(node)};
     vartype ty = vartable_get(DATA_ATC_GET()->vartable, r).ty;
 
-    int count = 0;
-    node_st *expr = VARREF_EXPRS(node);
-    while (expr) {
-        count++;
-
+    for (node_st *expr = VARREF_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
         if (ty.ty != TY_error && ty.dims != 0) {
             vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
-            if (resolved_ty.dims == 0) {
-                if (resolved_ty.ty != TY_int) {
+            if (resolved_ty.ty != TY_error) {
+                if (resolved_ty.dims == 0) {
+                    if (resolved_ty.ty != TY_int) {
+                        CTI(CTI_ERROR, true,
+                            "can't index into %d-dimensional array of type "
+                            "'%s' "
+                            "with value of type '%s'",
+                            ty.dims, fmt_BasicType(ty.ty),
+                            fmt_BasicType(resolved_ty.ty));
+                    }
+                } else {
                     CTI(CTI_ERROR, true,
                         "can't index into %d-dimensional array of type '%s' "
-                        "with value of type '%s'",
-                        ty.dims, fmt_BasicType(ty.ty),
+                        "with "
+                        "%d-dimensional array of type '%s'",
+                        ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
                         fmt_BasicType(resolved_ty.ty));
                 }
-            } else {
-                CTI(CTI_ERROR, true,
-                    "can't index into %d-dimensional array of type '%s' with "
-                    "%d-dimensional array of type '%s'",
-                    ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
-                    fmt_BasicType(resolved_ty.ty));
             }
         }
+    }
 
-        expr = EXPRS_NEXT(expr);
+    int index_count = 0;
+    for (node_st *expr = VARREF_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
+        index_count++;
     }
 
     if (ty.ty == TY_error) {
-    } else if (count <= ty.dims) {
-        ty.dims -= count;
+    } else if (index_count <= ty.dims) {
+        ty.dims -= index_count;
     } else if (ty.dims == 0) {
         CTI(CTI_ERROR, true, "can't index into value of type '%s'",
             fmt_BasicType(ty.ty));
     } else {
         CTI(CTI_ERROR, true,
             "can't index %d times into %d-dimensional array of type '%s'",
-            count, ty.dims, fmt_BasicType(ty.ty));
+            index_count, ty.dims, fmt_BasicType(ty.ty));
         ty.dims = 0;
     }
 

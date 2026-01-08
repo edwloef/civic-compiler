@@ -36,14 +36,17 @@ node_st *ARfunbody(node_st *node) {
 }
 
 node_st *ARparam(node_st *node) {
-    int dims = 0;
-    node_st *expr = TYPE_EXPRS(PARAM_TY(node));
-    while (expr) {
-        dims++;
+    for (node_st *expr = TYPE_EXPRS(PARAM_TY(node)); expr;
+         expr = EXPRS_NEXT(expr)) {
         vartable_entry e = {
             ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
         vartable_insert(DATA_AR_GET()->vartable, e);
-        expr = EXPRS_NEXT(expr);
+    }
+
+    int dims = 0;
+    for (node_st *expr = TYPE_EXPRS(PARAM_TY(node)); expr;
+         expr = EXPRS_NEXT(expr)) {
+        dims++;
     }
 
     vartable_entry e = {
@@ -58,10 +61,9 @@ node_st *ARvardecl(node_st *node) {
         TRAVchildren(node);
 
         int dims = 0;
-        node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
-        while (expr) {
+        for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
+             expr = EXPRS_NEXT(expr)) {
             dims++;
-            expr = EXPRS_NEXT(expr);
         }
 
         vartable_entry e = {
@@ -94,11 +96,9 @@ node_st *ARfor(node_st *node) {
 node_st *ARcall(node_st *node) {
     TRAVchildren(node);
 
-    node_st *arg = CALL_EXPRS(node);
     int param_count = 0;
-    while (arg) {
+    for (node_st *arg = CALL_EXPRS(node); arg; arg = EXPRS_NEXT(arg)) {
         param_count++;
-        arg = EXPRS_NEXT(arg);
     }
 
     funtable_ref r = funtable_resolve(DATA_AR_GET()->funtable,
