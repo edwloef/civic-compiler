@@ -26,10 +26,10 @@
     constval.intval = op;                                                      \
     goto intval;
 #define CONST_FLOAT(op)                                                        \
-    constval.floatval = op;                                                      \
+    constval.floatval = op;                                                    \
     goto floatval;
 #define CONST_BOOL(op)                                                         \
-    constval.boolval = op;                                                      \
+    constval.boolval = op;                                                     \
     goto boolval;
 
 #define INT_MONOP(op) op INT_VAL(MONOP_EXPR(node))
