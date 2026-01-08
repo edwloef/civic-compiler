@@ -83,31 +83,6 @@ node_st *OSIbinop(node_st *node) {
 
     switch (BINOP_OP(node)) {
     case BO_sub:
-        if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
-             INT_VAL(BINOP_LEFT(node)) == 0) ||
-            (NODE_TYPE(BINOP_LEFT(node)) == NT_FLOAT &&
-             FLOAT_VAL(BINOP_LEFT(node)) == 0.0)) {
-            TAKE(BINOP_RIGHT(node));
-        } else if ((NODE_TYPE(BINOP_RIGHT(node)) == NT_INT &&
-                    INT_VAL(BINOP_RIGHT(node)) == 0) ||
-                   (NODE_TYPE(BINOP_RIGHT(node)) == NT_FLOAT &&
-                    FLOAT_VAL(BINOP_RIGHT(node)) == 0.0)) {
-            TAKE(BINOP_LEFT(node));
-            node = ASTmonop(node, MO_neg);
-        } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
-                   MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
-            BINOP_OP(node) = BO_add;
-            SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-        }
-        break;
-    case BO_div:
-        if ((NODE_TYPE(BINOP_RIGHT(node)) == NT_INT &&
-             INT_VAL(BINOP_RIGHT(node)) == 1) ||
-            (NODE_TYPE(BINOP_RIGHT(node)) == NT_FLOAT &&
-             FLOAT_VAL(BINOP_RIGHT(node)) == 1.0)) {
-            TAKE(BINOP_LEFT(node));
-        }
-        break;
     case BO_add:
         if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
              INT_VAL(BINOP_LEFT(node)) == 0) ||
@@ -133,10 +108,11 @@ node_st *OSIbinop(node_st *node) {
             node = ASTmonop(node, MO_not);
         } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
                    MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
-            BINOP_OP(node) = BO_sub;
+            BINOP_OP(node) = BINOP_OP(node) == BO_add ? BO_sub : BO_add;
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
         }
         break;
+    case BO_div:
     case BO_mul:
         if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
              INT_VAL(BINOP_LEFT(node)) == 1) ||
@@ -160,6 +136,14 @@ node_st *OSIbinop(node_st *node) {
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
             node = ASTmonop(node, MO_not);
+        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_LEFT(node)) == MO_neg) {
+            SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
+            node = ASTmonop(node, MO_neg);
+        } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
+            SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
+            node = ASTmonop(node, MO_neg);
         }
         break;
     case BO_and:
