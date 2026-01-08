@@ -82,32 +82,19 @@ node_st *OCCFstmts(node_st *node) {
         if (NODE_TYPE(FOR_LOOP_START(stmt)) == NT_INT &&
             NODE_TYPE(FOR_LOOP_END(stmt)) == NT_INT &&
             NODE_TYPE(FOR_LOOP_STEP(stmt)) == NT_INT) {
-            if (INT_VAL(FOR_LOOP_STEP(stmt)) > 0) {
-                if (INT_VAL(FOR_LOOP_START(stmt)) >=
-                    INT_VAL(FOR_LOOP_END(stmt))) {
-                    CCNfree(STMTS_STMT(node));
-                    STMTS_STMT(node) = NULL;
-                    node = OCCFinlinestmts(node, NULL);
-                } else if (INT_VAL(FOR_LOOP_END(stmt)) -
-                               INT_VAL(FOR_LOOP_START(stmt)) <=
-                           INT_VAL(FOR_LOOP_STEP(stmt))) {
-                    node_st *stmts = FOR_STMTS(stmt);
-                    FOR_STMTS(stmt) = NULL;
-                    node = OCCFinlinestmts(node, stmts);
-                }
-            } else {
-                if (INT_VAL(FOR_LOOP_START(stmt)) <=
-                    INT_VAL(FOR_LOOP_END(stmt))) {
-                    CCNfree(STMTS_STMT(node));
-                    STMTS_STMT(node) = NULL;
-                    node = OCCFinlinestmts(node, NULL);
-                } else if (INT_VAL(FOR_LOOP_START(stmt)) -
-                               INT_VAL(FOR_LOOP_END(stmt)) <=
-                           INT_VAL(FOR_LOOP_STEP(stmt))) {
-                    node_st *stmts = FOR_STMTS(stmt);
-                    FOR_STMTS(stmt) = NULL;
-                    node = OCCFinlinestmts(node, stmts);
-                }
+            if (INT_VAL(FOR_LOOP_START(stmt)) == INT_VAL(FOR_LOOP_END(stmt)) ||
+                ((INT_VAL(FOR_LOOP_START(stmt)) >
+                  INT_VAL(FOR_LOOP_END(stmt))) ==
+                 (INT_VAL(FOR_LOOP_STEP(stmt)) > 0))) {
+                CCNfree(STMTS_STMT(node));
+                STMTS_STMT(node) = NULL;
+                node = OCCFinlinestmts(node, NULL);
+            } else if (INT_VAL(FOR_LOOP_END(stmt)) -
+                           INT_VAL(FOR_LOOP_START(stmt)) <=
+                       INT_VAL(FOR_LOOP_STEP(stmt))) {
+                node_st *stmts = FOR_STMTS(stmt);
+                FOR_STMTS(stmt) = NULL;
+                node = OCCFinlinestmts(node, stmts);
             }
         }
         break;
