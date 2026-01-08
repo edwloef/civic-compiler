@@ -77,6 +77,11 @@ funtable_ref funtable_resolve(funtable *self, char *name, int param_count) {
 }
 
 funtable_entry funtable_get(funtable *self, funtable_ref e) {
+    if (e.n == -1 && e.l == -1) {
+        funtable_entry e = {"error", {0, 0, NULL, TY_error}};
+        return e;
+    }
+
     for (int i = 0; i < e.n; i++)
         self = self->parent;
     return self->buf[e.l];

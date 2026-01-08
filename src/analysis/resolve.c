@@ -1,10 +1,9 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "palm/ctinfo.h"
 
 void ARinit(void) { DATA_AR_GET()->vartable = vartable_new(NULL); }
 
-void ARfini(void) { CTIabortOnError(); }
+void ARfini(void) {}
 
 node_st *ARprogram(node_st *node) {
     DATA_AR_GET()->funtable = PROGRAM_FUNTABLE(node);

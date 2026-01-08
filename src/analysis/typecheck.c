@@ -219,6 +219,7 @@ node_st *ATCarrexprs(node_st *node) {
             self_ty = resolved_ty;
             continue;
         }
+
         if (self_ty.dims == resolved_ty.dims && self_ty.ty == resolved_ty.ty) {
             continue;
         }
@@ -254,6 +255,7 @@ node_st *ATCarrexprs(node_st *node) {
                     fmt_BasicType(resolved_ty.ty));
             }
         }
+
         error = true;
     }
 
@@ -322,27 +324,27 @@ node_st *ATCbinop(node_st *node) {
 
     if (left_ty.ty == TY_error || right_ty.ty == TY_error) {
         BINOP_RESOLVED_TY(node) = TY_error;
-        return node;
     } else if (left_ty.dims != 0) {
         CTI(CTI_ERROR, true,
             "can't apply binop '%s' to %d-dimensional array of type '%s'",
             fmt_BinOpKind(BINOP_OP(node)), left_ty.dims,
             fmt_BasicType(left_ty.ty));
         BINOP_RESOLVED_TY(node) = TY_error;
-        return node;
     } else if (right_ty.dims != 0) {
         CTI(CTI_ERROR, true,
             "can't apply binop '%s' to %d-dimensional array of type '%s'",
             fmt_BinOpKind(BINOP_OP(node)), right_ty.dims,
             fmt_BasicType(right_ty.ty));
         BINOP_RESOLVED_TY(node) = TY_error;
-        return node;
     } else if (left_ty.ty != right_ty.ty) {
         CTI(CTI_ERROR, true,
             "can't apply binop '%s' to values of nonequal types '%s' and '%s'",
             fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty),
             fmt_BasicType(right_ty.ty));
         BINOP_RESOLVED_TY(node) = TY_error;
+    }
+
+    if (BINOP_RESOLVED_TY(node) == TY_error) {
         return node;
     }
 
@@ -434,9 +436,9 @@ node_st *ATCcall(node_st *node) {
         vartype expected_ty = e.buf[i];
         vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(arg));
 
-        if ((expected_ty.dims != resolved_ty.dims ||
-             expected_ty.ty != resolved_ty.ty) &&
-            resolved_ty.ty != TY_error) {
+        if (resolved_ty.ty != TY_error &&
+            (expected_ty.dims != resolved_ty.dims ||
+             expected_ty.ty != resolved_ty.ty)) {
             if (expected_ty.dims == 0) {
                 if (resolved_ty.dims == 0) {
                     CTI(CTI_ERROR, true,
@@ -488,7 +490,7 @@ node_st *ATCvarref(node_st *node) {
     while (expr) {
         count++;
 
-        if (ty.dims != 0) {
+        if (ty.ty != TY_error && ty.dims != 0) {
             vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
             if (resolved_ty.dims == 0) {
                 if (resolved_ty.ty != TY_int) {
@@ -510,7 +512,8 @@ node_st *ATCvarref(node_st *node) {
         expr = EXPRS_NEXT(expr);
     }
 
-    if (count <= ty.dims) {
+    if (ty.ty == TY_error) {
+    } else if (count <= ty.dims) {
         ty.dims -= count;
     } else if (ty.dims == 0) {
         CTI(CTI_ERROR, true, "can't index into value of type '%s'",

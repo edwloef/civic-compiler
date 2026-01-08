@@ -54,6 +54,11 @@ vartable_ref vartable_resolve(vartable *self, char *name) {
 }
 
 vartable_entry vartable_get(vartable *self, vartable_ref e) {
+    if (e.n == -1 && e.l == -1) {
+        vartable_entry e = {"error", {TY_error, 0}, false};
+        return e;
+    }
+
     for (int i = 0; i < e.n; i++)
         self = self->parent;
     return self->buf[e.l];
