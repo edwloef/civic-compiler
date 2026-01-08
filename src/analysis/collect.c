@@ -52,19 +52,19 @@ node_st *ACfunbody(node_st *node) {
 }
 
 node_st *ACvardecl(node_st *node) {
-    int dims = 0;
-    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
-    while (expr) {
-        dims++;
-        if (VARDECL_EXTERNAL(node)) {
-            vartable_entry e = {
-                ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
-            vartable_insert(DATA_AC_GET()->vartable, e);
-        }
-        expr = EXPRS_NEXT(expr);
-    }
-
     if (VARDECL_GLOBAL(node)) {
+        int dims = 0;
+        node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
+        while (expr) {
+            dims++;
+            if (VARDECL_EXTERNAL(node)) {
+                vartable_entry e = {
+                    ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
+                vartable_insert(DATA_AC_GET()->vartable, e);
+            }
+            expr = EXPRS_NEXT(expr);
+        }
+
         vartable_entry e = {
             ID_VAL(VARDECL_ID(node)), {TYPE_TY(VARDECL_TY(node)), dims}, false};
         vartable_insert(DATA_AC_GET()->vartable, e);

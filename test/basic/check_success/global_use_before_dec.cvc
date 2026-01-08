@@ -1,5 +1,0 @@
-void foo() {
-    int a = x;
-}
-
-int x = 0;

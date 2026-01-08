@@ -54,16 +54,16 @@ node_st *ARparam(node_st *node) {
 }
 
 node_st *ARvardecl(node_st *node) {
-    TRAVchildren(node);
-
-    int dims = 0;
-    node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
-    while (expr) {
-        dims++;
-        expr = EXPRS_NEXT(expr);
-    }
-
     if (!VARDECL_GLOBAL(node)) {
+        TRAVchildren(node);
+
+        int dims = 0;
+        node_st *expr = TYPE_EXPRS(VARDECL_TY(node));
+        while (expr) {
+            dims++;
+            expr = EXPRS_NEXT(expr);
+        }
+
         vartable_entry e = {
             ID_VAL(VARDECL_ID(node)), {TYPE_TY(VARDECL_TY(node)), dims}, false};
         vartable_insert(DATA_AR_GET()->vartable, e);
