@@ -37,7 +37,7 @@ void funtable_insert(funtable *self, funtable_entry e, node_st *id) {
     for (int l = self->len - 1; l >= 0; l--) {
         funtable_entry entry = self->buf[l];
         if (entry.ty.len == e.ty.len && STReq(entry.name, e.name)) {
-            ERROR(id, "couldn't re-declare function '%s' with %d parameters",
+            ERROR(id, "can't re-declare function '%s' with %d parameters",
                   e.name, e.ty.len);
             return;
         }
@@ -76,7 +76,7 @@ funtable_ref funtable_resolve(funtable *self, node_st *call) {
         n++;
     }
 
-    ERROR(call, "couldn't resolve function '%s' with %d parameters",
+    ERROR(call, "can't resolve function '%s' with %d parameters",
           ID_VAL(CALL_ID(call)), param_count);
     funtable_ref r = {-1, -1};
     return r;

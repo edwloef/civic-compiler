@@ -17,7 +17,7 @@ void vartable_insert(vartable *self, vartable_entry e, node_st *id) {
     for (int l = self->len - 1; l >= 0; l--) {
         vartable_entry entry = self->buf[l];
         if (!entry.loopvar && STReq(entry.name, e.name)) {
-            ERROR(id, "couldn't re-declare variable '%s'", e.name);
+            ERROR(id, "can't re-declare variable '%s'", e.name);
             return;
         }
     }
@@ -49,7 +49,7 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
         n++;
     }
 
-    ERROR(id, "couldn't resolve variable '%s'", ID_VAL(id));
+    ERROR(id, "can't resolve variable '%s'", ID_VAL(id));
     vartable_ref r = {-1, -1};
     return r;
 }
