@@ -13,6 +13,10 @@ int yyerror(char *err);
     globals.col += yyleng; \
     return(token);
 
+static void token_action();
+
+#define YY_USER_ACTION token_action();
+
 %}
 
 %option noyywrap
@@ -99,7 +103,8 @@ int yyerror(char *err);
                                                            globals.col = 0;
                                                          }
 
-[ \t]                                                    { globals.col += yyleng; }
+" "                                                      { globals.col += 1; }
+\t                                                       { globals.col += 4; }
 
 "//".*                                                   { globals.col += yyleng; }
 "/*"                                                     {
@@ -119,3 +124,9 @@ int yyerror(char *err);
 }
 
 %%
+
+static void token_action() {
+    yylloc.first_line = yylloc.last_line = globals.line;
+    yylloc.first_column = globals.col;
+    yylloc.last_column = globals.col + yyleng - 1;
+}

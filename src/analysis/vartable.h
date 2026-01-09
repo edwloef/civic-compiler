@@ -30,11 +30,7 @@ typedef struct {
 
 vartable *vartable_new(vartable *parent);
 
-void vartable_insert(vartable *self, vartable_entry e);
-
 void vartable_push(vartable *self, vartable_entry e);
-
-vartable_ref vartable_resolve(vartable *self, char *name);
 
 vartable_entry vartable_get(vartable *self, vartable_ref e);
 

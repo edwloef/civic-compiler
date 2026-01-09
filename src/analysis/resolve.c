@@ -1,3 +1,4 @@
+#include "analysis/resolve.h"
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 
@@ -40,7 +41,8 @@ node_st *ARparam(node_st *node) {
          expr = EXPRS_NEXT(expr)) {
         vartable_entry e = {
             ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
-        vartable_insert(DATA_AR_GET()->vartable, e);
+        vartable_insert(DATA_AR_GET()->vartable, e,
+                        VARREF_ID(EXPRS_EXPR(expr)));
     }
 
     int dims = 0;
@@ -51,7 +53,7 @@ node_st *ARparam(node_st *node) {
 
     vartable_entry e = {
         ID_VAL(PARAM_ID(node)), {TYPE_TY(PARAM_TY(node)), dims}, false};
-    vartable_insert(DATA_AR_GET()->vartable, e);
+    vartable_insert(DATA_AR_GET()->vartable, e, PARAM_ID(node));
 
     return node;
 }
@@ -68,7 +70,7 @@ node_st *ARvardecl(node_st *node) {
 
         vartable_entry e = {
             ID_VAL(VARDECL_ID(node)), {TYPE_TY(VARDECL_TY(node)), dims}, false};
-        vartable_insert(DATA_AR_GET()->vartable, e);
+        vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node));
 
         VARDECL_L(node) = DATA_AR_GET()->vartable->len - 1;
     }
@@ -101,8 +103,8 @@ node_st *ARcall(node_st *node) {
         param_count++;
     }
 
-    funtable_ref r = funtable_resolve(DATA_AR_GET()->funtable,
-                                      ID_VAL(CALL_ID(node)), param_count);
+    funtable_ref r =
+        funtable_resolve(DATA_AR_GET()->funtable, CALL_ID(node), param_count);
     CALL_N(node) = r.n;
     CALL_L(node) = r.l;
 
@@ -112,8 +114,7 @@ node_st *ARcall(node_st *node) {
 node_st *ARvarref(node_st *node) {
     TRAVchildren(node);
 
-    vartable_ref r =
-        vartable_resolve(DATA_AR_GET()->vartable, ID_VAL(VARREF_ID(node)));
+    vartable_ref r = vartable_resolve(DATA_AR_GET()->vartable, VARREF_ID(node));
     VARREF_N(node) = r.n;
     VARREF_L(node) = r.l;
 

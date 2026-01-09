@@ -1,5 +1,6 @@
 #include "analysis/vartable.h"
-#include "palm/ctinfo.h"
+#include "analysis/error.h"
+#include "analysis/resolve.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 
@@ -12,11 +13,11 @@ vartable *vartable_new(vartable *parent) {
     return n;
 }
 
-void vartable_insert(vartable *self, vartable_entry e) {
+void vartable_insert(vartable *self, vartable_entry e, node_st *id) {
     for (int l = self->len - 1; l >= 0; l--) {
         vartable_entry entry = self->buf[l];
         if (!entry.loopvar && STReq(entry.name, e.name)) {
-            CTI(CTI_ERROR, true, "couldn't re-declare variable '%s'", e.name);
+            ERROR(id, "couldn't re-declare variable '%s'", e.name);
             return;
         }
     }
@@ -33,12 +34,12 @@ void vartable_push(vartable *self, vartable_entry e) {
     self->buf[self->len++] = e;
 }
 
-vartable_ref vartable_resolve(vartable *self, char *name) {
+vartable_ref vartable_resolve(vartable *self, node_st *id) {
     int n = 0;
     while (self) {
         for (int l = self->len - 1; l >= 0; l--) {
             vartable_entry entry = self->buf[l];
-            if (!entry.loopvar && STReq(entry.name, name)) {
+            if (!entry.loopvar && STReq(entry.name, ID_VAL(id))) {
                 vartable_ref r = {n, l};
                 return r;
             }
@@ -48,7 +49,7 @@ vartable_ref vartable_resolve(vartable *self, char *name) {
         n++;
     }
 
-    CTI(CTI_ERROR, true, "couldn't resolve variable '%s'", name);
+    ERROR(id, "couldn't resolve variable '%s'", ID_VAL(id));
     vartable_ref r = {-1, -1};
     return r;
 }

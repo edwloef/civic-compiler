@@ -35,11 +35,7 @@ typedef struct {
 
 funtable *funtable_new(funtable *parent);
 
-void funtable_insert(funtable *self, funtable_entry e);
-
 void funtable_push(funtable *self, funtable_entry e);
-
-funtable_ref funtable_resolve(funtable *self, char *name, int param_count);
 
 funtable_entry funtable_get(funtable *self, funtable_ref e);
 

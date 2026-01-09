@@ -1,5 +1,6 @@
 #include "analysis/funtable.h"
-#include "palm/ctinfo.h"
+#include "analysis/error.h"
+#include "analysis/resolve.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 
@@ -32,13 +33,12 @@ funtable *funtable_new(funtable *parent) {
     return n;
 }
 
-void funtable_insert(funtable *self, funtable_entry e) {
+void funtable_insert(funtable *self, funtable_entry e, node_st *id) {
     for (int l = self->len - 1; l >= 0; l--) {
         funtable_entry entry = self->buf[l];
         if (entry.ty.len == e.ty.len && STReq(entry.name, e.name)) {
-            CTI(CTI_ERROR, true,
-                "couldn't re-declare function '%s' with arity %d", e.name,
-                e.ty.len);
+            ERROR(id, "couldn't re-declare function '%s' with %d parameters",
+                  e.name, e.ty.len);
             return;
         }
     }
@@ -55,12 +55,12 @@ void funtable_push(funtable *self, funtable_entry e) {
     self->buf[self->len++] = e;
 }
 
-funtable_ref funtable_resolve(funtable *self, char *name, int param_count) {
+funtable_ref funtable_resolve(funtable *self, node_st *id, int param_count) {
     int n = 0;
     while (self) {
         for (int l = self->len - 1; l >= 0; l--) {
             funtable_entry entry = self->buf[l];
-            if (entry.ty.len == param_count && STReq(entry.name, name)) {
+            if (entry.ty.len == param_count && STReq(entry.name, ID_VAL(id))) {
                 funtable_ref r = {n, l};
                 return r;
             }
@@ -70,8 +70,8 @@ funtable_ref funtable_resolve(funtable *self, char *name, int param_count) {
         n++;
     }
 
-    CTI(CTI_ERROR, true, "couldn't resolve function '%s' with arity %d", name,
-        param_count);
+    ERROR(id, "couldn't resolve function '%s' with %d parameters", ID_VAL(id),
+          param_count);
     funtable_ref r = {-1, -1};
     return r;
 }

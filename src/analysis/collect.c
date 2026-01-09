@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "resolve.h"
 
 void ACinit(void) {
     DATA_AC_GET()->funtable = funtable_new(NULL);
@@ -33,7 +34,7 @@ node_st *ACfundecl(node_st *node) {
     }
 
     funtable_entry e = {ID_VAL(FUNDECL_ID(node)), ty};
-    funtable_insert(DATA_AC_GET()->funtable, e);
+    funtable_insert(DATA_AC_GET()->funtable, e, FUNDECL_ID(node));
 
     TRAVchildren(node);
 
@@ -58,7 +59,8 @@ node_st *ACvardecl(node_st *node) {
                  expr = EXPRS_NEXT(expr)) {
                 vartable_entry e = {
                     ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
-                vartable_insert(DATA_AC_GET()->vartable, e);
+                vartable_insert(DATA_AC_GET()->vartable, e,
+                                VARREF_ID(EXPRS_EXPR(expr)));
             }
         } else {
             TRAVpush(TRAV_AR);
@@ -74,7 +76,7 @@ node_st *ACvardecl(node_st *node) {
 
         vartable_entry e = {
             ID_VAL(VARDECL_ID(node)), {TYPE_TY(VARDECL_TY(node)), dims}, false};
-        vartable_insert(DATA_AC_GET()->vartable, e);
+        vartable_insert(DATA_AC_GET()->vartable, e, VARDECL_ID(node));
 
         VARDECL_L(node) = DATA_AC_GET()->vartable->len - 1;
     }

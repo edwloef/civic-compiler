@@ -5,24 +5,16 @@
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
 
-static node_st *parseresult = NULL;
 int yylex();
-int yyerror(char *errname);
+
+static node_st *parseresult = NULL;
 extern FILE *yyin;
 
-node_st *rev_vardecls(node_st *root) {
-	node_st *curr = root;
-	node_st *prev = NULL;
+typedef struct YYLTYPE YYLTYPE;
 
-	while (curr) {
-		node_st *next = VARDECLS_NEXT(curr);
-		VARDECLS_NEXT(curr) = prev;
-		prev = curr;
-		curr = next;
-	}
-
-	return prev;
-}
+node_st *rev_vardecls(node_st *root);
+void add_loc_to_node(node_st *node, YYLTYPE *loc);
+int yyerror(char *errname);
 
 %}
 
@@ -432,6 +424,7 @@ varref: id BRACKET_L exprs BRACKET_R
 id: ID
     {
       $$ = ASTid($1);
+      add_loc_to_node($$, &@$);
     }
   ;
 
@@ -478,6 +471,27 @@ basictype: TY_BOOL
          ;
 
 %%
+
+node_st *rev_vardecls(node_st *root) {
+    node_st *curr = root;
+    node_st *prev = NULL;
+
+    while (curr) {
+        node_st *next = VARDECLS_NEXT(curr);
+        VARDECLS_NEXT(curr) = prev;
+        prev = curr;
+        curr = next;
+    }
+
+    return prev;
+}
+
+void add_loc_to_node(node_st *node, YYLTYPE *loc) {
+    NODE_BLINE(node) = loc->first_line;
+    NODE_BCOL(node) = loc->first_column;
+    NODE_ELINE(node) = loc->last_line;
+    NODE_ECOL(node) = loc->last_column;
+}
 
 int yyerror(char *error) {
     CTI(CTI_ERROR, true, "%s:%d:%d: %s\n", globals.input_file, globals.line + 1,
