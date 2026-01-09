@@ -149,7 +149,7 @@ node Stmts {
     }
 };
 
-nodeset Stmt = { Assign, Call, IfElse, While, DoWhile, For, Return };
+nodeset Stmt = Expr | { Assign, IfElse, While, DoWhile, For, Return };
 
 node Exprs {
     children {

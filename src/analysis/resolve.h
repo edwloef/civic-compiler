@@ -8,4 +8,4 @@ vartable_ref vartable_resolve(vartable *self, node_st *id);
 
 void funtable_insert(funtable *self, funtable_entry e, node_st *id);
 
-funtable_ref funtable_resolve(funtable *self, node_st *id, int param_count);
+funtable_ref funtable_resolve(funtable *self, node_st *call);

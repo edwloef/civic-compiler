@@ -4,16 +4,16 @@
 #include "globals/globals.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
+#include "parser.h"
 
 int yylex();
 
 static node_st *parseresult = NULL;
 extern FILE *yyin;
 
-typedef struct YYLTYPE YYLTYPE;
-
 node_st *rev_vardecls(node_st *root);
-void add_loc_to_node(node_st *node, YYLTYPE *loc);
+void add_loc_to_node(node_st *node, YYLTYPE loc);
+void add_locs_to_node(node_st *node, YYLTYPE lhs, YYLTYPE rhs);
 int yyerror(char *errname);
 
 %}
@@ -30,11 +30,10 @@ int yyerror(char *errname);
 %define parse.trace
 %locations
 
-%token PAREN_L PAREN_R BRACKET_L BRACKET_R BRACE_L BRACE_R
-%token COMMA SEMICOLON
+%token PAREN_L PAREN_R BRACKET_L BRACKET_R BRACE_L BRACE_R COMMA SEMICOLON
 %token BANG PLUS MINUS STAR SLASH PERCENT LE LT GE GT EQ NE AND OR ASSIGN
-%token TY_INT TY_FLOAT TY_BOOL TY_VOID
 %token KW_EXTERN KW_EXPORT KW_IF KW_ELSE KW_WHILE KW_DO KW_FOR KW_RETURN
+%token TY_INT TY_FLOAT TY_BOOL TY_VOID
 
 %token <cbool> LIT_BOOL
 %token <cint> LIT_INT
@@ -125,49 +124,54 @@ stmts: stmt stmts
        }
      ;
 
-stmt: varref ASSIGN arrexpr SEMICOLON
+stmt: expr SEMICOLON
+      {
+        $$ = $1;
+      }
+    | varref ASSIGN arrexpr SEMICOLON
       {
         $$ = ASTassign($1, $3);
-      }
-    | id PAREN_L exprs PAREN_R SEMICOLON
-      {
-        $$ = ASTcall($1, $3);
-      }
-    | id PAREN_L PAREN_R SEMICOLON
-      {
-        $$ = ASTcall($1, NULL);
+        add_locs_to_node($$, @1, @3);
       }
     | KW_IF PAREN_L expr PAREN_R block %prec "none"
       {
         $$ = ASTifelse($3, $5, NULL);
+        add_loc_to_node($$, @$);
       }
     | KW_IF PAREN_L expr PAREN_R block KW_ELSE block
       {
         $$ = ASTifelse($3, $5, $7);
+        add_loc_to_node($$, @$);
       }
     | KW_WHILE PAREN_L expr PAREN_R block
       {
         $$ = ASTwhile($3, $5);
+        add_loc_to_node($$, @$);
       }
     | KW_DO block KW_WHILE PAREN_L expr PAREN_R SEMICOLON
       {
         $$ = ASTdowhile($2, $5);
+        add_locs_to_node($$, @1, @6);
       }
     | KW_FOR PAREN_L TY_INT id ASSIGN expr COMMA expr PAREN_R block
       {
         $$ = ASTfor($4, $6, $8, ASTint(1), $10);
+        add_loc_to_node($$, @$);
       }
     | KW_FOR PAREN_L TY_INT id ASSIGN expr COMMA expr COMMA expr PAREN_R block
       {
         $$ = ASTfor($4, $6, $8, $10, $12);
+        add_loc_to_node($$, @$);
       }
     | KW_RETURN SEMICOLON
       {
         $$ = ASTreturn(NULL);
+        add_loc_to_node($$, @1);
       }
     | KW_RETURN expr SEMICOLON
       {
         $$ = ASTreturn($2);
+        add_locs_to_node($$, @1, @2);
       }
     ;
 
@@ -184,118 +188,146 @@ exprs: expr COMMA exprs
 expr: PAREN_L basictype PAREN_R expr %prec "monop"
       {
         $$ = ASTcast($4, $2);
+        add_loc_to_node($$, @$);
       }
     | PLUS expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_pos);
+        add_loc_to_node($$, @$);
       }
     | MINUS expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_neg);
+        add_loc_to_node($$, @$);
       }
     | BANG expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_not);
+        add_loc_to_node($$, @$);
       }
     | expr STAR expr
       {
         $$ = ASTbinop($1, $3, BO_mul);
+        add_loc_to_node($$, @$);
       }
     | expr SLASH expr
       {
         $$ = ASTbinop($1, $3, BO_div);
+        add_loc_to_node($$, @$);
       }
     | expr PERCENT expr
       {
         $$ = ASTbinop($1, $3, BO_mod);
+        add_loc_to_node($$, @$);
       }
     | expr PLUS expr
       {
         $$ = ASTbinop($1, $3, BO_add);
+        add_loc_to_node($$, @$);
       }
     | expr MINUS expr
       {
         $$ = ASTbinop($1, $3, BO_sub);
+        add_loc_to_node($$, @$);
       }
     | expr LT expr
       {
         $$ = ASTbinop($1, $3, BO_lt);
+        add_loc_to_node($$, @$);
       }
     | expr LE expr
       {
         $$ = ASTbinop($1, $3, BO_le);
+        add_loc_to_node($$, @$);
       }
     | expr GT expr
       {
         $$ = ASTbinop($1, $3, BO_gt);
+        add_loc_to_node($$, @$);
       }
     | expr GE expr
       {
         $$ = ASTbinop($1, $3, BO_ge);
+        add_loc_to_node($$, @$);
       }
     | expr EQ expr
       {
         $$ = ASTbinop($1, $3, BO_eq);
+        add_loc_to_node($$, @$);
       }
     | expr NE expr
       {
         $$ = ASTbinop($1, $3, BO_ne);
+        add_loc_to_node($$, @$);
       }
     | expr AND expr
       {
         $$ = ASTbinop($1, $3, BO_and);
+        add_loc_to_node($$, @$);
       }
     | expr OR expr
       {
         $$ = ASTbinop($1, $3, BO_or);
+        add_loc_to_node($$, @$);
       }
     | PAREN_L expr PAREN_R
       {
         $$ = $2;
+        add_loc_to_node($$, @$);
       }
     | id PAREN_L exprs PAREN_R
       {
         $$ = ASTcall($1, $3);
+        add_loc_to_node($$, @$);
       }
     | id PAREN_L PAREN_R
       {
         $$ = ASTcall($1, NULL);
+        add_loc_to_node($$, @$);
       }
     | varref
       {
         $$ = $1;
+        add_loc_to_node($$, @$);
       }
     | LIT_INT
       {
         $$ = ASTint($1);
+        add_loc_to_node($$, @$);
       }
     | LIT_FLOAT
       {
         $$ = ASTfloat($1);
+        add_loc_to_node($$, @$);
       }
     | LIT_BOOL
       {
         $$ = ASTbool($1);
+        add_loc_to_node($$, @$);
       }
     ;
 
 arrexprs: arrexpr COMMA arrexprs
           {
             $$ = ASTarrexprs($1, $3);
+            add_loc_to_node($$, @$);
           }
         | arrexpr
           {
             $$ = ASTarrexprs($1, NULL);
+            add_loc_to_node($$, @$);
           }
         ;
 
 arrexpr: expr
          {
            $$ = $1;
+           add_loc_to_node($$, @$);
          }
        | BRACKET_L arrexprs BRACKET_R
          {
            $$ = $2;
+           add_loc_to_node($$, @$);
          }
        ;
 
@@ -424,7 +456,7 @@ varref: id BRACKET_L exprs BRACKET_R
 id: ID
     {
       $$ = ASTid($1);
-      add_loc_to_node($$, &@$);
+      add_loc_to_node($$, @$);
     }
   ;
 
@@ -486,11 +518,15 @@ node_st *rev_vardecls(node_st *root) {
     return prev;
 }
 
-void add_loc_to_node(node_st *node, YYLTYPE *loc) {
-    NODE_BLINE(node) = loc->first_line;
-    NODE_BCOL(node) = loc->first_column;
-    NODE_ELINE(node) = loc->last_line;
-    NODE_ECOL(node) = loc->last_column;
+void add_loc_to_node(node_st *node, YYLTYPE loc) {
+    add_locs_to_node(node, loc, loc);
+}
+
+void add_locs_to_node(node_st *node, YYLTYPE lhs, YYLTYPE rhs) {
+    NODE_BLINE(node) = lhs.first_line;
+    NODE_BCOL(node) = lhs.first_column;
+    NODE_ELINE(node) = rhs.last_line;
+    NODE_ECOL(node) = rhs.last_column;
 }
 
 int yyerror(char *error) {

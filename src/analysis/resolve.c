@@ -98,13 +98,7 @@ node_st *ARfor(node_st *node) {
 node_st *ARcall(node_st *node) {
     TRAVchildren(node);
 
-    int param_count = 0;
-    for (node_st *arg = CALL_EXPRS(node); arg; arg = EXPRS_NEXT(arg)) {
-        param_count++;
-    }
-
-    funtable_ref r =
-        funtable_resolve(DATA_AR_GET()->funtable, CALL_ID(node), param_count);
+    funtable_ref r = funtable_resolve(DATA_AR_GET()->funtable, node);
     CALL_N(node) = r.n;
     CALL_L(node) = r.l;
 

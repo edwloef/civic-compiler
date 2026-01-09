@@ -55,12 +55,18 @@ void funtable_push(funtable *self, funtable_entry e) {
     self->buf[self->len++] = e;
 }
 
-funtable_ref funtable_resolve(funtable *self, node_st *id, int param_count) {
+funtable_ref funtable_resolve(funtable *self, node_st *call) {
+    int param_count = 0;
+    for (node_st *arg = CALL_EXPRS(call); arg; arg = EXPRS_NEXT(arg)) {
+        param_count++;
+    }
+
     int n = 0;
     while (self) {
         for (int l = self->len - 1; l >= 0; l--) {
             funtable_entry entry = self->buf[l];
-            if (entry.ty.len == param_count && STReq(entry.name, ID_VAL(id))) {
+            if (entry.ty.len == param_count &&
+                STReq(entry.name, ID_VAL(CALL_ID(call)))) {
                 funtable_ref r = {n, l};
                 return r;
             }
@@ -70,8 +76,8 @@ funtable_ref funtable_resolve(funtable *self, node_st *id, int param_count) {
         n++;
     }
 
-    ERROR(id, "couldn't resolve function '%s' with %d parameters", ID_VAL(id),
-          param_count);
+    ERROR(call, "couldn't resolve function '%s' with %d parameters",
+          ID_VAL(CALL_ID(call)), param_count);
     funtable_ref r = {-1, -1};
     return r;
 }
