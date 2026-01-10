@@ -12,8 +12,6 @@ char *fmt_BasicType(enum BasicType ty) {
         return "float";
     case TY_void:
         return "void";
-    case TY_error:
-        return "error";
     default:
         DBUG_ASSERT(false, "Unknown basic type detected.");
         return NULL;

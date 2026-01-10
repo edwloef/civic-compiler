@@ -189,20 +189,23 @@ node_st *ATCvardecl(node_st *node) {
     for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
          expr = EXPRS_NEXT(expr)) {
         vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
-        if (resolved_ty.dims == 0) {
-            if (resolved_ty.ty != TY_int) {
+        if (resolved_ty.ty != TY_error) {
+            if (resolved_ty.dims == 0) {
+                if (resolved_ty.ty != TY_int) {
+                    ERROR(
+                        EXPRS_EXPR(expr),
+                        "can't declare %d-dimensional array of type '%s' with "
+                        "length of value of type '%s'",
+                        ty.dims, fmt_BasicType(ty.ty),
+                        fmt_BasicType(resolved_ty.ty));
+                }
+            } else {
                 ERROR(EXPRS_EXPR(expr),
                       "can't declare %d-dimensional array of type '%s' with "
-                      "length of value of type '%s'",
-                      ty.dims, fmt_BasicType(ty.ty),
+                      "length of %d-dimensional array of type '%s'",
+                      ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
                       fmt_BasicType(resolved_ty.ty));
             }
-        } else {
-            ERROR(EXPRS_EXPR(expr),
-                  "can't declare %d-dimensional array of type '%s' with length "
-                  "of %d-dimensional array of type '%s'",
-                  ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
-                  fmt_BasicType(resolved_ty.ty));
         }
     }
 
@@ -402,38 +405,41 @@ node_st *ATCmonop(node_st *node) {
 
     if (resolved_ty.ty == TY_error) {
         MONOP_RESOLVED_TY(node) = TY_error;
-        return node;
     } else if (resolved_ty.dims != 0) {
-        ERROR(node,
+        ERROR(MONOP_EXPR(node),
               "can't apply monop '%s' to %d-dimensional array of type '%s'",
               fmt_MonOpKind(MONOP_OP(node)), resolved_ty.dims,
               fmt_BasicType(resolved_ty.ty));
         MONOP_RESOLVED_TY(node) = TY_error;
+    }
+
+    if (MONOP_RESOLVED_TY(node) == TY_error) {
         return node;
     }
 
-    enum BasicType ty = resolved_ty.ty;
+    BINOP_RESOLVED_TY(node) = resolved_ty.ty;
     switch (MONOP_OP(node)) {
     case MO_pos:
     case MO_neg:
-        if (ty != TY_int && ty != TY_float) {
-            ERROR(node, "can't apply monop '%s' to value of type '%s'",
-                  fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(ty));
-            ty = TY_error;
+        if (resolved_ty.ty != TY_int && resolved_ty.ty != TY_float) {
+            ERROR(MONOP_EXPR(node),
+                  "can't apply monop '%s' to value of type '%s'",
+                  fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(resolved_ty.ty));
+            MONOP_RESOLVED_TY(node) = TY_error;
         }
         break;
     case MO_not:
-        if (ty != TY_bool) {
-            ERROR(node, "can't apply monop '%s' to value of type '%s'",
-                  fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(ty));
-            ty = TY_bool;
+        if (resolved_ty.ty != TY_bool) {
+            ERROR(MONOP_EXPR(node),
+                  "can't apply monop '%s' to value of type '%s'",
+                  fmt_MonOpKind(MONOP_OP(node)), fmt_BasicType(resolved_ty.ty));
+            MONOP_RESOLVED_TY(node) = TY_bool;
         }
         break;
     default:
         DBUG_ASSERT(false, "Unknown monop detected.");
         break;
     }
-    MONOP_RESOLVED_TY(node) = ty;
 
     return node;
 }
@@ -446,25 +452,23 @@ node_st *ATCbinop(node_st *node) {
 
     BINOP_RESOLVED_DIMS(node) = 0;
 
-    if (left_ty.ty == TY_error || right_ty.ty == TY_error) {
+    if (left_ty.ty == TY_error) {
         BINOP_RESOLVED_TY(node) = TY_error;
     } else if (left_ty.dims != 0) {
-        CTI(CTI_ERROR, true,
-            "can't apply binop '%s' to %d-dimensional array of type '%s'",
-            fmt_BinOpKind(BINOP_OP(node)), left_ty.dims,
-            fmt_BasicType(left_ty.ty));
+        ERROR(BINOP_LEFT(node),
+              "can't apply binop '%s' to %d-dimensional array of type '%s'",
+              fmt_BinOpKind(BINOP_OP(node)), left_ty.dims,
+              fmt_BasicType(left_ty.ty));
+        BINOP_RESOLVED_TY(node) = TY_error;
+    }
+
+    if (right_ty.ty == TY_error) {
         BINOP_RESOLVED_TY(node) = TY_error;
     } else if (right_ty.dims != 0) {
-        CTI(CTI_ERROR, true,
-            "can't apply binop '%s' to %d-dimensional array of type '%s'",
-            fmt_BinOpKind(BINOP_OP(node)), right_ty.dims,
-            fmt_BasicType(right_ty.ty));
-        BINOP_RESOLVED_TY(node) = TY_error;
-    } else if (left_ty.ty != right_ty.ty) {
-        CTI(CTI_ERROR, true,
-            "can't apply binop '%s' to values of nonequal types '%s' and '%s'",
-            fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty),
-            fmt_BasicType(right_ty.ty));
+        ERROR(BINOP_RIGHT(node),
+              "can't apply binop '%s' to %d-dimensional array of type '%s'",
+              fmt_BinOpKind(BINOP_OP(node)), right_ty.dims,
+              fmt_BasicType(right_ty.ty));
         BINOP_RESOLVED_TY(node) = TY_error;
     }
 
@@ -472,34 +476,45 @@ node_st *ATCbinop(node_st *node) {
         return node;
     }
 
-    enum BasicType ty = left_ty.ty;
     switch (BINOP_OP(node)) {
     case BO_lt:
     case BO_le:
     case BO_gt:
     case BO_ge:
-        ty = TY_bool;
+        BINOP_RESOLVED_TY(node) = TY_bool;
         // fallthrough
     case BO_sub:
     case BO_div:
         if (left_ty.ty != TY_int && left_ty.ty != TY_float) {
-            CTI(CTI_ERROR, true,
-                "can't apply binop '%s' to values of type '%s'",
-                fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
-            ty = TY_error;
+            ERROR(BINOP_LEFT(node),
+                  "can't apply binop '%s' to value of type '%s'",
+                  fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
+            BINOP_RESOLVED_TY(node) = TY_error;
+        }
+        if (right_ty.ty != TY_int && right_ty.ty != TY_float) {
+            ERROR(BINOP_LEFT(node),
+                  "can't apply binop '%s' to value of type '%s'",
+                  fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(right_ty.ty));
+            BINOP_RESOLVED_TY(node) = TY_error;
         }
         break;
     case BO_mod:
         if (left_ty.ty != TY_int) {
-            CTI(CTI_ERROR, true,
-                "can't apply binop '%s' to values of type '%s'",
-                fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
-            ty = TY_error;
+            ERROR(BINOP_LEFT(node),
+                  "can't apply binop '%s' to value of type '%s'",
+                  fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
+            BINOP_RESOLVED_TY(node) = TY_error;
+        }
+        if (right_ty.ty != TY_int) {
+            ERROR(BINOP_RIGHT(node),
+                  "can't apply binop '%s' to value of type '%s'",
+                  fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(right_ty.ty));
+            BINOP_RESOLVED_TY(node) = TY_error;
         }
         break;
     case BO_eq:
     case BO_ne:
-        ty = TY_bool;
+        BINOP_RESOLVED_TY(node) = TY_bool;
         // fallthrough
     case BO_add:
     case BO_mul:
@@ -507,10 +522,16 @@ node_st *ATCbinop(node_st *node) {
     case BO_and:
     case BO_or:
         if (left_ty.ty != TY_bool) {
-            CTI(CTI_ERROR, true,
-                "can't apply binop '%s' to values of type '%s'",
-                fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
-            ty = TY_error;
+            ERROR(BINOP_LEFT(node),
+                  "can't apply binop '%s' to value of type '%s'",
+                  fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty));
+            BINOP_RESOLVED_TY(node) = TY_error;
+        }
+        if (right_ty.ty != TY_bool) {
+            ERROR(BINOP_RIGHT(node),
+                  "can't apply binop '%s' to value of type '%s'",
+                  fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(right_ty.ty));
+            BINOP_RESOLVED_TY(node) = TY_error;
         }
         break;
     default:
@@ -518,7 +539,20 @@ node_st *ATCbinop(node_st *node) {
         break;
     }
 
-    BINOP_RESOLVED_TY(node) = ty;
+    if (BINOP_RESOLVED_TY(node) == TY_error) {
+        return node;
+    }
+
+    if (left_ty.ty == right_ty.ty) {
+        BINOP_RESOLVED_TY(node) = left_ty.ty;
+    } else {
+        ERROR(node,
+              "can't apply binop '%s' to values of nonequal types '%s' and "
+              "'%s'",
+              fmt_BinOpKind(BINOP_OP(node)), fmt_BasicType(left_ty.ty),
+              fmt_BasicType(right_ty.ty));
+        BINOP_RESOLVED_TY(node) = TY_error;
+    }
 
     return node;
 }
@@ -578,7 +612,7 @@ node_st *ATCcall(node_st *node) {
                 } else {
                     if (resolved_ty.dims == 0) {
                         ERROR(EXPRS_EXPR(arg),
-                              "expected %d-dimensional array of argument '%s', "
+                              "expected %d-dimensional array of type '%s', "
                               "found argument of type '%s'",
                               expected_ty.dims, fmt_BasicType(expected_ty.ty),
                               fmt_BasicType(resolved_ty.ty));
