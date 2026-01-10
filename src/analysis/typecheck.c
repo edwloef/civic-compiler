@@ -417,7 +417,7 @@ node_st *ATCmonop(node_st *node) {
         return node;
     }
 
-    BINOP_RESOLVED_TY(node) = resolved_ty.ty;
+    MONOP_RESOLVED_TY(node) = resolved_ty.ty;
     switch (MONOP_OP(node)) {
     case MO_pos:
     case MO_neg:
@@ -476,6 +476,7 @@ node_st *ATCbinop(node_st *node) {
         return node;
     }
 
+    BINOP_RESOLVED_TY(node) = left_ty.ty;
     switch (BINOP_OP(node)) {
     case BO_lt:
     case BO_le:
@@ -543,9 +544,7 @@ node_st *ATCbinop(node_st *node) {
         return node;
     }
 
-    if (left_ty.ty == right_ty.ty) {
-        BINOP_RESOLVED_TY(node) = left_ty.ty;
-    } else {
+    if (left_ty.ty != right_ty.ty) {
         ERROR(node,
               "can't apply binop '%s' to values of nonequal types '%s' and "
               "'%s'",

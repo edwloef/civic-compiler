@@ -1,12 +1,21 @@
 #include "ccngen/ast.h"
+#include "palm/ctinfo.h"
 #include "palm/memory.h"
 #include "palm/str.h"
+
+#define SPAN(node)                                                             \
+    {NODE_BLINE(node), NODE_BCOL(node), NODE_ELINE(node), NODE_ECOL(node)}
 
 #define ERROR(node, format, ...)                                               \
     {                                                                          \
         char *error = STRfmt(format, ##__VA_ARGS__);                           \
-        emit_error_at_node(node, error);                                       \
+        span span = SPAN(node);                                                \
+        emit_message_at_node(CTI_ERROR, span, error);                          \
         MEMfree(error);                                                        \
     }
 
-void emit_error_at_node(node_st *node, char *error);
+typedef struct {
+    int bl, bc, el, ec;
+} span;
+
+void emit_message_at_node(enum cti_type type, span span, char *error);
