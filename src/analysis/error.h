@@ -1,24 +1,18 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include "analysis/span.h"
-#include "palm/memory.h"
-#include "palm/str.h"
 
 #define ERROR(node, format, ...)                                               \
     {                                                                          \
         span span = SPAN(node);                                                \
-        char *message = STRfmt(format, ##__VA_ARGS__);                         \
-        emit_message_with_span(span, message, true);                           \
-        MEMfree(message);                                                      \
+        emit_message_with_span(span, true, format, ##__VA_ARGS__);             \
     }
 
 #define NOTE(span, format, ...)                                                \
-    {                                                                          \
-        char *message = STRfmt(format, ##__VA_ARGS__);                         \
-        emit_message_with_span(span, message, false);                          \
-        MEMfree(message);                                                      \
-    }
+    emit_message_with_span(span, false, format, ##__VA_ARGS__);
 
 void abort_on_error(void);
-void emit_message(char *message, bool err);
-void emit_message_with_span(span span, char *message, bool err);
+void emit_message(bool error, char *format, ...);
+void emit_message_with_span(span span, bool error, char *format, ...);

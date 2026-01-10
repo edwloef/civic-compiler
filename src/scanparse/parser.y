@@ -543,10 +543,10 @@ node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
     yyin = fopen(globals.input_file, "r");
     if (yyin == NULL) {
-        char *error = STRfmt("couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
-        emit_message(error, true);
-        abort_on_error();
+        emit_message(true, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+    } else {
+        yyparse();
     }
-    yyparse();
+    abort_on_error();
     return parseresult;
 }
