@@ -39,7 +39,9 @@ void funtable_insert(funtable *self, funtable_entry e, node_st *id) {
         if (entry.ty.len == e.ty.len && STReq(entry.name, e.name)) {
             ERROR(id, "can't re-declare function '%s' with %d parameters",
                   e.name, e.ty.len);
-            NOTE(entry.span, "function '%s' previously declared here", e.name);
+            emit_message_with_span(entry.span, L_INFO,
+                                   "function '%s' previously declared here",
+                                   e.name);
             return;
         }
     }

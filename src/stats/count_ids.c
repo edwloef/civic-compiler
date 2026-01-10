@@ -9,7 +9,7 @@ void SCIinit(void) { DATA_SCI_GET()->count = HTnew_String(256); }
 void SCIfini(void) {
     htable_st_ptr count = DATA_SCI_GET()->count;
 
-    for (htable_iter_st *iter = HTiterate(count); iter != NULL;
+    for (htable_iter_st *iter = HTiterate(count); iter;
          iter = HTiterateNext(iter)) {
         char *name = HTiterKey(iter);
         int *count = HTiterValue(iter);

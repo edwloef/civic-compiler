@@ -1,16 +1,45 @@
 #include <math.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "analysis/error.h"
 #include "globals/globals.h"
+#include "palm/dbug.h"
 #include "palm/str.h"
 
 #define ANSI_RESET "\033[0m"
 #define ANSI_BRIGHT_RED "\033[30;91m"
+#define ANSI_BRIGHT_YELLOW "\033[30;93m"
 #define ANSI_BRIGHT_BLUE "\033[30;94m"
 #define ANSI_BRIGHT_CYAN "\033[30;96m"
+
+static char *color_of_level(level level) {
+    switch (level) {
+    case L_ERROR:
+        return ANSI_BRIGHT_RED;
+    case L_WARNING:
+        return ANSI_BRIGHT_YELLOW;
+    case L_INFO:
+        return ANSI_BRIGHT_CYAN;
+    default:
+        DBUG_ASSERT(false, "Unknown level");
+        return "";
+    }
+}
+
+static char *message_of_level(level level) {
+    switch (level) {
+    case L_ERROR:
+        return "error: ";
+    case L_WARNING:
+        return "warning: ";
+    case L_INFO:
+        return "info: ";
+    default:
+        DBUG_ASSERT(false, "Unknown level");
+        return "";
+    }
+}
 
 static int error_count = 0;
 
@@ -25,33 +54,32 @@ void abort_on_error(void) {
     }
 }
 
-static void va_emit_message(bool error, char *format, va_list ap) {
-    if (error) {
+static void va_emit_message(level level, char *format, va_list ap) {
+    if (level == L_ERROR) {
         if (error_count > 0)
             fputc('\n', stderr);
-        fputs(ANSI_BRIGHT_RED "error: " ANSI_RESET, stderr);
         error_count++;
-    } else {
-        fputs(ANSI_BRIGHT_CYAN "note: " ANSI_RESET, stderr);
     }
 
+    fprintf(stderr, "%s%s" ANSI_RESET, color_of_level(level),
+            message_of_level(level));
     vfprintf(stderr, format, ap);
     fputc('\n', stderr);
 }
 
-void emit_message(bool error, char *format, ...) {
+void emit_message(level level, char *format, ...) {
     va_list ap;
 
     va_start(ap, format);
-    va_emit_message(error, format, ap);
+    va_emit_message(level, format, ap);
     va_end(ap);
 }
 
-void emit_message_with_span(span span, bool error, char *format, ...) {
+void emit_message_with_span(span span, level level, char *format, ...) {
     va_list ap;
 
     va_start(ap, format);
-    va_emit_message(error, format, ap);
+    va_emit_message(level, format, ap);
     va_end(ap);
 
     FILE *file = fopen(globals.input_file, "r");
@@ -71,7 +99,7 @@ void emit_message_with_span(span span, bool error, char *format, ...) {
 
     while (lineno <= span.el && fgets(line, sizeof line, file)) {
         if (lineno >= span.bl) {
-            fprintf(stderr, "%*d " ANSI_BRIGHT_BLUE "|" ANSI_RESET " %s",
+            fprintf(stderr, "%*d |" ANSI_RESET " %s" ANSI_BRIGHT_BLUE,
                     lineno_width, lineno + 1, line);
         }
 
@@ -81,18 +109,18 @@ void emit_message_with_span(span span, bool error, char *format, ...) {
 
     fclose(file);
 
-    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s|", lineno_width + 1, "");
+    fprintf(stderr, "%*s|", lineno_width + 1, "");
 
-    char *color = error ? ANSI_BRIGHT_RED : ANSI_BRIGHT_CYAN;
-
+    char *color = color_of_level(level);
     if (span.bl == span.el) {
         fprintf(stderr, "%*s%s", span.bc + 1, "", color);
         for (int i = 0; i <= span.ec - span.bc; i++)
             fputc('^', stderr);
+    } else {
+        fprintf(stderr, "\n%*s|", lineno_width + 1, "");
     }
 
-    fprintf(stderr, "\n" ANSI_BRIGHT_BLUE "%*s|%s %*s", lineno_width + 1, "",
-            color, span.bc, "");
+    fprintf(stderr, " %s", color);
 
     va_start(ap, format);
     vfprintf(stderr, format, ap);

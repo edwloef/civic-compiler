@@ -9,7 +9,7 @@ static vartype RESOLVED_TY(node_st *node) {
     return ty;
 }
 
-void ATCcheckassign(vartype from, vartype to, node_st *node) {
+static void ATCcheckassign(vartype from, vartype to, node_st *node) {
     if (from.ty == TY_error) {
         return;
     }
@@ -69,11 +69,18 @@ node_st *ATCprogram(node_st *node) {
 node_st *ATCstmts(node_st *node) {
     TRAVchildren(node);
 
-    STMTS_ALWAYS_RETURNS(node) =
-        NODE_TYPE(STMTS_STMT(node)) == NT_RETURN ||
-        (NODE_TYPE(STMTS_STMT(node)) == NT_IFELSE &&
-         IFELSE_ALWAYS_RETURNS(STMTS_STMT(node))) ||
-        (STMTS_NEXT(node) != NULL && STMTS_ALWAYS_RETURNS(STMTS_NEXT(node)));
+    STMTS_ALWAYS_RETURNS(node) = NODE_TYPE(STMTS_STMT(node)) == NT_RETURN ||
+                                 (NODE_TYPE(STMTS_STMT(node)) == NT_IFELSE &&
+                                  IFELSE_ALWAYS_RETURNS(STMTS_STMT(node)));
+
+    if (STMTS_ALWAYS_RETURNS(node) && STMTS_NEXT(node)) {
+        WARNING(STMTS_STMT(node),
+                "any code following this statement is unreachable");
+        INFO(STMTS_STMT(STMTS_NEXT(node)), "first unreachable statement");
+    } else {
+        STMTS_ALWAYS_RETURNS(node) |=
+            STMTS_NEXT(node) && STMTS_ALWAYS_RETURNS(STMTS_NEXT(node));
+    }
 
     return node;
 }
@@ -222,7 +229,8 @@ node_st *ATCassign(node_st *node) {
 
     if (e.loopvar) {
         ERROR(node, "can't assign to loop variable");
-        NOTE(e.span, "loop variable '%s' declared here", e.name);
+        emit_message_with_span(e.span, L_INFO,
+                               "loop variable '%s' declared here", e.name);
     }
 
     ATCcheckassign(RESOLVED_TY(ASSIGN_EXPR(node)),
@@ -250,9 +258,9 @@ node_st *ATCifelse(node_st *node) {
         }
     }
 
-    IFELSE_ALWAYS_RETURNS(node) = IFELSE_IF_BLOCK(node) != NULL &&
+    IFELSE_ALWAYS_RETURNS(node) = IFELSE_IF_BLOCK(node) &&
                                   STMTS_ALWAYS_RETURNS(IFELSE_IF_BLOCK(node)) &&
-                                  IFELSE_ELSE_BLOCK(node) != NULL &&
+                                  IFELSE_ELSE_BLOCK(node) &&
                                   STMTS_ALWAYS_RETURNS(IFELSE_ELSE_BLOCK(node));
 
     return node;

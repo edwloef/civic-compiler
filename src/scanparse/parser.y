@@ -16,8 +16,8 @@ static node_st *parseresult = NULL;
 extern FILE *yyin;
 
 node_st *rev_vardecls(node_st *root);
+YYLTYPE span_locs(YYLTYPE lhs, YYLTYPE rhs);
 void add_loc_to_node(node_st *node, YYLTYPE loc);
-void add_locs_to_node(node_st *node, YYLTYPE lhs, YYLTYPE rhs);
 void yyerror(char *errname);
 
 %}
@@ -121,27 +121,32 @@ decl: KW_EXTERN funheader SEMICOLON
 stmts: stmt stmts
        {
          $$ = ASTstmts($1, $2);
+         add_loc_to_node($$, @$);
        }
      | stmt
        {
          $$ = ASTstmts($1, NULL);
+         add_loc_to_node($$, @$);
        }
      ;
 
 stmt: id PAREN_L exprs PAREN_R SEMICOLON
       {
         $$ = ASTcall($1, $3);
-        add_locs_to_node($$, @1, @4);
+        @$ = span_locs(@1, @4);
+        add_loc_to_node($$, @$);
       }
     | id PAREN_L PAREN_R SEMICOLON
       {
         $$ = ASTcall($1, NULL);
-        add_locs_to_node($$, @1, @3);
+        @$ = span_locs(@1, @3);
+        add_loc_to_node($$, @$);
       }
     | varref ASSIGN arrexpr SEMICOLON
       {
         $$ = ASTassign($1, $3);
-        add_locs_to_node($$, @1, @3);
+        @$ = span_locs(@1, @3);
+        add_loc_to_node($$, @$);
       }
     | KW_IF PAREN_L expr PAREN_R block %prec "none"
       {
@@ -161,7 +166,8 @@ stmt: id PAREN_L exprs PAREN_R SEMICOLON
     | KW_DO block KW_WHILE PAREN_L expr PAREN_R SEMICOLON
       {
         $$ = ASTdowhile($2, $5);
-        add_locs_to_node($$, @1, @6);
+        @$ = span_locs(@1, @6);
+        add_loc_to_node($$, @$);
       }
     | KW_FOR PAREN_L TY_INT id ASSIGN expr COMMA expr PAREN_R block
       {
@@ -181,7 +187,8 @@ stmt: id PAREN_L exprs PAREN_R SEMICOLON
     | KW_RETURN expr SEMICOLON
       {
         $$ = ASTreturn($2);
-        add_locs_to_node($$, @1, @2);
+        @$ = span_locs(@1, @2);
+        add_loc_to_node($$, @$);
       }
     ;
 
@@ -528,22 +535,23 @@ node_st *rev_vardecls(node_st *root) {
     return prev;
 }
 
-void add_loc_to_node(node_st *node, YYLTYPE loc) {
-    add_locs_to_node(node, loc, loc);
+YYLTYPE span_locs(YYLTYPE lhs, YYLTYPE rhs) {
+    YYLTYPE loc = {lhs.first_line, lhs.first_column, rhs.last_line, rhs.last_column};
+    return loc;
 }
 
-void add_locs_to_node(node_st *node, YYLTYPE lhs, YYLTYPE rhs) {
-    NODE_BLINE(node) = lhs.first_line;
-    NODE_BCOL(node) = lhs.first_column;
-    NODE_ELINE(node) = rhs.last_line;
-    NODE_ECOL(node) = rhs.last_column;
+void add_loc_to_node(node_st *node, YYLTYPE loc) {
+    NODE_BLINE(node) = loc.first_line;
+    NODE_BCOL(node) = loc.first_column;
+    NODE_ELINE(node) = loc.last_line;
+    NODE_ECOL(node) = loc.last_column;
 }
 
 node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
     yyin = fopen(globals.input_file, "r");
     if (yyin == NULL) {
-        emit_message(true, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+        emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
     } else {
         yyparse();
     }

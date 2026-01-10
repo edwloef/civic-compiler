@@ -18,7 +18,9 @@ void vartable_insert(vartable *self, vartable_entry e, node_st *id) {
         vartable_entry entry = self->buf[l];
         if (!entry.loopvar && STReq(entry.name, e.name)) {
             ERROR(id, "can't re-declare variable '%s'", e.name);
-            NOTE(entry.span, "variable '%s' previously declared here", e.name);
+            emit_message_with_span(entry.span, L_INFO,
+                                   "variable '%s' previously declared here",
+                                   e.name);
             return;
         }
     }
