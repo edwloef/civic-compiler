@@ -1,5 +1,4 @@
 #include "ccn/ccn.h"
-#include "palm/ctinfo.h"
 #include "palm/dbug.h"
 
 #define CONST_INT(val) CONST_RETURN(ASTint(val))
@@ -111,7 +110,6 @@ node_st *OCSCFbinop(node_st *node) {
             if (INT_VAL(BINOP_RIGHT(node)) != 0) {
                 CONST_INT(INT_BINOP(/));
             } else {
-                CTI(CTI_WARN, true, "encountered integer division by zero");
                 return node;
             }
         case NT_FLOAT:
@@ -125,7 +123,6 @@ node_st *OCSCFbinop(node_st *node) {
             if (INT_VAL(BINOP_RIGHT(node)) != 0) {
                 CONST_INT(INT_BINOP(%));
             } else {
-                CTI(CTI_WARN, true, "encountered integer modulo by zero");
                 return node;
             }
         default:

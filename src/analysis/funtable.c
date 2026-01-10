@@ -39,6 +39,7 @@ void funtable_insert(funtable *self, funtable_entry e, node_st *id) {
         if (entry.ty.len == e.ty.len && STReq(entry.name, e.name)) {
             ERROR(id, "can't re-declare function '%s' with %d parameters",
                   e.name, e.ty.len);
+            NOTE(entry.span, "'%s' previously declared here", e.name);
             return;
         }
     }
@@ -84,7 +85,7 @@ funtable_ref funtable_resolve(funtable *self, node_st *call) {
 
 funtable_entry funtable_get(funtable *self, funtable_ref e) {
     if (e.n == -1 && e.l == -1) {
-        funtable_entry e = {"error", {0, 0, NULL, TY_error}};
+        funtable_entry e = {"error", {0, 0, NULL, TY_error}, {0, 0, 0, 0}};
         return e;
     }
 

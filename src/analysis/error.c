@@ -1,21 +1,37 @@
-#include "analysis/error.h"
-#include "globals/globals.h"
-#include "palm/ctinfo.h"
-#include "palm/dbug.h"
-#include "palm/str.h"
-
 #include <math.h>
 #include <stdio.h>
+
+#include "analysis/error.h"
+#include "globals/globals.h"
+#include "palm/str.h"
 
 #define ANSI_RESET "\033[0m"
 #define ANSI_BRIGHT_RED "\033[30;91m"
 #define ANSI_BRIGHT_BLUE "\033[30;94m"
+#define ANSI_BRIGHT_CYAN "\033[30;96m"
 
-void emit_message_at_node(enum cti_type type, span span, char *error) {
-    if (CTIgetErrors())
-        fprintf(stderr, "\n");
+static int error_count = 0;
 
-    CTI(type, false, "%s", error);
+void abort_on_error(void) {
+    if (error_count > 0) {
+        fprintf(stderr,
+                ANSI_BRIGHT_RED
+                "error: " ANSI_RESET
+                "could not compile '%s' due to %d previous error%s\n",
+                globals.input_file, error_count, error_count > 1 ? "s" : "");
+        exit(1);
+    }
+}
+
+void emit_message_at_node(span span, char *message, bool error) {
+    if (error) {
+        if (error_count > 0)
+            fprintf(stderr, "\n");
+        fprintf(stderr, ANSI_BRIGHT_RED "error: " ANSI_RESET "%s\n", message);
+        error_count++;
+    } else {
+        fprintf(stderr, ANSI_BRIGHT_CYAN "note: " ANSI_RESET "%s\n", message);
+    }
 
     FILE *file = fopen(globals.input_file, "r");
     if (file == NULL)
@@ -45,23 +61,15 @@ void emit_message_at_node(enum cti_type type, span span, char *error) {
 
     fprintf(stderr, ANSI_BRIGHT_BLUE "%*s", lineno_width + 2, "|");
 
-    char *color;
-    if (type == CTI_ERROR) {
-        color = ANSI_BRIGHT_RED;
-    } else if (type == CTI_NOTE) {
-        color = ANSI_BRIGHT_BLUE;
-    } else {
-        DBUG_ASSERT(false, "Unreachable.");
-    }
-
+    char *color = error ? ANSI_BRIGHT_RED : ANSI_BRIGHT_CYAN;
     if (span.bl == span.el) {
         fprintf(stderr, "%*s%s", span.bc + 1, "", color);
         for (int i = 0; i <= span.ec - span.bc; i++)
             putc('^', stderr);
         fprintf(stderr, "\n" ANSI_BRIGHT_BLUE "%*s%s %*s%s\n", lineno_width + 2,
-                "|", color, span.bc, "", error);
+                "|", color, span.bc, "", message);
     } else {
-        fprintf(stderr, "%*s%s %s\n", lineno_width + 2, "|", color, error);
+        fprintf(stderr, "%*s%s %s\n", lineno_width + 2, "|", color, message);
     }
 
     fprintf(stderr, ANSI_BRIGHT_BLUE "%*s\n" ANSI_RESET, lineno_width + 2, "|");

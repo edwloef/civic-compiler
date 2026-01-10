@@ -18,6 +18,7 @@ void vartable_insert(vartable *self, vartable_entry e, node_st *id) {
         vartable_entry entry = self->buf[l];
         if (!entry.loopvar && STReq(entry.name, e.name)) {
             ERROR(id, "can't re-declare variable '%s'", e.name);
+            NOTE(entry.span, "'%s' previously declared here", e.name);
             return;
         }
     }
@@ -56,7 +57,7 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
 
 vartable_entry vartable_get(vartable *self, vartable_ref e) {
     if (e.n == -1 && e.l == -1) {
-        vartable_entry e = {"error", {TY_error, 0}, false};
+        vartable_entry e = {"error", {TY_error, 0}, {0, 0, 0, 0}, false};
         return e;
     }
 

@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 
+#include "analysis/span.h"
 #include "ccngen/enum.h"
 
 typedef struct {
@@ -12,6 +13,7 @@ typedef struct {
 typedef struct {
     char *name;
     vartype ty;
+    span span;
     bool loopvar;
 } vartable_entry;
 

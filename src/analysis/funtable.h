@@ -18,6 +18,7 @@ void funtype_free(funtype self);
 typedef struct {
     char *name;
     funtype ty;
+    span span;
 } funtable_entry;
 
 typedef struct funtable funtable;

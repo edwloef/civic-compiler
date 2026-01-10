@@ -1,7 +1,6 @@
 #include "analysis/error.h"
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "palm/ctinfo.h"
 #include "palm/dbug.h"
 #include "print/print.h"
 
@@ -56,7 +55,7 @@ void ATCcheckassign(vartype from, vartype to, node_st *node) {
 
 void ATCinit(void) {}
 
-void ATCfini(void) { CTIabortOnError(); }
+void ATCfini(void) { abort_on_error(); }
 
 node_st *ATCprogram(node_st *node) {
     DATA_ATC_GET()->funtable = PROGRAM_FUNTABLE(node);
@@ -221,8 +220,10 @@ node_st *ATCassign(node_st *node) {
     vartable_ref r = {VARREF_N(ASSIGN_REF(node)), VARREF_L(ASSIGN_REF(node))};
     vartable_entry e = vartable_get(DATA_ATC_GET()->vartable, r);
 
-    if (e.loopvar)
+    if (e.loopvar) {
         ERROR(node, "can't assign to loop variable");
+        NOTE(e.span, "loop variable '%s' declared here", e.name);
+    }
 
     ATCcheckassign(RESOLVED_TY(ASSIGN_EXPR(node)),
                    RESOLVED_TY(ASSIGN_REF(node)), node);

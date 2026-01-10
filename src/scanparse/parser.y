@@ -124,9 +124,15 @@ stmts: stmt stmts
        }
      ;
 
-stmt: expr SEMICOLON
+stmt: id PAREN_L exprs PAREN_R SEMICOLON
       {
-        $$ = $1;
+        $$ = ASTcall($1, $3);
+        add_locs_to_node($$, @1, @4);
+      }
+    | id PAREN_L PAREN_R SEMICOLON
+      {
+        $$ = ASTcall($1, NULL);
+        add_locs_to_node($$, @1, @3);
       }
     | varref ASSIGN arrexpr SEMICOLON
       {
@@ -530,7 +536,7 @@ void add_locs_to_node(node_st *node, YYLTYPE lhs, YYLTYPE rhs) {
 }
 
 int yyerror(char *error) {
-    CTI(CTI_ERROR, true, "%s:%d:%d: %s\n", globals.input_file, globals.line + 1,
+    CTI(CTI_ERROR, false, "%s:%d:%d: %s\n", globals.input_file, globals.line + 1,
         globals.col + 1, error);
     CTIabortOnError();
     return 0;
@@ -540,7 +546,7 @@ node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
     yyin = fopen(globals.input_file, "r");
     if (yyin == NULL) {
-        CTI(CTI_ERROR, true, "couldn't read '%s'", globals.input_file);
+        CTI(CTI_ERROR, false, "couldn't read '%s'", globals.input_file);
         CTIabortOnError();
     }
     yyparse();

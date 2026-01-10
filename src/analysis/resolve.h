@@ -1,3 +1,5 @@
+#pragma once
+
 #include "analysis/funtable.h"
 #include "analysis/vartable.h"
 #include "ccngen/ast.h"

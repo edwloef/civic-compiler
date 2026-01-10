@@ -1,4 +1,5 @@
 #include "analysis/resolve.h"
+#include "analysis/span.h"
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 
@@ -39,8 +40,10 @@ node_st *ARfunbody(node_st *node) {
 node_st *ARparam(node_st *node) {
     for (node_st *expr = TYPE_EXPRS(PARAM_TY(node)); expr;
          expr = EXPRS_NEXT(expr)) {
-        vartable_entry e = {
-            ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, false};
+        vartable_entry e = {ID_VAL(VARREF_ID(EXPRS_EXPR(expr))),
+                            {TY_int, 0},
+                            SPAN(VARREF_ID(EXPRS_EXPR(expr))),
+                            false};
         vartable_insert(DATA_AR_GET()->vartable, e,
                         VARREF_ID(EXPRS_EXPR(expr)));
     }
@@ -51,8 +54,10 @@ node_st *ARparam(node_st *node) {
         dims++;
     }
 
-    vartable_entry e = {
-        ID_VAL(PARAM_ID(node)), {TYPE_TY(PARAM_TY(node)), dims}, false};
+    vartable_entry e = {ID_VAL(PARAM_ID(node)),
+                        {TYPE_TY(PARAM_TY(node)), dims},
+                        SPAN(PARAM_ID(node)),
+                        false};
     vartable_insert(DATA_AR_GET()->vartable, e, PARAM_ID(node));
 
     return node;
@@ -68,8 +73,10 @@ node_st *ARvardecl(node_st *node) {
             dims++;
         }
 
-        vartable_entry e = {
-            ID_VAL(VARDECL_ID(node)), {TYPE_TY(VARDECL_TY(node)), dims}, false};
+        vartable_entry e = {ID_VAL(VARDECL_ID(node)),
+                            {TYPE_TY(VARDECL_TY(node)), dims},
+                            SPAN(VARDECL_ID(node)),
+                            false};
         vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node));
 
         VARDECL_L(node) = DATA_AR_GET()->vartable->len - 1;
@@ -83,7 +90,8 @@ node_st *ARfor(node_st *node) {
     TRAVloop_end(node);
     TRAVloop_step(node);
 
-    vartable_entry e = {ID_VAL(FOR_ID(node)), {TY_int, 0}, false};
+    vartable_entry e = {
+        ID_VAL(FOR_ID(node)), {TY_int, 0}, SPAN(FOR_ID(node)), false};
     vartable_push(DATA_AR_GET()->vartable, e);
 
     int idx = DATA_AR_GET()->vartable->len - 1;
