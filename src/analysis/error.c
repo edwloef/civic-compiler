@@ -55,11 +55,8 @@ void abort_on_error(void) {
 }
 
 static void va_emit_message(level level, char *format, va_list ap) {
-    if (level == L_ERROR) {
-        if (error_count > 0)
-            fputc('\n', stderr);
+    if (level == L_ERROR)
         error_count++;
-    }
 
     fprintf(stderr, "%s%s" ANSI_RESET, color_of_level(level),
             message_of_level(level));
