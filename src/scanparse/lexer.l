@@ -2,18 +2,19 @@
 
 #include <limits.h>
 
+#include "analysis/error.h"
+#include "analysis/span.h"
 #include "ccn/ccn.h"
 #include "globals/globals.h"
 #include "palm/str.h"
 #include "parser.h"
 
-int yyerror(char *err);
+void yyerror(char *err);
+void token_action();
 
 #define FILTER(token) \
     globals.col += yyleng; \
     return(token);
-
-static void token_action();
 
 #define YY_USER_ACTION token_action();
 
@@ -125,8 +126,14 @@ static void token_action();
 
 %%
 
-static void token_action() {
+void token_action() {
     yylloc.first_line = yylloc.last_line = globals.line;
     yylloc.first_column = globals.col;
     yylloc.last_column = globals.col + yyleng - 1;
+}
+
+void yyerror(char *error) {
+    span s = {yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column};
+    emit_message_at_span(s, error, true);
+    abort_on_error();
 }

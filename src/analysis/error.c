@@ -23,7 +23,7 @@ void abort_on_error(void) {
     }
 }
 
-void emit_message_at_node(span span, char *message, bool error) {
+void emit_message_at_span(span span, char *message, bool error) {
     if (error) {
         if (error_count > 0)
             fprintf(stderr, "\n");
@@ -69,7 +69,7 @@ void emit_message_at_node(span span, char *message, bool error) {
         fprintf(stderr, "\n" ANSI_BRIGHT_BLUE "%*s%s %*s%s\n", lineno_width + 2,
                 "|", color, span.bc, "", message);
     } else {
-        fprintf(stderr, "%*s%s %s\n", lineno_width + 2, "|", color, message);
+        fprintf(stderr, "\n%*s%s %s\n", lineno_width + 2, "|", color, message);
     }
 
     fprintf(stderr, ANSI_BRIGHT_BLUE "%*s\n" ANSI_RESET, lineno_width + 2, "|");

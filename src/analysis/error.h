@@ -6,19 +6,19 @@
 
 #define ERROR(node, format, ...)                                               \
     {                                                                          \
-        char *error = STRfmt(format, ##__VA_ARGS__);                           \
         span span = SPAN(node);                                                \
-        emit_message_at_node(span, error, true);                               \
-        MEMfree(error);                                                        \
+        char *message = STRfmt(format, ##__VA_ARGS__);                         \
+        emit_message_at_span(span, message, true);                             \
+        MEMfree(message);                                                      \
     }
 
 #define NOTE(span, format, ...)                                                \
     {                                                                          \
-        char *error = STRfmt(format, ##__VA_ARGS__);                           \
-        emit_message_at_node(span, error, false);                              \
-        MEMfree(error);                                                        \
+        char *message = STRfmt(format, ##__VA_ARGS__);                         \
+        emit_message_at_span(span, message, false);                            \
+        MEMfree(message);                                                      \
     }
 
 void abort_on_error(void);
 
-void emit_message_at_node(span span, char *error, bool err);
+void emit_message_at_span(span span, char *message, bool err);

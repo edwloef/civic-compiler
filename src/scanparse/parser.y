@@ -1,5 +1,6 @@
 %{
 
+#include "analysis/error.h"
 #include "ccn/ccn.h"
 #include "globals/globals.h"
 #include "palm/ctinfo.h"
@@ -14,7 +15,7 @@ extern FILE *yyin;
 node_st *rev_vardecls(node_st *root);
 void add_loc_to_node(node_st *node, YYLTYPE loc);
 void add_locs_to_node(node_st *node, YYLTYPE lhs, YYLTYPE rhs);
-int yyerror(char *errname);
+void yyerror(char *errname);
 
 %}
 
@@ -533,13 +534,6 @@ void add_locs_to_node(node_st *node, YYLTYPE lhs, YYLTYPE rhs) {
     NODE_BCOL(node) = lhs.first_column;
     NODE_ELINE(node) = rhs.last_line;
     NODE_ECOL(node) = rhs.last_column;
-}
-
-int yyerror(char *error) {
-    CTI(CTI_ERROR, false, "%s:%d:%d: %s\n", globals.input_file, globals.line + 1,
-        globals.col + 1, error);
-    CTIabortOnError();
-    return 0;
 }
 
 node_st *scanparse(node_st *root) {
