@@ -8,17 +8,17 @@
     {                                                                          \
         span span = SPAN(node);                                                \
         char *message = STRfmt(format, ##__VA_ARGS__);                         \
-        emit_message_at_span(span, message, true);                             \
+        emit_message_with_span(span, message, true);                           \
         MEMfree(message);                                                      \
     }
 
 #define NOTE(span, format, ...)                                                \
     {                                                                          \
         char *message = STRfmt(format, ##__VA_ARGS__);                         \
-        emit_message_at_span(span, message, false);                            \
+        emit_message_with_span(span, message, false);                          \
         MEMfree(message);                                                      \
     }
 
 void abort_on_error(void);
-
-void emit_message_at_span(span span, char *message, bool err);
+void emit_message(char *message, bool err);
+void emit_message_with_span(span span, char *message, bool err);

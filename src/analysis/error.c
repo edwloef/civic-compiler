@@ -17,13 +17,13 @@ void abort_on_error(void) {
         fprintf(stderr,
                 ANSI_BRIGHT_RED
                 "error: " ANSI_RESET
-                "could not compile '%s' due to %d previous error%s\n",
+                "couldn't compile '%s' due to %d previous error%s\n",
                 globals.input_file, error_count, error_count > 1 ? "s" : "");
         exit(1);
     }
 }
 
-void emit_message_at_span(span span, char *message, bool error) {
+void emit_message(char *message, bool error) {
     if (error) {
         if (error_count > 0)
             fprintf(stderr, "\n");
@@ -32,6 +32,10 @@ void emit_message_at_span(span span, char *message, bool error) {
     } else {
         fprintf(stderr, ANSI_BRIGHT_CYAN "note: " ANSI_RESET "%s\n", message);
     }
+}
+
+void emit_message_with_span(span span, char *message, bool error) {
+    emit_message(message, error);
 
     FILE *file = fopen(globals.input_file, "r");
     if (file == NULL)

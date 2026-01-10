@@ -134,6 +134,6 @@ void token_action() {
 
 void yyerror(char *error) {
     span s = {yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column};
-    emit_message_at_span(s, error, true);
+    emit_message_with_span(s, error, true);
     abort_on_error();
 }

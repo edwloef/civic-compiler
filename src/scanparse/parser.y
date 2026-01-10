@@ -1,5 +1,8 @@
 %{
 
+#include <errno.h>
+#include <string.h>
+
 #include "analysis/error.h"
 #include "ccn/ccn.h"
 #include "globals/globals.h"
@@ -540,8 +543,9 @@ node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
     yyin = fopen(globals.input_file, "r");
     if (yyin == NULL) {
-        CTI(CTI_ERROR, false, "couldn't read '%s'", globals.input_file);
-        CTIabortOnError();
+        char *error = STRfmt("couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+        emit_message(error, true);
+        abort_on_error();
     }
     yyparse();
     return parseresult;
