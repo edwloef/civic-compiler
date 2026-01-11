@@ -105,6 +105,13 @@ node_st *OTCFstmts(node_st *node) {
     case NT_RETURN:
         OTCFlaststmt(node);
         break;
+    case NT_CALL:
+        if (CALL_TRANSP(stmt)) {
+            CCNfree(STMTS_STMT(node));
+            STMTS_STMT(node) = NULL;
+            node = OTCFinlinestmts(node, NULL);
+        }
+        break;
     default:
         break;
     }
