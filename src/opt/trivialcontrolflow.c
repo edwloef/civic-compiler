@@ -49,15 +49,20 @@ node_st *OTCFstmts(node_st *node) {
 
             node = OTCFinlinestmts(node, stmts);
         } else if (NODE_TYPE(IFELSE_EXPR(stmt)) == NT_MONOP &&
-                   MONOP_OP(IFELSE_EXPR(node)) == MO_not) {
-            node_st *tmp = IFELSE_EXPR(node);
-            IFELSE_EXPR(node) = MONOP_EXPR(tmp);
+                   MONOP_OP(IFELSE_EXPR(stmt)) == MO_not) {
+            node_st *tmp = IFELSE_EXPR(stmt);
+            IFELSE_EXPR(stmt) = MONOP_EXPR(tmp);
             MONOP_EXPR(tmp) = NULL;
             CCNfree(tmp);
 
-            tmp = IFELSE_IF_BLOCK(node);
-            IFELSE_IF_BLOCK(node) = IFELSE_ELSE_BLOCK(node);
-            IFELSE_ELSE_BLOCK(node) = tmp;
+            tmp = IFELSE_IF_BLOCK(stmt);
+            IFELSE_IF_BLOCK(stmt) = IFELSE_ELSE_BLOCK(stmt);
+            IFELSE_ELSE_BLOCK(stmt) = tmp;
+
+            CCNcycleNotify();
+        } else if (ARREXPR_TRANSP(IFELSE_EXPR(stmt)) &&
+                   !IFELSE_IF_BLOCK(node) && !IFELSE_ELSE_BLOCK(node)) {
+            node = OTCFinlinestmts(node, NULL);
         }
         break;
     case NT_WHILE:
