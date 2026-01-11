@@ -29,13 +29,6 @@ node_st *OImonop(node_st *node) {
         if (NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
             MONOP_OP(MONOP_EXPR(node)) == MO_neg) {
             TAKE(MONOP_EXPR(MONOP_EXPR(node)));
-        } else if (NODE_TYPE(MONOP_EXPR(node)) == NT_BINOP &&
-                   BINOP_OP(MONOP_EXPR(node)) == BO_sub &&
-                   NODE_TYPE(BINOP_LEFT(MONOP_EXPR(node))) == NT_MONOP &&
-                   MONOP_OP(BINOP_LEFT(MONOP_EXPR(node))) == MO_neg) {
-            TAKE(MONOP_EXPR(node));
-            SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
-            BINOP_OP(node) = BO_add;
         }
         break;
     case MO_not:
@@ -108,6 +101,10 @@ node_st *OIbinop(node_st *node) {
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
             node = ASTmonop(node, MO_not);
+        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
+                   MONOP_OP(BINOP_LEFT(node)) == MO_neg) {
+            BINOP_OP(node) = BINOP_OP(node) == BO_add ? BO_sub : BO_add;
+            SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
         } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
                    MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
             BINOP_OP(node) = BINOP_OP(node) == BO_add ? BO_sub : BO_add;
@@ -133,23 +130,6 @@ node_st *OIbinop(node_st *node) {
                      BOOL_VAL(BINOP_RIGHT(node)) == false))) {
             TAKE(BINOP_RIGHT(node));
             break;
-        }
-        // fallthrough
-    case BO_div:
-        if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
-             INT_VAL(BINOP_LEFT(node)) == 1) ||
-            (NODE_TYPE(BINOP_LEFT(node)) == NT_FLOAT &&
-             FLOAT_VAL(BINOP_LEFT(node)) == 1.0) ||
-            (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
-             BOOL_VAL(BINOP_LEFT(node)) == true)) {
-            TAKE(BINOP_RIGHT(node));
-        } else if ((NODE_TYPE(BINOP_RIGHT(node)) == NT_INT &&
-                    INT_VAL(BINOP_RIGHT(node)) == 1) ||
-                   (NODE_TYPE(BINOP_RIGHT(node)) == NT_FLOAT &&
-                    FLOAT_VAL(BINOP_RIGHT(node)) == 1.0) ||
-                   (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
-                    BOOL_VAL(BINOP_RIGHT(node)) == true)) {
-            TAKE(BINOP_LEFT(node));
         } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
                    MONOP_OP(BINOP_LEFT(node)) == MO_not &&
                    NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
@@ -158,6 +138,25 @@ node_st *OIbinop(node_st *node) {
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
             node = ASTmonop(node, MO_not);
+            break;
+        } else if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
+                    INT_VAL(BINOP_LEFT(node)) == 1) ||
+                   (NODE_TYPE(BINOP_LEFT(node)) == NT_FLOAT &&
+                    FLOAT_VAL(BINOP_LEFT(node)) == 1.0) ||
+                   (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
+                    BOOL_VAL(BINOP_LEFT(node)) == true)) {
+            TAKE(BINOP_RIGHT(node));
+            break;
+        }
+        // fallthrough
+    case BO_div:
+        if ((NODE_TYPE(BINOP_RIGHT(node)) == NT_INT &&
+             INT_VAL(BINOP_RIGHT(node)) == 1) ||
+            (NODE_TYPE(BINOP_RIGHT(node)) == NT_FLOAT &&
+             FLOAT_VAL(BINOP_RIGHT(node)) == 1.0) ||
+            (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
+             BOOL_VAL(BINOP_RIGHT(node)) == true)) {
+            TAKE(BINOP_LEFT(node));
         } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
                    MONOP_OP(BINOP_LEFT(node)) == MO_neg) {
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
@@ -166,6 +165,13 @@ node_st *OIbinop(node_st *node) {
                    MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
             node = ASTmonop(node, MO_neg);
+        }
+        break;
+    case BO_mod:
+        if (ARREXPR_TRANSP(BINOP_LEFT(node)) &&
+            NODE_TYPE(BINOP_RIGHT(node)) == NT_INT &&
+            INT_VAL(BINOP_RIGHT(node)) == 1) {
+            TAKE(BINOP_RIGHT(node));
         }
         break;
     case BO_and:
