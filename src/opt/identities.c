@@ -18,12 +18,7 @@
         CCNcycleNotify();                                                      \
     }
 
-static vartype RESOLVED_TY(node_st *node) {
-    vartype ty = {ARREXPR_RESOLVED_TY(node), ARREXPR_RESOLVED_DIMS(node)};
-    return ty;
-}
-
-node_st *OCImonop(node_st *node) {
+node_st *OImonop(node_st *node) {
     TRAVchildren(node);
 
     switch (MONOP_OP(node)) {
@@ -85,7 +80,7 @@ node_st *OCImonop(node_st *node) {
     return node;
 }
 
-node_st *OCIbinop(node_st *node) {
+node_st *OIbinop(node_st *node) {
     TRAVchildren(node);
 
     switch (BINOP_OP(node)) {
@@ -212,15 +207,6 @@ node_st *OCIbinop(node_st *node) {
     default:
         break;
     }
-
-    return node;
-}
-
-node_st *OCIcast(node_st *node) {
-    TRAVchildren(node);
-
-    if (CAST_TY(node) == RESOLVED_TY(CAST_EXPR(node)).ty)
-        TAKE(CAST_EXPR(node));
 
     return node;
 }

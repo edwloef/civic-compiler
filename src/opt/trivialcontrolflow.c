@@ -9,7 +9,7 @@
         node = tmp;                                                            \
     }
 
-static node_st *OCCFinlinestmts(node_st *node, node_st *stmts) {
+static node_st *OTCFinlinestmts(node_st *node, node_st *stmts) {
     TAKE(STMTS_NEXT(node));
 
     if (stmts) {
@@ -23,7 +23,7 @@ static node_st *OCCFinlinestmts(node_st *node, node_st *stmts) {
     }
 }
 
-node_st *OCCFstmts(node_st *node) {
+node_st *OTCFstmts(node_st *node) {
     TRAVchildren(node);
 
     node_st *stmt = STMTS_STMT(node);
@@ -39,7 +39,7 @@ node_st *OCCFstmts(node_st *node) {
                 IFELSE_ELSE_BLOCK(stmt) = NULL;
             }
 
-            node = OCCFinlinestmts(node, stmts);
+            node = OTCFinlinestmts(node, stmts);
         } else if (NODE_TYPE(IFELSE_EXPR(stmt)) == NT_MONOP &&
                    MONOP_OP(IFELSE_EXPR(node)) == MO_not) {
             node_st *tmp = IFELSE_EXPR(node);
@@ -61,7 +61,7 @@ node_st *OCCFstmts(node_st *node) {
             } else {
                 CCNfree(STMTS_STMT(node));
                 STMTS_STMT(node) = NULL;
-                node = OCCFinlinestmts(node, NULL);
+                node = OTCFinlinestmts(node, NULL);
             }
         }
         break;
@@ -74,7 +74,7 @@ node_st *OCCFstmts(node_st *node) {
             } else {
                 node_st *stmts = DOWHILE_STMTS(stmt);
                 DOWHILE_STMTS(stmt) = NULL;
-                node = OCCFinlinestmts(node, stmts);
+                node = OTCFinlinestmts(node, stmts);
             }
         }
         break;
@@ -88,13 +88,13 @@ node_st *OCCFstmts(node_st *node) {
                  (INT_VAL(FOR_LOOP_STEP(stmt)) > 0))) {
                 CCNfree(STMTS_STMT(node));
                 STMTS_STMT(node) = NULL;
-                node = OCCFinlinestmts(node, NULL);
+                node = OTCFinlinestmts(node, NULL);
             } else if (INT_VAL(FOR_LOOP_END(stmt)) -
                            INT_VAL(FOR_LOOP_START(stmt)) <=
                        INT_VAL(FOR_LOOP_STEP(stmt))) {
                 node_st *stmts = FOR_STMTS(stmt);
                 FOR_STMTS(stmt) = NULL;
-                node = OCCFinlinestmts(node, stmts);
+                node = OTCFinlinestmts(node, stmts);
             }
         }
         break;

@@ -16,7 +16,7 @@
 #define FLOAT_MONOP(op) op FLOAT_VAL(MONOP_EXPR(node))
 #define BOOL_MONOP(op) op BOOL_VAL(MONOP_EXPR(node))
 
-node_st *OCSCFmonop(node_st *node) {
+node_st *OSCFmonop(node_st *node) {
     switch (MONOP_OP(node)) {
     case MO_pos:
         switch (NODE_TYPE(MONOP_EXPR(node))) {
@@ -54,7 +54,7 @@ node_st *OCSCFmonop(node_st *node) {
     FLOAT_VAL(BINOP_LEFT(node)) op FLOAT_VAL(BINOP_RIGHT(node))
 #define BOOL_BINOP(op) BOOL_VAL(BINOP_LEFT(node)) op BOOL_VAL(BINOP_RIGHT(node))
 
-node_st *OCSCFbinop(node_st *node) {
+node_st *OSCFbinop(node_st *node) {
     if (NODE_TYPE(BINOP_LEFT(node)) != NODE_TYPE(BINOP_RIGHT(node)))
         return node;
 
@@ -192,7 +192,7 @@ node_st *OCSCFbinop(node_st *node) {
     }
 }
 
-node_st *OCSCFcast(node_st *node) {
+node_st *OSCFcast(node_st *node) {
     switch (CAST_TY(node)) {
     case TY_int:
         switch (NODE_TYPE(CAST_EXPR(node))) {

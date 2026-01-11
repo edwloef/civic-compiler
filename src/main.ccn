@@ -4,6 +4,7 @@ start phase RootPhase {
         // Print;
         // Stats;
         Analysis;
+        Desugar;
         Opt;
         Free;
     }
@@ -69,25 +70,30 @@ phase Analysis {
     }
 };
 
-phase Opt {
+phase Desugar {
     actions {
-        cycle Canonicalize {
-            actions {
-                traversal ScalarConstFold {
-                    uid = OCSCF,
-                    nodes = { Monop, Binop, Cast }
-                };
+        traversal Casts {
+            uid = DC,
+            nodes = { Cast }
+        };
+    }
+};
 
-                traversal ControlFlow {
-                    uid = OCCF,
-                    nodes = { Stmts }
-                };
+cycle Opt {
+    actions {
+        traversal ScalarConstFold {
+            uid = OSCF,
+            nodes = { Monop, Binop, Cast }
+        };
 
-                traversal Identities {
-                    uid = OCI,
-                    nodes = { Monop, Binop, Cast }
-                };
-            }
+        traversal TrivialControlFlow {
+            uid = OTCF,
+            nodes = { Stmts }
+        };
+
+        traversal Identities {
+            uid = OI,
+            nodes = { Monop, Binop }
         };
     }
 };
