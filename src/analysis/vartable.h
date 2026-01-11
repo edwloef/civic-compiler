@@ -13,6 +13,7 @@ typedef struct {
 typedef struct {
     char *name;
     vartype ty;
+    int level;
     span span;
     bool loopvar;
 } vartable_entry;
@@ -34,6 +35,6 @@ vartable *vartable_new(vartable *parent);
 
 void vartable_push(vartable *self, vartable_entry e);
 
-vartable_entry vartable_get(vartable *self, vartable_ref e);
+vartable_entry *vartable_get(vartable *self, vartable_ref r);
 
 void vartable_free(vartable *self);

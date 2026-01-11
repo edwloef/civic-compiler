@@ -6,7 +6,7 @@ typedef struct {
     int len;
     int cap;
     vartype *buf;
-    enum BasicType ret_ty;
+    enum BasicType ty;
 } funtype;
 
 funtype funtype_new(enum BasicType);
@@ -18,6 +18,8 @@ void funtype_free(funtype self);
 typedef struct {
     char *name;
     funtype ty;
+    int nesting_level;
+    int min_nesting_level;
     span span;
 } funtable_entry;
 
@@ -38,6 +40,8 @@ funtable *funtable_new(funtable *parent);
 
 void funtable_push(funtable *self, funtable_entry e);
 
-funtable_entry funtable_get(funtable *self, funtable_ref e);
+funtable_entry *funtable_get(funtable *self, funtable_ref r);
+
+bool funtable_transparent(funtable *self, funtable_ref r);
 
 void funtable_free(funtable *self);

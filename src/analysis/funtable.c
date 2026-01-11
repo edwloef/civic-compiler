@@ -4,12 +4,12 @@
 #include "palm/memory.h"
 #include "palm/str.h"
 
-funtype funtype_new(enum BasicType ret_ty) {
+funtype funtype_new(enum BasicType ty) {
     funtype n;
     n.len = 0;
     n.cap = 0;
     n.buf = NULL;
-    n.ret_ty = ret_ty;
+    n.ty = ty;
     return n;
 }
 
@@ -85,15 +85,18 @@ funtable_ref funtable_resolve(funtable *self, node_st *call) {
     return r;
 }
 
-funtable_entry funtable_get(funtable *self, funtable_ref e) {
-    if (e.n == -1 && e.l == -1) {
-        funtable_entry e = {"error", {0, 0, NULL, TY_error}, {0, 0, 0, 0}};
-        return e;
-    }
-
-    for (int i = 0; i < e.n; i++)
+static funtable_entry error = {.name = "error", .ty = {.ty = TY_error}};
+funtable_entry *funtable_get(funtable *self, funtable_ref r) {
+    if (r.n == -1 && r.l == -1)
+        return &error;
+    for (int i = 0; i < r.n; i++)
         self = self->parent;
-    return self->buf[e.l];
+    return &self->buf[r.l];
+}
+
+bool funtable_transparent(funtable *self, funtable_ref r) {
+    funtable_entry *e = funtable_get(self, r);
+    return e->min_nesting_level > e->nesting_level;
 }
 
 void funtable_free(funtable *self) {

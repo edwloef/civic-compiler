@@ -28,10 +28,12 @@ node_st *ARfundecl(node_st *node) {
 }
 
 node_st *ARfunbody(node_st *node) {
+    DATA_AC_GET()->nesting_level++;
     DATA_AR_GET()->funtable = FUNBODY_FUNTABLE(node);
 
     TRAVchildren(node);
 
+    DATA_AC_GET()->nesting_level--;
     DATA_AR_GET()->funtable = DATA_AR_GET()->funtable->parent;
 
     return node;
@@ -42,6 +44,7 @@ node_st *ARparam(node_st *node) {
          expr = EXPRS_NEXT(expr)) {
         vartable_entry e = {ID_VAL(VARREF_ID(EXPRS_EXPR(expr))),
                             {TY_int, 0},
+                            DATA_AR_GET()->nesting_level,
                             SPAN(VARREF_ID(EXPRS_EXPR(expr))),
                             false};
         vartable_insert(DATA_AR_GET()->vartable, e,
@@ -56,6 +59,7 @@ node_st *ARparam(node_st *node) {
 
     vartable_entry e = {ID_VAL(PARAM_ID(node)),
                         {TYPE_TY(PARAM_TY(node)), dims},
+                        DATA_AR_GET()->nesting_level,
                         SPAN(PARAM_ID(node)),
                         false};
     vartable_insert(DATA_AR_GET()->vartable, e, PARAM_ID(node));
@@ -75,6 +79,7 @@ node_st *ARvardecl(node_st *node) {
 
         vartable_entry e = {ID_VAL(VARDECL_ID(node)),
                             {TYPE_TY(VARDECL_TY(node)), dims},
+                            DATA_AR_GET()->nesting_level,
                             SPAN(VARDECL_ID(node)),
                             false};
         vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node));
@@ -90,15 +95,18 @@ node_st *ARfor(node_st *node) {
     TRAVloop_end(node);
     TRAVloop_step(node);
 
-    vartable_entry e = {
-        ID_VAL(FOR_ID(node)), {TY_int, 0}, SPAN(FOR_ID(node)), false};
+    vartable_entry e = {ID_VAL(FOR_ID(node)),
+                        {TY_int, 0},
+                        DATA_AR_GET()->nesting_level,
+                        SPAN(FOR_ID(node)),
+                        false};
     vartable_push(DATA_AR_GET()->vartable, e);
 
-    int idx = DATA_AR_GET()->vartable->len - 1;
+    vartable_ref r = {0, DATA_AR_GET()->vartable->len - 1};
 
     TRAVstmts(node);
 
-    DATA_AR_GET()->vartable->buf[idx].loopvar = true;
+    vartable_get(DATA_AR_GET()->vartable, r)->loopvar = true;
 
     return node;
 }

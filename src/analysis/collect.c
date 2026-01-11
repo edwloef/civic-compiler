@@ -33,8 +33,11 @@ node_st *ACfundecl(node_st *node) {
         arg = PARAMS_NEXT(arg);
     }
 
-    funtable_entry e = {ID_VAL(FUNDECL_ID(node)), ty, SPAN(FUNDECL_ID(node))};
+    funtable_entry e = {ID_VAL(FUNDECL_ID(node)), ty,
+                        DATA_AC_GET()->nesting_level, 0,
+                        SPAN(FUNDECL_ID(node))};
     funtable_insert(DATA_AC_GET()->funtable, e, FUNDECL_ID(node));
+    FUNDECL_L(node) = DATA_AC_GET()->funtable->len - 1;
 
     TRAVchildren(node);
 
@@ -42,11 +45,13 @@ node_st *ACfundecl(node_st *node) {
 }
 
 node_st *ACfunbody(node_st *node) {
+    DATA_AC_GET()->nesting_level++;
     DATA_AC_GET()->funtable = funtable_new(DATA_AC_GET()->funtable);
 
     TRAVchildren(node);
     FUNBODY_FUNTABLE(node) = DATA_AC_GET()->funtable;
 
+    DATA_AC_GET()->nesting_level--;
     DATA_AC_GET()->funtable = DATA_AC_GET()->funtable->parent;
 
     return node;
@@ -59,6 +64,7 @@ node_st *ACvardecl(node_st *node) {
                  expr = EXPRS_NEXT(expr)) {
                 vartable_entry e = {ID_VAL(VARREF_ID(EXPRS_EXPR(expr))),
                                     {TY_int, 0},
+                                    DATA_AC_GET()->nesting_level,
                                     SPAN(VARREF_ID(EXPRS_EXPR(expr))),
                                     false};
                 vartable_insert(DATA_AC_GET()->vartable, e,
@@ -78,6 +84,7 @@ node_st *ACvardecl(node_st *node) {
 
         vartable_entry e = {ID_VAL(VARDECL_ID(node)),
                             {TYPE_TY(VARDECL_TY(node)), dims},
+                            DATA_AC_GET()->nesting_level,
                             SPAN(VARDECL_ID(node)),
                             false};
         vartable_insert(DATA_AC_GET()->vartable, e, VARDECL_ID(node));

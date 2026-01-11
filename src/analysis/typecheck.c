@@ -191,8 +191,7 @@ node_st *ATCvardecl(node_st *node) {
     TRAVchildren(node);
 
     vartable_ref r = {0, VARDECL_L(node)};
-    vartable_entry e = vartable_get(DATA_ATC_GET()->vartable, r);
-    vartype ty = e.ty;
+    vartype ty = vartable_get(DATA_ATC_GET()->vartable, r)->ty;
 
     for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
          expr = EXPRS_NEXT(expr)) {
@@ -227,12 +226,12 @@ node_st *ATCassign(node_st *node) {
     TRAVchildren(node);
 
     vartable_ref r = {VARREF_N(ASSIGN_REF(node)), VARREF_L(ASSIGN_REF(node))};
-    vartable_entry e = vartable_get(DATA_ATC_GET()->vartable, r);
+    vartable_entry *e = vartable_get(DATA_ATC_GET()->vartable, r);
 
-    if (e.loopvar) {
+    if (e->loopvar) {
         ERROR(node, "can't assign to loop variable");
-        emit_message_with_span(e.span, L_INFO,
-                               "loop variable '%s' declared here", e.name);
+        emit_message_with_span(e->span, L_INFO,
+                               "loop variable '%s' declared here", e->name);
     }
 
     ATCcheckassign(RESOLVED_TY(ASSIGN_EXPR(node)),
@@ -599,11 +598,11 @@ node_st *ATCcall(node_st *node) {
     TRAVchildren(node);
 
     funtable_ref r = {CALL_N(node), CALL_L(node)};
-    funtype e = funtable_get(DATA_ATC_GET()->funtable, r).ty;
+    funtype ty = funtable_get(DATA_ATC_GET()->funtable, r)->ty;
 
     node_st *arg = CALL_EXPRS(node);
-    for (int i = 0; i < e.len; i++) {
-        vartype expected_ty = e.buf[i];
+    for (int i = 0; i < ty.len; i++) {
+        vartype expected_ty = ty.buf[i];
         vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(arg));
         if (resolved_ty.ty != TY_error) {
             if ((expected_ty.dims != resolved_ty.dims ||
@@ -643,7 +642,7 @@ node_st *ATCcall(node_st *node) {
         arg = EXPRS_NEXT(arg);
     }
 
-    CALL_RESOLVED_TY(node) = e.ret_ty;
+    CALL_RESOLVED_TY(node) = ty.ty;
     CALL_RESOLVED_DIMS(node) = 0;
 
     return node;
@@ -653,7 +652,7 @@ node_st *ATCvarref(node_st *node) {
     TRAVchildren(node);
 
     vartable_ref r = {VARREF_N(node), VARREF_L(node)};
-    vartype ty = vartable_get(DATA_ATC_GET()->vartable, r).ty;
+    vartype ty = vartable_get(DATA_ATC_GET()->vartable, r)->ty;
 
     for (node_st *expr = VARREF_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
         if (ty.ty != TY_error && ty.dims != 0) {

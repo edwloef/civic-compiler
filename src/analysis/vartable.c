@@ -57,15 +57,13 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
     return r;
 }
 
-vartable_entry vartable_get(vartable *self, vartable_ref e) {
-    if (e.n == -1 && e.l == -1) {
-        vartable_entry e = {"error", {TY_error, 0}, {0, 0, 0, 0}, false};
-        return e;
-    }
-
-    for (int i = 0; i < e.n; i++)
+static vartable_entry error = {.name = "error", .ty = {.ty = TY_error}};
+vartable_entry *vartable_get(vartable *self, vartable_ref r) {
+    if (r.n == -1 && r.l == -1)
+        return &error;
+    for (int i = 0; i < r.n; i++)
         self = self->parent;
-    return self->buf[e.l];
+    return &self->buf[r.l];
 }
 
 void vartable_free(vartable *self) {

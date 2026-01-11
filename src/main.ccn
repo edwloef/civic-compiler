@@ -45,7 +45,8 @@ phase Analysis {
             nodes = { Program, FunDecl, FunBody, VarDecl },
             travdata {
                 user funtable_ptr funtable,
-                user vartable_ptr vartable
+                user vartable_ptr vartable,
+                int nesting_level
             }
         };
 
@@ -54,7 +55,8 @@ phase Analysis {
             nodes = { Program, FunDecl, FunBody, Param, VarDecl, For, Call, VarRef },
             travdata {
                 user funtable_ptr funtable,
-                user vartable_ptr vartable
+                user vartable_ptr vartable,
+                int nesting_level
             }
         };
 
@@ -65,6 +67,21 @@ phase Analysis {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
                 BasicType ret_ty
+            }
+        };
+
+        cycle Transparency {
+            actions {
+                traversal ClosureTransparency {
+                    uid = ATCT,
+                    nodes = { Program, FunDecl, FunBody, Assign, Call },
+                    travdata {
+                        user funtable_ptr funtable,
+                        user vartable_ptr vartable,
+                        int nesting_level,
+                        int min_nesting_level
+                    }
+                };
             }
         };
     }
@@ -199,7 +216,8 @@ node FunDecl {
         BasicType ty { constructor },
         bool external,
         bool exported,
-        user vartable_ptr vartable
+        user vartable_ptr vartable,
+        int l
     }
 };
 
