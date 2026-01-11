@@ -275,6 +275,10 @@ node DoWhile {
     children {
         Stmts stmts { constructor },
         Expr expr { constructor }
+    },
+
+    attributes {
+        bool always_returns
     }
 };
 
