@@ -36,12 +36,15 @@ node_st *OCTCTarrexprs(node_st *node) {
 
 node_st *OCTCTfundecl(node_st *node) {
     int prev = DATA_OCTCT_GET()->min_nesting_level;
-    DATA_OCTCT_GET()->min_nesting_level = DATA_OCTCT_GET()->nesting_level + 1;
+    DATA_OCTCT_GET()->min_nesting_level = DATA_OCTCT_GET()->nesting_level;
     DATA_OCTCT_GET()->vartable = FUNDECL_VARTABLE(node);
 
-    TRAVchildren(node);
-    int min_nesting_level = DATA_OCTCT_GET()->min_nesting_level;
+    if (!FUNDECL_EXTERNAL(node)) {
+        DATA_OCTCT_GET()->min_nesting_level++;
+        TRAVchildren(node);
+    }
 
+    int min_nesting_level = DATA_OCTCT_GET()->min_nesting_level;
     DATA_OCTCT_GET()->min_nesting_level = MIN(prev, min_nesting_level);
     DATA_OCTCT_GET()->vartable = DATA_OCTCT_GET()->vartable->parent;
 
