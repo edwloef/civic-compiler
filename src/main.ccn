@@ -69,21 +69,6 @@ phase Analysis {
                 BasicType ret_ty
             }
         };
-
-        cycle Transparency {
-            actions {
-                traversal ClosureTransparency {
-                    uid = ATCT,
-                    nodes = { Program, FunDecl, FunBody, Assign, Call },
-                    travdata {
-                        user funtable_ptr funtable,
-                        user vartable_ptr vartable,
-                        int nesting_level,
-                        int min_nesting_level
-                    }
-                };
-            }
-        };
     }
 };
 
@@ -98,6 +83,21 @@ phase Desugar {
 
 cycle Opt {
     actions {
+        cycle ComputeTransparency {
+            actions {
+                traversal ClosureTransparency {
+                    uid = OCTCT,
+                    nodes = { Program, FunDecl, FunBody, Assign, Call },
+                    travdata {
+                        user funtable_ptr funtable,
+                        user vartable_ptr vartable,
+                        int nesting_level,
+                        int min_nesting_level
+                    }
+                };
+            }
+        };
+
         traversal ScalarConstFold {
             uid = OSCF,
             nodes = { Monop, Binop, Cast }
