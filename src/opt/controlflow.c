@@ -9,7 +9,7 @@
         node = tmp;                                                            \
     }
 
-node_st *OCCFinlinestmts(node_st *node, node_st *stmts) {
+static node_st *OCCFinlinestmts(node_st *node, node_st *stmts) {
     TAKE(STMTS_NEXT(node));
 
     if (stmts) {

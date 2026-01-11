@@ -45,11 +45,9 @@ static int error_count = 0;
 
 void abort_on_error(void) {
     if (error_count > 0) {
-        fprintf(stderr,
-                ANSI_BRIGHT_RED
-                "error: " ANSI_RESET
-                "couldn't compile '%s' due to %d previous error%s\n",
-                globals.input_file, error_count, error_count > 1 ? "s" : "");
+        emit_message(
+            L_ERROR, "couldn't compile '%s' due to %d previous error%s\n",
+            globals.input_file, error_count, error_count > 1 ? "s" : "");
         exit(1);
     }
 }
@@ -94,7 +92,7 @@ void emit_message_with_span(span span, level level, char *format, ...) {
     int lineno = 0;
     char line[256];
 
-    while (lineno <= span.el && fgets(line, sizeof line, file)) {
+    while (lineno <= span.el && fgets(line, sizeof(line), file)) {
         if (lineno >= span.bl) {
             fprintf(stderr, "%*d |" ANSI_RESET " %s" ANSI_BRIGHT_BLUE,
                     lineno_width, lineno + 1, line);

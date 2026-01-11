@@ -18,8 +18,8 @@ char *fmt_BasicType(enum BasicType ty) {
     }
 }
 
-char *fmt_MonOpKind(enum MonOpKind bo) {
-    switch (bo) {
+char *fmt_MonOpKind(enum MonOpKind mo) {
+    switch (mo) {
     case MO_pos:
         return "+";
     case MO_neg:

@@ -1,10 +1,5 @@
 #include "ccn/ccn.h"
 
-static vartype RESOLVED_TY(node_st *node) {
-    vartype ty = {ARREXPR_RESOLVED_TY(node), ARREXPR_RESOLVED_DIMS(node)};
-    return ty;
-}
-
 #define TAKE(n)                                                                \
     {                                                                          \
         node_st *tmp = n;                                                      \
@@ -22,6 +17,11 @@ static vartype RESOLVED_TY(node_st *node) {
         CCNfree(tmp);                                                          \
         CCNcycleNotify();                                                      \
     }
+
+static vartype RESOLVED_TY(node_st *node) {
+    vartype ty = {ARREXPR_RESOLVED_TY(node), ARREXPR_RESOLVED_DIMS(node)};
+    return ty;
+}
 
 node_st *OCImonop(node_st *node) {
     TRAVchildren(node);
