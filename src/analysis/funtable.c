@@ -94,7 +94,7 @@ funtable_entry *funtable_get(funtable *self, funtable_ref r) {
     return &self->buf[r.l];
 }
 
-bool funtable_transparent(funtable *self, funtable_ref r) {
+bool funtable_transp(funtable *self, funtable_ref r) {
     funtable_entry *e = funtable_get(self, r);
     return e->min_nesting_level > e->nesting_level;
 }

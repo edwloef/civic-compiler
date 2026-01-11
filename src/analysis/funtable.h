@@ -42,6 +42,6 @@ void funtable_push(funtable *self, funtable_entry e);
 
 funtable_entry *funtable_get(funtable *self, funtable_ref r);
 
-bool funtable_transparent(funtable *self, funtable_ref r);
+bool funtable_transp(funtable *self, funtable_ref r);
 
 void funtable_free(funtable *self);

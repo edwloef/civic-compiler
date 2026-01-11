@@ -57,9 +57,13 @@ node_st *OCTCTassign(node_st *node) {
 }
 
 node_st *OCTCTcall(node_st *node) {
-    DATA_OCTCT_GET()->min_nesting_level =
-        MIN(DATA_OCTCT_GET()->min_nesting_level,
-            DATA_OCTCT_GET()->nesting_level - CALL_N(node));
+    funtable_ref r = {CALL_N(node), CALL_L(node)};
+
+    if (!funtable_transp(DATA_OCTCT_GET()->funtable, r)) {
+        DATA_OCTCT_GET()->min_nesting_level =
+            MIN(DATA_OCTCT_GET()->min_nesting_level,
+                DATA_OCTCT_GET()->nesting_level - CALL_N(node));
+    }
 
     return node;
 }

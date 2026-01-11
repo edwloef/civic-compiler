@@ -39,7 +39,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/desugar/casts.c
     src/free/free.c
     src/globals/globals.c
-    src/opt/closuretransparency.c
+    src/opt/funtransp.c
     src/opt/identities.c
     src/opt/scalarconstfold.c
     src/opt/trivialcontrolflow.c
