@@ -9,6 +9,14 @@
         node = tmp;                                                            \
     }
 
+static void OTCFlaststmt(node_st *node) {
+    if (STMTS_NEXT(node)) {
+        CCNfree(STMTS_NEXT(node));
+        STMTS_NEXT(node) = NULL;
+        CCNcycleNotify();
+    }
+}
+
 static node_st *OTCFinlinestmts(node_st *node, node_st *stmts) {
     TAKE(STMTS_NEXT(node));
 
@@ -55,9 +63,7 @@ node_st *OTCFstmts(node_st *node) {
     case NT_WHILE:
         if (NODE_TYPE(WHILE_EXPR(stmt)) == NT_BOOL) {
             if (BOOL_VAL(WHILE_EXPR(stmt)) == true) {
-                CCNfree(STMTS_NEXT(node));
-                STMTS_NEXT(node) = NULL;
-                CCNcycleNotify();
+                OTCFlaststmt(node);
             } else {
                 CCNfree(STMTS_STMT(node));
                 STMTS_STMT(node) = NULL;
@@ -68,9 +74,7 @@ node_st *OTCFstmts(node_st *node) {
     case NT_DOWHILE:
         if (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL) {
             if (BOOL_VAL(DOWHILE_EXPR(stmt)) == true) {
-                CCNfree(STMTS_NEXT(node));
-                STMTS_NEXT(node) = NULL;
-                CCNcycleNotify();
+                OTCFlaststmt(node);
             } else {
                 node_st *stmts = DOWHILE_STMTS(stmt);
                 DOWHILE_STMTS(stmt) = NULL;
@@ -99,9 +103,8 @@ node_st *OTCFstmts(node_st *node) {
         }
         break;
     case NT_RETURN:
-        CCNfree(STMTS_NEXT(node));
-        STMTS_NEXT(node) = NULL;
-        CCNcycleNotify();
+        OTCFlaststmt(node);
+        break;
     default:
         break;
     }
