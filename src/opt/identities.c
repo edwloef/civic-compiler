@@ -175,6 +175,40 @@ node_st *OCIbinop(node_st *node) {
             TAKE(BINOP_RIGHT(node));
         }
         break;
+    case BO_eq:
+        if (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL) {
+            if (BOOL_VAL(BINOP_LEFT(node)) == true) {
+                TAKE(BINOP_RIGHT(node));
+            } else {
+                TAKE(BINOP_RIGHT(node));
+                node = ASTmonop(node, MO_not);
+            }
+        } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL) {
+            if (BOOL_VAL(BINOP_RIGHT(node)) == true) {
+                TAKE(BINOP_LEFT(node));
+            } else {
+                TAKE(BINOP_LEFT(node));
+                node = ASTmonop(node, MO_not);
+            }
+        }
+        break;
+    case BO_ne:
+        if (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL) {
+            if (BOOL_VAL(BINOP_LEFT(node)) == true) {
+                TAKE(BINOP_RIGHT(node));
+                node = ASTmonop(node, MO_not);
+            } else {
+                TAKE(BINOP_RIGHT(node));
+            }
+        } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL) {
+            if (BOOL_VAL(BINOP_RIGHT(node)) == true) {
+                TAKE(BINOP_LEFT(node));
+                node = ASTmonop(node, MO_not);
+            } else {
+                TAKE(BINOP_LEFT(node));
+            }
+        }
+        break;
     default:
         break;
     }
