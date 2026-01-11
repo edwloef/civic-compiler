@@ -79,20 +79,26 @@ node_st *OCTCTassign(node_st *node) {
 
 node_st *OCTCTmonop(node_st *node) {
     TRAVchildren(node);
+
     MONOP_TRANSP(node) = EXPR_TRANSP(MONOP_EXPR(node));
+
     return node;
 }
 
 node_st *OCTCTbinop(node_st *node) {
     TRAVchildren(node);
+
     BINOP_TRANSP(node) =
         EXPR_TRANSP(BINOP_LEFT(node)) && EXPR_TRANSP(BINOP_RIGHT(node));
+
     return node;
 }
 
 node_st *OCTCTcast(node_st *node) {
     TRAVchildren(node);
+
     CAST_TRANSP(node) = EXPR_TRANSP(CAST_EXPR(node));
+
     return node;
 }
 
@@ -116,22 +122,27 @@ node_st *OCTCTcall(node_st *node) {
 
 node_st *OCTCTvarref(node_st *node) {
     TRAVchildren(node);
+
     VARREF_TRANSP(node) =
         !VARREF_EXPRS(node) || EXPRS_TRANSP(VARREF_EXPRS(node));
+
     return node;
 }
 
 node_st *OCTCTint(node_st *node) {
     INT_TRANSP(node) = true;
+
     return node;
 }
 
 node_st *OCTCTfloat(node_st *node) {
     FLOAT_TRANSP(node) = true;
+
     return node;
 }
 
 node_st *OCTCTbool(node_st *node) {
     BOOL_TRANSP(node) = true;
+
     return node;
 }

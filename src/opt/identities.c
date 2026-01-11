@@ -114,8 +114,28 @@ node_st *OIbinop(node_st *node) {
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
         }
         break;
-    case BO_div:
     case BO_mul:
+        if (ARREXPR_TRANSP(BINOP_RIGHT(node)) &&
+            ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
+              INT_VAL(BINOP_LEFT(node)) == 0) ||
+             (NODE_TYPE(BINOP_LEFT(node)) == NT_FLOAT &&
+              FLOAT_VAL(BINOP_LEFT(node)) == 0.0) ||
+             (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
+              BOOL_VAL(BINOP_LEFT(node)) == false))) {
+            TAKE(BINOP_LEFT(node));
+            break;
+        } else if (ARREXPR_TRANSP(BINOP_LEFT(node)) &&
+                   ((NODE_TYPE(BINOP_RIGHT(node)) == NT_INT &&
+                     INT_VAL(BINOP_RIGHT(node)) == 0) ||
+                    (NODE_TYPE(BINOP_RIGHT(node)) == NT_FLOAT &&
+                     FLOAT_VAL(BINOP_RIGHT(node)) == 0.0) ||
+                    (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
+                     BOOL_VAL(BINOP_RIGHT(node)) == false))) {
+            TAKE(BINOP_RIGHT(node));
+            break;
+        }
+        // fallthrough
+    case BO_div:
         if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
              INT_VAL(BINOP_LEFT(node)) == 1) ||
             (NODE_TYPE(BINOP_LEFT(node)) == NT_FLOAT &&
@@ -154,8 +174,11 @@ node_st *OIbinop(node_st *node) {
             (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
              BOOL_VAL(BINOP_RIGHT(node)) == true)) {
             TAKE(BINOP_LEFT(node));
-        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
-                   BOOL_VAL(BINOP_LEFT(node)) == true) {
+        } else if ((NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
+                    BOOL_VAL(BINOP_LEFT(node)) == true) ||
+                   (ARREXPR_TRANSP(BINOP_LEFT(node)) &&
+                    NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
+                    BOOL_VAL(BINOP_RIGHT(node)) == false)) {
             TAKE(BINOP_RIGHT(node));
         }
         break;
@@ -165,8 +188,11 @@ node_st *OIbinop(node_st *node) {
             (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
              BOOL_VAL(BINOP_RIGHT(node)) == false)) {
             TAKE(BINOP_LEFT(node));
-        } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
-                   BOOL_VAL(BINOP_LEFT(node)) == false) {
+        } else if ((NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL &&
+                    BOOL_VAL(BINOP_LEFT(node)) == false) ||
+                   (ARREXPR_TRANSP(BINOP_LEFT(node)) &&
+                    NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL &&
+                    BOOL_VAL(BINOP_RIGHT(node)) == false)) {
             TAKE(BINOP_RIGHT(node));
         }
         break;
