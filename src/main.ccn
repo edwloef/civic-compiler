@@ -86,7 +86,7 @@ cycle Opt {
         cycle ComputeTransp {
             actions {
                 traversal Transp {
-                    uid = OCTCT,
+                    uid = OCTT,
                     nodes = ArrExpr | { Program, FunDecl, FunBody, Assign, Exprs },
                     travdata {
                         user funtable_ptr funtable,
