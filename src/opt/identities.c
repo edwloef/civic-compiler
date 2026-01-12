@@ -18,6 +18,13 @@
         CCNcycleNotify();                                                      \
     }
 
+#define WRAP(o)                                                                \
+    {                                                                          \
+        node = ASTmonop(node, o);                                              \
+        MONOP_TRANSP(node) = ARREXPR_TRANSP(MONOP_EXPR(node));                 \
+        CCNcycleNotify();                                                      \
+    }
+
 node_st *OImonop(node_st *node) {
     TRAVchildren(node);
 
@@ -100,7 +107,7 @@ node_st *OIbinop(node_st *node) {
             BINOP_OP(node) = BO_mul;
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-            node = ASTmonop(node, MO_not);
+            WRAP(MO_not);
         } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
                    MONOP_OP(BINOP_LEFT(node)) == MO_neg) {
             BINOP_OP(node) = BINOP_OP(node) == BO_add ? BO_sub : BO_add;
@@ -137,7 +144,7 @@ node_st *OIbinop(node_st *node) {
             BINOP_OP(node) = BO_add;
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-            node = ASTmonop(node, MO_not);
+            WRAP(MO_not);
             break;
         } else if ((NODE_TYPE(BINOP_LEFT(node)) == NT_INT &&
                     INT_VAL(BINOP_LEFT(node)) == 1) ||
@@ -160,11 +167,11 @@ node_st *OIbinop(node_st *node) {
         } else if (NODE_TYPE(BINOP_LEFT(node)) == NT_MONOP &&
                    MONOP_OP(BINOP_LEFT(node)) == MO_neg) {
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
-            node = ASTmonop(node, MO_neg);
+            WRAP(MO_neg);
         } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_MONOP &&
                    MONOP_OP(BINOP_RIGHT(node)) == MO_neg) {
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-            node = ASTmonop(node, MO_neg);
+            WRAP(MO_neg);
         }
         break;
     case BO_mod:
@@ -208,14 +215,14 @@ node_st *OIbinop(node_st *node) {
                 TAKE(BINOP_RIGHT(node));
             } else {
                 TAKE(BINOP_RIGHT(node));
-                node = ASTmonop(node, MO_not);
+                WRAP(MO_not);
             }
         } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL) {
             if (BOOL_VAL(BINOP_RIGHT(node)) == true) {
                 TAKE(BINOP_LEFT(node));
             } else {
                 TAKE(BINOP_LEFT(node));
-                node = ASTmonop(node, MO_not);
+                WRAP(MO_not);
             }
         }
         break;
@@ -223,14 +230,14 @@ node_st *OIbinop(node_st *node) {
         if (NODE_TYPE(BINOP_LEFT(node)) == NT_BOOL) {
             if (BOOL_VAL(BINOP_LEFT(node)) == true) {
                 TAKE(BINOP_RIGHT(node));
-                node = ASTmonop(node, MO_not);
+                WRAP(MO_not);
             } else {
                 TAKE(BINOP_RIGHT(node));
             }
         } else if (NODE_TYPE(BINOP_RIGHT(node)) == NT_BOOL) {
             if (BOOL_VAL(BINOP_RIGHT(node)) == true) {
                 TAKE(BINOP_LEFT(node));
-                node = ASTmonop(node, MO_not);
+                WRAP(MO_not);
             } else {
                 TAKE(BINOP_LEFT(node));
             }

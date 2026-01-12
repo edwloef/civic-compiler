@@ -61,7 +61,7 @@ node_st *OTCFstmts(node_st *node) {
 
             CCNcycleNotify();
         } else if (ARREXPR_TRANSP(IFELSE_EXPR(stmt)) &&
-                   !IFELSE_IF_BLOCK(node) && !IFELSE_ELSE_BLOCK(node)) {
+                   !IFELSE_IF_BLOCK(stmt) && !IFELSE_ELSE_BLOCK(stmt)) {
             node = OTCFinlinestmts(node, NULL);
         }
         break;
