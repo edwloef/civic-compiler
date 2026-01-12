@@ -77,7 +77,10 @@ node_st *PRTdecls(node_st *node) {
 }
 
 node_st *PRTstmts(node_st *node) {
-    TRAVchildren(node);
+    TRAVstmt(node);
+    if (NODE_TYPE(STMTS_STMT(node)) == NT_CALL)
+        printf(";\n");
+    TRAVopt(STMTS_NEXT(node));
     return node;
 }
 
