@@ -13,16 +13,15 @@ node_st *ADprogram(node_st *node) {
 node_st *ADstmts(node_st *node) {
     TRAVchildren(node);
 
-    STMTS_DIVERGES(node) = STMT_DIVERGES(STMTS_STMT(node));
-
-    if (STMTS_DIVERGES(node) && STMTS_NEXT(node)) {
+    if (STMT_DIVERGES(STMTS_STMT(node)) && STMTS_NEXT(node)) {
         WARNING(STMTS_STMT(node),
                 "any code following this statement is unreachable");
         INFO(STMTS_STMT(STMTS_NEXT(node)), "first unreachable statement");
-    } else {
-        STMTS_DIVERGES(node) |=
-            STMTS_NEXT(node) && STMTS_DIVERGES(STMTS_NEXT(node));
     }
+
+    STMTS_DIVERGES(node) =
+        STMT_DIVERGES(STMTS_STMT(node)) ||
+        (STMTS_NEXT(node) && STMTS_DIVERGES(STMTS_NEXT(node)));
 
     return node;
 }
