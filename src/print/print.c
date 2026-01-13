@@ -107,11 +107,6 @@ node_st *PRTarrexprs(node_st *node) {
     return node;
 }
 
-node_st *PRTfundecls(node_st *node) {
-    TRAVchildren(node);
-    return node;
-}
-
 node_st *PRTfundecl(node_st *node) {
     if (FUNDECL_EXPORTED(node))
         printf("export ");
@@ -133,11 +128,6 @@ node_st *PRTfundecl(node_st *node) {
 }
 
 node_st *PRTfunbody(node_st *node) {
-    TRAVchildren(node);
-    return node;
-}
-
-node_st *PRTvardecls(node_st *node) {
     TRAVchildren(node);
     return node;
 }

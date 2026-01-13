@@ -88,6 +88,14 @@ phase Desugar {
             uid = DC,
             nodes = { Cast }
         };
+
+        traversal TypeExprs {
+            uid = DTE,
+            nodes = { Program, Decls, FunDecl },
+            travdata {
+                user vartable_ptr vartable
+            }
+        };
     }
 };
 
@@ -220,13 +228,6 @@ nodeset ArrExpr {
     }
 };
 
-node FunDecls {
-    children {
-        FunDecl decl { constructor, mandatory},
-        FunDecls next { constructor }
-    }
-};
-
 node FunDecl {
     children {
         Id id { constructor, mandatory },
@@ -245,8 +246,7 @@ node FunDecl {
 
 node FunBody {
     children {
-        VarDecls var_decls { constructor },
-        FunDecls fun_decls { constructor },
+        Decls decls { constructor },
         Stmts stmts { constructor }
     },
 
@@ -266,13 +266,6 @@ node Param {
     children {
         Type ty { constructor, mandatory },
         Id id { constructor, mandatory }
-    }
-};
-
-node VarDecls {
-    children {
-        VarDecl decl { constructor, mandatory },
-        VarDecls next { constructor }
     }
 };
 

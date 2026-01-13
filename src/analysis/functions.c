@@ -16,18 +16,16 @@ node_st *AFprogram(node_st *node) {
 
 node_st *AFfundecl(node_st *node) {
     funtype ty = funtype_new(FUNDECL_TY(node));
-    node_st *arg = FUNDECL_PARAMS(node);
-    while (arg) {
+    for (node_st *param = FUNDECL_PARAMS(node); param;
+         param = PARAMS_NEXT(param)) {
         int dims = 0;
-        node_st *id = TYPE_EXPRS(PARAM_TY(PARAMS_PARAM(arg)));
-        while (id) {
+        for (node_st *expr = TYPE_EXPRS(PARAM_TY(PARAMS_PARAM(param))); expr;
+             expr = EXPRS_NEXT(expr)) {
             dims++;
-            id = EXPRS_NEXT(id);
         }
 
-        vartype e = {TYPE_TY(PARAM_TY(PARAMS_PARAM(arg))), dims};
+        vartype e = {TYPE_TY(PARAM_TY(PARAMS_PARAM(param))), dims};
         funtype_push(&ty, e);
-        arg = PARAMS_NEXT(arg);
     }
 
     funtable_entry e = {ID_VAL(FUNDECL_ID(node)), ty, false, 0,

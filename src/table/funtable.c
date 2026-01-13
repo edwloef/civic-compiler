@@ -1,7 +1,7 @@
-#include "table/funtable.h"
 #include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
+#include "table/funtable.h"
 #include "table/insert.h"
 
 funtype funtype_new(enum BasicType ty) {
@@ -60,7 +60,7 @@ void funtable_push(funtable *self, funtable_entry e) {
 
 funtable_ref funtable_resolve(funtable *self, node_st *call) {
     int param_count = 0;
-    for (node_st *arg = CALL_EXPRS(call); arg; arg = EXPRS_NEXT(arg)) {
+    for (node_st *expr = CALL_EXPRS(call); expr; expr = EXPRS_NEXT(expr)) {
         param_count++;
     }
 

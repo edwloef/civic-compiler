@@ -350,11 +350,11 @@ arrexpr: expr
 
 vardecls: vardecls vardecl
           {
-            $$ = ASTvardecls($2, $1);
+            $$ = ASTdecls($2, $1);
           }
         | vardecl
           {
-            $$ = ASTvardecls($1, NULL);
+            $$ = ASTdecls($1, NULL);
           }
         ;
 
@@ -378,53 +378,69 @@ vardecl: basictype id SEMICOLON
 
 fundefs: fundef fundefs
          {
-           $$ = ASTfundecls($1, $2);
+           $$ = ASTdecls($1, $2);
          }
        | fundef
          {
-           $$ = ASTfundecls($1, NULL);
+           $$ = ASTdecls($1, NULL);
          }
        ;
 
 fundef: funheader BRACE_L BRACE_R
         {
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(NULL, NULL, NULL);
+          FUNDECL_BODY($$) = ASTfunbody(NULL, NULL);
         }
       | funheader BRACE_L vardecls BRACE_R
         {
+          $3 = rev_vardecls($3);
+
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(rev_vardecls($3), NULL, NULL);
+          FUNDECL_BODY($$) = ASTfunbody($3, NULL);
         }
       | funheader BRACE_L fundefs BRACE_R
         {
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(NULL, $3, NULL);
+          FUNDECL_BODY($$) = ASTfunbody($3, NULL);
         }
       | funheader BRACE_L stmts BRACE_R
         {
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(NULL, NULL, $3);
+          FUNDECL_BODY($$) = ASTfunbody(NULL, $3);
         }
       | funheader BRACE_L vardecls fundefs BRACE_R
         {
+          $3 = rev_vardecls($3);
+
+          node_st *vardecl;
+          for (vardecl = $3; DECLS_NEXT(vardecl); vardecl = DECLS_NEXT(vardecl));
+          DECLS_NEXT(vardecl) = $4;
+
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(rev_vardecls($3), $4, NULL);
+          FUNDECL_BODY($$) = ASTfunbody($3, NULL);
         }
       | funheader BRACE_L vardecls stmts BRACE_R
         {
+          $3 = rev_vardecls($3);
+
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(rev_vardecls($3), NULL, $4);
+          FUNDECL_BODY($$) = ASTfunbody($3, $4);
         }
       | funheader BRACE_L fundefs stmts BRACE_R
         {
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(NULL, $3, $4);
+          FUNDECL_BODY($$) = ASTfunbody($3, $4);
         }
       | funheader BRACE_L vardecls fundefs stmts BRACE_R
         {
+          $3 = rev_vardecls($3);
+
+          node_st *vardecl;
+          for (vardecl = $3; DECLS_NEXT(vardecl); vardecl = DECLS_NEXT(vardecl));
+          DECLS_NEXT(vardecl) = $4;
+
           $$ = $1;
-          FUNDECL_BODY($$) = ASTfunbody(rev_vardecls($3), $4, $5);
+          FUNDECL_BODY($$) = ASTfunbody($3, $5);
         }
       ;
 
@@ -526,8 +542,8 @@ node_st *rev_vardecls(node_st *root) {
     node_st *prev = NULL;
 
     while (curr) {
-        node_st *next = VARDECLS_NEXT(curr);
-        VARDECLS_NEXT(curr) = prev;
+        node_st *next = DECLS_NEXT(curr);
+        DECLS_NEXT(curr) = prev;
         prev = curr;
         curr = next;
     }

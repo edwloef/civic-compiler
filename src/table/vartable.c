@@ -1,8 +1,8 @@
-#include "table/vartable.h"
 #include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 #include "table/insert.h"
+#include "table/vartable.h"
 
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));

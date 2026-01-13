@@ -70,9 +70,9 @@ node_st *ATCarrexprs(node_st *node) {
     bool error = false;
     vartype self_ty = {TY_void, 0};
 
-    for (node_st *inner = node; inner; inner = ARREXPRS_NEXT(inner)) {
-        TRAVexpr(inner);
-        vartype resolved_ty = RESOLVED_TY(ARREXPRS_EXPR(inner));
+    for (node_st *expr = node; expr; expr = ARREXPRS_NEXT(expr)) {
+        TRAVexpr(expr);
+        vartype resolved_ty = RESOLVED_TY(ARREXPRS_EXPR(expr));
 
         if (resolved_ty.ty == TY_error) {
             error = true;
@@ -90,12 +90,12 @@ node_st *ATCarrexprs(node_st *node) {
 
         if (self_ty.dims == 0) {
             if (resolved_ty.dims == 0) {
-                ERROR(ARREXPRS_EXPR(inner),
+                ERROR(ARREXPRS_EXPR(expr),
                       "encountered inconsistent array expression containing "
                       "value of type '%s' and value of type '%s'",
                       fmt_BasicType(self_ty.ty), fmt_BasicType(resolved_ty.ty));
             } else {
-                ERROR(ARREXPRS_EXPR(inner),
+                ERROR(ARREXPRS_EXPR(expr),
                       "encountered inconsistent array expression containing "
                       "value of type '%s' and %d-dimensional array of type "
                       "'%s'",
@@ -104,14 +104,14 @@ node_st *ATCarrexprs(node_st *node) {
             }
         } else {
             if (resolved_ty.dims == 0) {
-                ERROR(ARREXPRS_EXPR(inner),
+                ERROR(ARREXPRS_EXPR(expr),
                       "encountered inconsistent array expression containing "
                       "%d-dimensional array of type '%s' and value of type "
                       "'%s'",
                       self_ty.dims, fmt_BasicType(self_ty.ty),
                       fmt_BasicType(resolved_ty.ty));
             } else {
-                ERROR(ARREXPRS_EXPR(inner),
+                ERROR(ARREXPRS_EXPR(expr),
                       "encountered inconsistent array expression containing "
                       "%d-dimensional array of type '%s' and %d-dimensional "
                       "array of type '%s'",
