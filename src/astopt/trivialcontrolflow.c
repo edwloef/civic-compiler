@@ -9,7 +9,7 @@
         node = tmp;                                                            \
     }
 
-static void AOTCFlaststmt(node_st *node) {
+static void AOTCFdiverges(node_st *node) {
     if (STMTS_NEXT(node)) {
         CCNfree(STMTS_NEXT(node));
         STMTS_NEXT(node) = NULL;
@@ -29,6 +29,12 @@ static node_st *AOTCFinlinestmts(node_st *node, node_st *stmts) {
     } else {
         return node;
     }
+}
+
+static node_st *AOTCFnoop(node_st *node) {
+    CCNfree(STMTS_STMT(node));
+    STMTS_STMT(node) = NULL;
+    return AOTCFinlinestmts(node, NULL);
 }
 
 node_st *AOTCFstmts(node_st *node) {
@@ -68,18 +74,16 @@ node_st *AOTCFstmts(node_st *node) {
     case NT_WHILE:
         if (NODE_TYPE(WHILE_EXPR(stmt)) == NT_BOOL) {
             if (BOOL_VAL(WHILE_EXPR(stmt)) == true) {
-                AOTCFlaststmt(node);
+                AOTCFdiverges(node);
             } else {
-                CCNfree(STMTS_STMT(node));
-                STMTS_STMT(node) = NULL;
-                node = AOTCFinlinestmts(node, NULL);
+                node = AOTCFnoop(node);
             }
         }
         break;
     case NT_DOWHILE:
         if (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL) {
             if (BOOL_VAL(DOWHILE_EXPR(stmt)) == true) {
-                AOTCFlaststmt(node);
+                AOTCFdiverges(node);
             } else {
                 node_st *stmts = DOWHILE_STMTS(stmt);
                 DOWHILE_STMTS(stmt) = NULL;
@@ -105,16 +109,18 @@ node_st *AOTCFstmts(node_st *node) {
                 FOR_STMTS(stmt) = NULL;
                 node = AOTCFinlinestmts(node, stmts);
             }
+        } else if (EXPR_TRANSP(FOR_LOOP_START(stmt)) &&
+                   EXPR_TRANSP(FOR_LOOP_END(stmt)) &&
+                   EXPR_TRANSP(FOR_LOOP_STEP(stmt)) && !FOR_STMTS(stmt)) {
+            node = AOTCFnoop(node);
         }
         break;
     case NT_RETURN:
-        AOTCFlaststmt(node);
+        AOTCFdiverges(node);
         break;
     case NT_CALL:
         if (CALL_TRANSP(stmt)) {
-            CCNfree(STMTS_STMT(node));
-            STMTS_STMT(node) = NULL;
-            node = AOTCFinlinestmts(node, NULL);
+            node = AOTCFnoop(node);
         }
         break;
     default:
