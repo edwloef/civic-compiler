@@ -36,13 +36,13 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/analysis/resolve.c
     src/analysis/typecheck.c
     src/analysis/vartable.c
+    src/astopt/constfold.c
+    src/astopt/identities.c
+    src/astopt/transp.c
+    src/astopt/trivialcontrolflow.c
     src/desugar/casts.c
     src/free/free.c
     src/globals/globals.c
-    src/opt/identities.c
-    src/opt/scalarconstfold.c
-    src/opt/transp.c
-    src/opt/trivialcontrolflow.c
     src/print/print.c
     src/stats/count_ops.c
     src/stats/count_ids.c

@@ -25,7 +25,7 @@
         CCNcycleNotify();                                                      \
     }
 
-node_st *OImonop(node_st *node) {
+node_st *AOImonop(node_st *node) {
     TRAVchildren(node);
 
     switch (MONOP_OP(node)) {
@@ -80,7 +80,7 @@ node_st *OImonop(node_st *node) {
     return node;
 }
 
-node_st *OIbinop(node_st *node) {
+node_st *AOIbinop(node_st *node) {
     TRAVchildren(node);
 
     switch (BINOP_OP(node)) {

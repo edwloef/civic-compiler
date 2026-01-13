@@ -1,11 +1,9 @@
 start phase RootPhase {
     actions {
         pass scanparse;
-        // Print;
-        // Stats;
         Analysis;
         Desugar;
-        Opt;
+        AstOpt;
         Free;
     }
 };
@@ -81,17 +79,17 @@ phase Desugar {
     }
 };
 
-cycle Opt {
+cycle AstOpt {
     actions {
-        traversal ScalarConstFold {
-            uid = OSCF,
+        traversal ConstFold {
+            uid = AOCF,
             nodes = { Monop, Binop, Cast }
         };
 
         cycle ComputeTransp {
             actions {
                 traversal Transp {
-                    uid = OCTT,
+                    uid = AOT,
                     nodes = ArrExpr | { Program, FunDecl, FunBody, Assign, Exprs },
                     travdata {
                         user funtable_ptr funtable,
@@ -104,12 +102,12 @@ cycle Opt {
         };
 
         traversal TrivialControlFlow {
-            uid = OTCF,
+            uid = AOTCF,
             nodes = { Stmts }
         };
 
         traversal Identities {
-            uid = OI,
+            uid = AOI,
             nodes = { Monop, Binop }
         };
     }
