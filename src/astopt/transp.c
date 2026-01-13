@@ -35,26 +35,24 @@ node_st *AOTarrexprs(node_st *node) {
 }
 
 node_st *AOTfundecl(node_st *node) {
-    int prev = DATA_AOT_GET()->min_nesting_level;
-    DATA_AOT_GET()->min_nesting_level = DATA_AOT_GET()->nesting_level;
-    DATA_AOT_GET()->vartable = FUNDECL_VARTABLE(node);
-
     if (!FUNDECL_EXTERNAL(node)) {
-        DATA_AOT_GET()->min_nesting_level++;
+        int prev = DATA_AOT_GET()->min_nesting_level;
+        DATA_AOT_GET()->vartable = FUNDECL_VARTABLE(node);
+        DATA_AOT_GET()->min_nesting_level = DATA_AOT_GET()->nesting_level + 1;
+
         TRAVchildren(node);
-    }
+        bool transp =
+            DATA_AOT_GET()->min_nesting_level > DATA_AOT_GET()->nesting_level;
 
-    bool transp =
-        DATA_AOT_GET()->min_nesting_level > DATA_AOT_GET()->nesting_level;
-    DATA_AOT_GET()->min_nesting_level =
-        MIN(prev, DATA_AOT_GET()->min_nesting_level);
-    DATA_AOT_GET()->vartable = DATA_AOT_GET()->vartable->parent;
+        DATA_AOT_GET()->vartable = DATA_AOT_GET()->vartable->parent;
+        DATA_AOT_GET()->min_nesting_level = prev;
 
-    funtable_ref r = {0, FUNDECL_L(node)};
-    funtable_entry *e = funtable_get(DATA_AOT_GET()->funtable, r);
-    if (transp != e->transp) {
-        e->transp = transp;
-        CCNcycleNotify();
+        funtable_ref r = {0, FUNDECL_L(node)};
+        funtable_entry *e = funtable_get(DATA_AOT_GET()->funtable, r);
+        if (transp != e->transp) {
+            e->transp = transp;
+            CCNcycleNotify();
+        }
     }
 
     return node;
