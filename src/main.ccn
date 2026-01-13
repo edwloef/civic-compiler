@@ -60,12 +60,17 @@ phase Analysis {
 
         traversal TypeCheck {
             uid = ATC,
-            nodes = ArrExpr | Stmt | { Program, Stmts, FunDecl, FunBody, VarDecl },
+            nodes = ArrExpr | Stmt | { Program, FunDecl, FunBody, VarDecl },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
                 BasicType ret_ty
             }
+        };
+
+        traversal Diverge {
+            uid = AD,
+            nodes = { Program, Stmts, FunDecl, IfElse, While, DoWhile, Return }
         };
     }
 };
