@@ -13,7 +13,6 @@ typedef struct {
 typedef struct {
     char *name;
     vartype ty;
-    int level;
     span span;
     bool loopvar;
 } vartable_entry;

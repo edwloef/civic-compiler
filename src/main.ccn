@@ -43,8 +43,7 @@ phase Analysis {
             nodes = { Program, FunDecl, FunBody, VarDecl },
             travdata {
                 user funtable_ptr funtable,
-                user vartable_ptr vartable,
-                int nesting_level
+                user vartable_ptr vartable
             }
         };
 
@@ -53,8 +52,7 @@ phase Analysis {
             nodes = { Program, FunDecl, FunBody, Param, VarDecl, For, Call, VarRef },
             travdata {
                 user funtable_ptr funtable,
-                user vartable_ptr vartable,
-                int nesting_level
+                user vartable_ptr vartable
             }
         };
 
