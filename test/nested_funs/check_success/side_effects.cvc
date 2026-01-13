@@ -14,6 +14,16 @@ void also_side_effects() {
     side_effects();
 }
 
+void nested_no_side_effects() {
+    int a = 0;
+
+    void nested() {
+        a = a + 1;
+    }
+
+    nested();
+}
+
 void nested_side_effects() {
     void nested() {
         also_side_effects();
@@ -26,5 +36,6 @@ void foo() {
     no_side_effects();
     side_effects();
     also_side_effects();
+    nested_no_side_effects();
     nested_side_effects();
 }
