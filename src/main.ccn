@@ -166,11 +166,17 @@ node Stmts {
     },
 
     attributes {
-        bool always_returns
+        bool diverges
     }
 };
 
-nodeset Stmt = { Assign, IfElse, While, DoWhile, For, Return, Call };
+nodeset Stmt {
+    nodes = { Assign, IfElse, While, DoWhile, For, Return, Call },
+
+    attributes {
+        bool diverges
+    }
+};
 
 node Exprs {
     children {
@@ -194,6 +200,7 @@ node ArrExprs {
 
 nodeset ArrExpr {
     nodes = Expr | { ArrExprs },
+
     attributes {
         BasicType resolved_ty,
         int resolved_dims,
@@ -284,10 +291,6 @@ node IfElse {
         Expr expr { constructor, mandatory },
         Stmts if_block { constructor },
         Stmts else_block { constructor }
-    },
-
-    attributes {
-        bool always_returns
     }
 };
 
@@ -295,10 +298,6 @@ node While {
     children {
         Expr expr { constructor },
         Stmts stmts { constructor }
-    },
-
-    attributes {
-        bool always_returns
     }
 };
 
@@ -306,10 +305,6 @@ node DoWhile {
     children {
         Stmts stmts { constructor },
         Expr expr { constructor }
-    },
-
-    attributes {
-        bool always_returns
     }
 };
 
