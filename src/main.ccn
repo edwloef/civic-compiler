@@ -295,6 +295,10 @@ node While {
     children {
         Expr expr { constructor },
         Stmts stmts { constructor }
+    },
+
+    attributes {
+        bool always_returns
     }
 };
 

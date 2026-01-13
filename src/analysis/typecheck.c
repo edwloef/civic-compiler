@@ -72,6 +72,8 @@ node_st *ATCstmts(node_st *node) {
     STMTS_ALWAYS_RETURNS(node) = NODE_TYPE(STMTS_STMT(node)) == NT_RETURN ||
                                  (NODE_TYPE(STMTS_STMT(node)) == NT_IFELSE &&
                                   IFELSE_ALWAYS_RETURNS(STMTS_STMT(node))) ||
+                                 (NODE_TYPE(STMTS_STMT(node)) == NT_WHILE &&
+                                  WHILE_ALWAYS_RETURNS(STMTS_STMT(node))) ||
                                  (NODE_TYPE(STMTS_STMT(node)) == NT_DOWHILE &&
                                   DOWHILE_ALWAYS_RETURNS(STMTS_STMT(node)));
 
@@ -288,14 +290,15 @@ node_st *ATCwhile(node_st *node) {
         }
     }
 
+    WHILE_EXPR(node) = TRAVstart(WHILE_EXPR(node), TRAV_AOCF);
+    WHILE_ALWAYS_RETURNS(node) = NODE_TYPE(WHILE_EXPR(node)) == NT_BOOL &&
+                                 BOOL_VAL(WHILE_EXPR(node)) == true;
+
     return node;
 }
 
 node_st *ATCdowhile(node_st *node) {
     TRAVchildren(node);
-
-    DOWHILE_ALWAYS_RETURNS(node) =
-        DOWHILE_STMTS(node) && STMTS_ALWAYS_RETURNS(DOWHILE_STMTS(node));
 
     vartype resolved_ty = RESOLVED_TY(DOWHILE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
@@ -313,6 +316,12 @@ node_st *ATCdowhile(node_st *node) {
             }
         }
     }
+
+    DOWHILE_EXPR(node) = TRAVstart(DOWHILE_EXPR(node), TRAV_AOCF);
+    DOWHILE_ALWAYS_RETURNS(node) =
+        (DOWHILE_STMTS(node) && STMTS_ALWAYS_RETURNS(DOWHILE_STMTS(node))) ||
+        (NODE_TYPE(DOWHILE_EXPR(node)) == NT_BOOL &&
+         BOOL_VAL(DOWHILE_EXPR(node)) == true);
 
     return node;
 }
