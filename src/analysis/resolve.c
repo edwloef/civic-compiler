@@ -1,7 +1,7 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "error/span.h"
-#include "table/insert.h"
+#include "table/table.h"
 
 void ARinit(void) {}
 

@@ -1,6 +1,5 @@
 #include "ccn/ccn.h"
-#include "table/insert.h"
-#include "table/vartable.h"
+#include "table/table.h"
 
 void AGinit(void) {}
 void AGfini(void) {}

@@ -40,7 +40,8 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/transp.c
     src/astopt/trivialcontrolflow.c
     src/desugar/casts.c
-    src/desugar/typeexprs.c
+    src/desugar/declexprs.c
+    src/desugar/stmtexprs.c
     src/error/error.c
     src/free/free.c
     src/globals/globals.c

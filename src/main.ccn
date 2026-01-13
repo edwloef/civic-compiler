@@ -89,11 +89,21 @@ phase Desugar {
             nodes = { Cast }
         };
 
-        traversal TypeExprs {
-            uid = DTE,
-            nodes = { Program, Decls, FunDecl },
+        traversal DeclExprs {
+            uid = DDE,
+            nodes = { Program, Decls, FunDecl, FunBody, Exprs },
             travdata {
-                user vartable_ptr vartable
+                user vartable_ptr vartable,
+                Decls decls
+            }
+        };
+
+        traversal StmtExprs {
+            uid = DSE,
+            nodes = { Program, Stmts, FunDecl, FunBody, Exprs },
+            travdata {
+                user vartable_ptr vartable,
+                Stmts stmts
             }
         };
     }
@@ -110,7 +120,7 @@ cycle AstOpt {
             actions {
                 traversal Transp {
                     uid = AOT,
-                    nodes = ArrExpr | { Program, FunDecl, FunBody, Assign, Exprs },
+                    nodes = ArrExpr | { Program, FunDecl, FunBody, Assign },
                     travdata {
                         user funtable_ptr funtable,
                         user vartable_ptr vartable,
@@ -202,10 +212,6 @@ node Exprs {
     children {
         Expr expr { constructor, mandatory },
         Exprs next { constructor }
-    },
-
-    attributes {
-        bool transp
     }
 };
 

@@ -1,8 +1,7 @@
 #include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
-#include "table/insert.h"
-#include "table/vartable.h"
+#include "table/table.h"
 
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));
@@ -55,6 +54,13 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
     ERROR(id, "can't resolve variable '%s'", ID_VAL(id));
     vartable_ref r = {-1, -1};
     return r;
+}
+
+node_st *vartable_temp_var(vartable *self, vartype ty) {
+    char *name = STRfmt("_%d", self->len);
+    vartable_entry e = {name, ty, {0, 0, 0, 0}, false};
+    vartable_push(self, e);
+    return ASTvarref(ASTid(name), NULL);
 }
 
 static vartable_entry error = {.name = "error", .ty = {.ty = TY_error}};
