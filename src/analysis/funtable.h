@@ -18,8 +18,7 @@ void funtype_free(funtype self);
 typedef struct {
     char *name;
     funtype ty;
-    int nesting_level;
-    int min_nesting_level;
+    bool transp;
     span span;
 } funtable_entry;
 
@@ -41,7 +40,5 @@ funtable *funtable_new(funtable *parent);
 void funtable_push(funtable *self, funtable_entry e);
 
 funtable_entry *funtable_get(funtable *self, funtable_ref r);
-
-bool funtable_transp(funtable *self, funtable_ref r);
 
 void funtable_free(funtable *self);

@@ -94,11 +94,6 @@ funtable_entry *funtable_get(funtable *self, funtable_ref r) {
     return &self->buf[r.l];
 }
 
-bool funtable_transp(funtable *self, funtable_ref r) {
-    funtable_entry *e = funtable_get(self, r);
-    return e->min_nesting_level > e->nesting_level;
-}
-
 void funtable_free(funtable *self) {
     for (int i = 0; i < self->len; i++)
         funtype_free(self->buf[i].ty);

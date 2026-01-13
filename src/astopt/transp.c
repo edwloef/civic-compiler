@@ -44,14 +44,16 @@ node_st *AOTfundecl(node_st *node) {
         TRAVchildren(node);
     }
 
-    int min_nesting_level = DATA_AOT_GET()->min_nesting_level;
-    DATA_AOT_GET()->min_nesting_level = MIN(prev, min_nesting_level);
+    bool transp =
+        DATA_AOT_GET()->min_nesting_level > DATA_AOT_GET()->nesting_level;
+    DATA_AOT_GET()->min_nesting_level =
+        MIN(prev, DATA_AOT_GET()->min_nesting_level);
     DATA_AOT_GET()->vartable = DATA_AOT_GET()->vartable->parent;
 
     funtable_ref r = {0, FUNDECL_L(node)};
     funtable_entry *e = funtable_get(DATA_AOT_GET()->funtable, r);
-    if (min_nesting_level != e->min_nesting_level) {
-        e->min_nesting_level = min_nesting_level;
+    if (transp != e->transp) {
+        e->transp = transp;
         CCNcycleNotify();
     }
 
@@ -109,7 +111,7 @@ node_st *AOTcall(node_st *node) {
     TRAVchildren(node);
 
     funtable_ref r = {CALL_N(node), CALL_L(node)};
-    bool fun_transp = funtable_transp(DATA_AOT_GET()->funtable, r);
+    bool fun_transp = funtable_get(DATA_AOT_GET()->funtable, r)->transp;
 
     CALL_TRANSP(node) =
         fun_transp && (!CALL_EXPRS(node) || EXPRS_TRANSP(CALL_EXPRS(node)));
