@@ -1,0 +1,30 @@
+extern void printInt(int x);
+
+extern void maybe_side_effects();
+
+void no_side_effects() {}
+
+int a = 0;
+void side_effects() {
+    a = a + 1;
+    printInt(a);
+}
+
+void also_side_effects() {
+    side_effects();
+}
+
+void nested_side_effects() {
+    void nested() {
+        also_side_effects();
+    }
+    nested();
+}
+
+void foo() {
+    maybe_side_effects();
+    no_side_effects();
+    side_effects();
+    also_side_effects();
+    nested_side_effects();
+}

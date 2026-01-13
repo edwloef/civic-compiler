@@ -97,8 +97,8 @@ cycle AstOpt {
                     travdata {
                         user funtable_ptr funtable,
                         user vartable_ptr vartable,
-                        int nesting_level,
-                        int min_nesting_level
+                        int level,
+                        int min_level
                     }
                 };
             }

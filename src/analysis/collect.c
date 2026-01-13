@@ -33,7 +33,7 @@ node_st *ACfundecl(node_st *node) {
         arg = PARAMS_NEXT(arg);
     }
 
-    funtable_entry e = {ID_VAL(FUNDECL_ID(node)), ty, false,
+    funtable_entry e = {ID_VAL(FUNDECL_ID(node)), ty, false, 0,
                         SPAN(FUNDECL_ID(node))};
     funtable_insert(DATA_AC_GET()->funtable, e, FUNDECL_ID(node));
     FUNDECL_L(node) = DATA_AC_GET()->funtable->len - 1;

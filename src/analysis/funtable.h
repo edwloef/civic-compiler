@@ -19,6 +19,7 @@ typedef struct {
     char *name;
     funtype ty;
     bool transp;
+    int min_level;
     span span;
 } funtable_entry;
 
