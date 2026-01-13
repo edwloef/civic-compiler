@@ -100,7 +100,7 @@ phase Desugar {
 
         traversal StmtExprs {
             uid = DSE,
-            nodes = { Program, Stmts, FunDecl, FunBody, Exprs },
+            nodes = { Program, Stmts, FunDecl, Exprs },
             travdata {
                 user vartable_ptr vartable,
                 Stmts stmts

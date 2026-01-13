@@ -39,12 +39,6 @@ node_st *DSEfundecl(node_st *node) {
     return node;
 }
 
-node_st *DSEfunbody(node_st *node) {
-    FUNBODY_STMTS(node) = TRAVopt(FUNBODY_STMTS(node));
-
-    return node;
-}
-
 node_st *DSEexprs(node_st *node) {
     EXPRS_NEXT(node) = TRAVopt(EXPRS_NEXT(node));
     EXPRS_EXPR(node) = TRAVdo(EXPRS_EXPR(node));
