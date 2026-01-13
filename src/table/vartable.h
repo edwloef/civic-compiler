@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "ccngen/enum.h"
-#include "span.h"
+#include "error/span.h"
 
 typedef struct {
     enum BasicType ty;

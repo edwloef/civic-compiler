@@ -1,6 +1,6 @@
-#include "analysis.h"
 #include "ccn/ccn.h"
-#include "vartable.h"
+#include "table/insert.h"
+#include "table/vartable.h"
 
 void AGinit(void) {}
 void AGfini(void) {}

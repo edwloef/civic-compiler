@@ -1,8 +1,8 @@
-#include "funtable.h"
-#include "analysis.h"
-#include "error.h"
+#include "table/funtable.h"
+#include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
+#include "table/insert.h"
 
 funtype funtype_new(enum BasicType ty) {
     funtype n;

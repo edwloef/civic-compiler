@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ccngen/ast.h"
-#include "funtable.h"
-#include "vartable.h"
+#include "table/funtable.h"
+#include "table/vartable.h"
 
 void vartable_insert(vartable *self, vartable_entry e, node_st *id);
 

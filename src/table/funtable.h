@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vartable.h"
+#include "table/vartable.h"
 
 typedef struct {
     int len;

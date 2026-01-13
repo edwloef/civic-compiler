@@ -1,6 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "error.h"
+#include "error/error.h"
 #include "palm/dbug.h"
 #include "print/print.h"
 

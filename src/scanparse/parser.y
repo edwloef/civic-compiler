@@ -3,8 +3,8 @@
 #include <errno.h>
 #include <string.h>
 
-#include "analysis/error.h"
 #include "ccn/ccn.h"
+#include "error/error.h"
 #include "globals/globals.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"

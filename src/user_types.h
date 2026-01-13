@@ -1,8 +1,8 @@
 #pragma once
 
-#include "analysis/funtable.h"
-#include "analysis/vartable.h"
 #include "palm/hash_table.h"
+#include "table/funtable.h"
+#include "table/vartable.h"
 
 typedef htable_st *htable_st_ptr;
 typedef funtable *funtable_ptr;

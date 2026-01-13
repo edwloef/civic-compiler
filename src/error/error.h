@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-#include "span.h"
+#include "error/span.h"
 
 #define ERROR(node, format, ...) MESSAGE(L_ERROR, node, format, ##__VA_ARGS__)
 #define WARNING(node, format, ...)                                             \
