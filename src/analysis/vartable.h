@@ -2,8 +2,8 @@
 
 #include <stdbool.h>
 
-#include "analysis/span.h"
 #include "ccngen/enum.h"
+#include "span.h"
 
 typedef struct {
     enum BasicType ty;

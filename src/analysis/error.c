@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#include "analysis/error.h"
+#include "error.h"
 #include "globals/globals.h"
 #include "palm/dbug.h"
 #include "palm/str.h"

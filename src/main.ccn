@@ -38,9 +38,17 @@ phase Stats {
 
 phase Analysis {
     actions {
-        traversal Collect {
-            uid = AC,
-            nodes = { Program, FunDecl, FunBody, VarDecl },
+        traversal Functions {
+            uid = AF,
+            nodes = { Program, FunDecl, FunBody },
+            travdata {
+                user funtable_ptr funtable
+            }
+        };
+
+        traversal Globals {
+            uid = AG,
+            nodes = { Program, VarDecl },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable
@@ -51,6 +59,7 @@ phase Analysis {
             uid = AR,
             nodes = { Program, FunDecl, FunBody, Param, VarDecl, For, Call, VarRef },
             travdata {
+                bool globals,
                 user funtable_ptr funtable,
                 user vartable_ptr vartable
             }

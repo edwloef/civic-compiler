@@ -1,6 +1,6 @@
-#include "analysis/vartable.h"
-#include "analysis/error.h"
-#include "analysis/resolve.h"
+#include "vartable.h"
+#include "analysis.h"
+#include "error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 

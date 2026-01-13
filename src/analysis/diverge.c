@@ -1,4 +1,4 @@
-#include "analysis/error.h"
+#include "error.h"
 #include "ccn/ccn.h"
 #include "print/print.h"
 
