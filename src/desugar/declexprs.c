@@ -28,10 +28,10 @@ node_st *DDEdecls(node_st *node) {
                 continue;
             }
 
-            vartype ty = {EXPR_RESOLVED_TY(EXPRS_EXPR(expr)), 0};
-            node_st *ref = vartable_temp_var(DATA_DDE_GET()->vartable, ty);
+            node_st *ref = vartable_temp_var(DATA_DDE_GET()->vartable,
+                                             (vartype){TY_int, 0});
             node_st *decl =
-                ASTvardecl(ASTtype(NULL, ty.ty), CCNcopy(VARREF_ID(ref)),
+                ASTvardecl(ASTtype(NULL, TY_int), CCNcopy(VARREF_ID(ref)),
                            EXPRS_EXPR(expr));
             EXPRS_EXPR(expr) = ref;
 
