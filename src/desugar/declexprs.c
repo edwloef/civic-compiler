@@ -16,14 +16,39 @@ node_st *DDEdecls(node_st *node) {
     DECLS_NEXT(node) = TRAVopt(DECLS_NEXT(node));
     DECLS_DECL(node) = TRAVdo(DECLS_DECL(node));
 
-    if (DATA_DDE_GET()->decls) {
-        node_st *tmp;
-        for (tmp = DATA_DDE_GET()->decls; DECLS_NEXT(tmp);
-             tmp = DECLS_NEXT(tmp))
-            ;
-        DECLS_NEXT(tmp) = node;
-        node = DATA_DDE_GET()->decls;
-        DATA_DDE_GET()->decls = NULL;
+    node_st *decl = DECLS_DECL(node);
+    if (NODE_TYPE(decl) == NT_VARDECL) {
+        node_st *root = NULL;
+        node_st *decls = NULL;
+
+        for (node_st *expr = TYPE_EXPRS(VARDECL_TY(decl)); expr;
+             expr = EXPRS_NEXT(expr)) {
+            if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_INT ||
+                (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
+                 !VARREF_EXPRS(EXPRS_EXPR(expr)))) {
+                continue;
+            }
+
+            vartype ty = {EXPR_RESOLVED_TY(EXPRS_EXPR(expr)), 0};
+            node_st *ref = vartable_temp_var(DATA_DDE_GET()->vartable, ty);
+            node_st *decl =
+                ASTvardecl(ASTtype(NULL, ty.ty), CCNcopy(VARREF_ID(ref)),
+                           EXPRS_EXPR(expr));
+            EXPRS_EXPR(expr) = ref;
+
+            if (root) {
+                DECLS_NEXT(decls) = ASTdecls(decl, NULL);
+                decls = DECLS_NEXT(decls);
+            } else {
+                decls = ASTdecls(decl, NULL);
+                root = decls;
+            }
+        }
+
+        if (decls) {
+            DECLS_NEXT(decls) = node;
+            node = root;
+        }
     }
 
     return node;
@@ -35,33 +60,6 @@ node_st *DDEfundecl(node_st *node) {
     TRAVchildren(node);
 
     DATA_DDE_GET()->vartable = DATA_DDE_GET()->vartable->parent;
-
-    return node;
-}
-
-node_st *DDEfunbody(node_st *node) {
-    FUNBODY_DECLS(node) = TRAVopt(FUNBODY_DECLS(node));
-
-    return node;
-}
-
-node_st *DDEexprs(node_st *node) {
-    EXPRS_NEXT(node) = TRAVopt(EXPRS_NEXT(node));
-    EXPRS_EXPR(node) = TRAVdo(EXPRS_EXPR(node));
-
-    if (NODE_TYPE(EXPRS_EXPR(node)) == NT_INT ||
-        (NODE_TYPE(EXPRS_EXPR(node)) == NT_VARREF &&
-         !VARREF_EXPRS(EXPRS_EXPR(node)))) {
-        return node;
-    }
-
-    vartype ty = {EXPR_RESOLVED_TY(EXPRS_EXPR(node)), 0};
-    node_st *ref = vartable_temp_var(DATA_DDE_GET()->vartable, ty);
-    node_st *decl = ASTvardecl(ASTtype(NULL, ty.ty), CCNcopy(VARREF_ID(ref)),
-                               EXPRS_EXPR(node));
-    EXPRS_EXPR(node) = ref;
-
-    DATA_DDE_GET()->decls = ASTdecls(decl, DATA_DDE_GET()->decls);
 
     return node;
 }

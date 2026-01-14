@@ -91,19 +91,9 @@ phase Desugar {
 
         traversal DeclExprs {
             uid = DDE,
-            nodes = { Program, Decls, FunDecl, FunBody, Exprs },
+            nodes = { Program, Decls, FunDecl },
             travdata {
-                user vartable_ptr vartable,
-                Decls decls
-            }
-        };
-
-        traversal StmtExprs {
-            uid = DSE,
-            nodes = { Program, Stmts, FunDecl, Exprs },
-            travdata {
-                user vartable_ptr vartable,
-                Stmts stmts
+                user vartable_ptr vartable
             }
         };
     }
@@ -213,6 +203,10 @@ node Exprs {
     children {
         Expr expr { constructor, mandatory },
         Exprs next { constructor }
+    },
+
+    attributes {
+        bool transp
     }
 };
 
