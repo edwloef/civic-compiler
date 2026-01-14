@@ -3,5 +3,9 @@ int foo(int x) {
     int b = (1 + 2) + (a - 3);
     int c = (1 + 2) - (b + 3);
     int d = (1 + 2) - (c - 3);
-    return d;
+    int e = (1 - 2) + (d + 3);
+    int f = (1 - 2) + (e - 3);
+    int g = (1 - 2) - (f + 3);
+    int h = (1 - 2) - (g - 3);
+    return h;
 }

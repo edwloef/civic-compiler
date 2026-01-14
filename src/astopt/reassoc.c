@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "ccngen/enum.h"
 
 node_st *AORbinop(node_st *node) {
     TRAVchildren(node);
@@ -11,10 +12,13 @@ node_st *AORbinop(node_st *node) {
     case BO_sub:
         if (NODE_TYPE(right) == NT_BINOP) {
             if (BINOP_OP(right) == BO_add || BINOP_OP(right) == BO_sub) {
+                if (BINOP_OP(node) == BO_sub) {
+                    BINOP_OP(right) =
+                        BINOP_OP(right) == BO_add ? BO_sub : BO_add;
+                }
+
                 BINOP_RIGHT(node) = BINOP_LEFT(right);
                 BINOP_LEFT(right) = node;
-                BINOP_OP(node) =
-                    BINOP_OP(node) != BINOP_OP(right) ? BO_sub : BO_add;
                 node = right;
             }
         } else if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT ||
@@ -29,6 +33,11 @@ node_st *AORbinop(node_st *node) {
                 BINOP_OP(node) = BINOP_OP(left);
                 BINOP_OP(left) = op;
             } else {
+                if (BINOP_OP(node) == BO_sub) {
+                    BINOP_OP(node) = BO_add;
+                    right = ASTmonop(right, MO_neg);
+                }
+
                 BINOP_LEFT(node) = right;
                 BINOP_RIGHT(node) = left;
             }
@@ -53,6 +62,13 @@ node_st *AORbinop(node_st *node) {
             }
         }
         break;
+    case BO_eq:
+    case BO_ne:
+        if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT ||
+            NODE_TYPE(right) == NT_BOOL) {
+            BINOP_LEFT(node) = right;
+            BINOP_RIGHT(node) = left;
+        }
     default:
         break;
     }
