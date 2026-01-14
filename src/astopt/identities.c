@@ -246,25 +246,25 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_and:
-        if ((NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false) ||
-            (NODE_TYPE(right) == NT_BOOL && BOOL_VAL(right) == true)) {
-            // (false && x) => false
-            // (x && true) => x
-            TAKE(BINOP_LEFT(node));
-        } else if (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == true) {
-            // (true && x) => x
-            TAKE(BINOP_RIGHT(node));
+        if (NODE_TYPE(left) == NT_BOOL) {
+            if (BOOL_VAL(left) == true) {
+                // (true && x) => x
+                TAKE(BINOP_RIGHT(node));
+            } else {
+                // (false && x) => false
+                TAKE(BINOP_LEFT(node));
+            }
         }
         break;
     case BO_or:
-        if ((NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == true) ||
-            (NODE_TYPE(right) == NT_BOOL && BOOL_VAL(right) == false)) {
-            // (true || x) => true
-            // (x || false) => x
-            TAKE(BINOP_LEFT(node));
-        } else if (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false) {
-            // (false || x) => x
-            TAKE(BINOP_RIGHT(node));
+        if (NODE_TYPE(left) == NT_BOOL) {
+            if (BOOL_VAL(left) == true) {
+                // (true || x) => true
+                TAKE(BINOP_LEFT(node));
+            } else {
+                // (false || x) => x
+                TAKE(BINOP_RIGHT(node));
+            }
         }
         break;
     case BO_eq:
