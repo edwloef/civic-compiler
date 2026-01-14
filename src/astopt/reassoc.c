@@ -1,5 +1,4 @@
 #include "ccn/ccn.h"
-#include "ccngen/enum.h"
 
 node_st *AORbinop(node_st *node) {
     TRAVchildren(node);

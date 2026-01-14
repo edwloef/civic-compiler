@@ -121,18 +121,14 @@ cycle AstOpt {
             nodes = { Monop, Binop, Cast }
         };
 
-        cycle ComputeTransp {
-            actions {
-                traversal Transp {
-                    uid = AOT,
-                    nodes = ArrExpr | { Program, FunDecl, FunBody, Assign },
-                    travdata {
-                        user funtable_ptr funtable,
-                        user vartable_ptr vartable,
-                        int level,
-                        int min_level
-                    }
-                };
+        traversal Transp {
+            uid = AOT,
+            nodes = ArrExpr | { Program, FunDecl, FunBody, Assign },
+            travdata {
+                user funtable_ptr funtable,
+                user vartable_ptr vartable,
+                int level,
+                int min_level
             }
         };
 

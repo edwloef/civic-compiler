@@ -28,22 +28,59 @@
 node_st *AOImonop(node_st *node) {
     TRAVchildren(node);
 
+    node_st *expr = MONOP_EXPR(node);
+
     switch (MONOP_OP(node)) {
     case MO_pos:
         TAKE(MONOP_EXPR(node));
         break;
     case MO_neg:
-        if (NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
-            MONOP_OP(MONOP_EXPR(node)) == MO_neg) {
+        if (NODE_TYPE(expr) == NT_MONOP && MONOP_OP(expr) == MO_neg) {
             TAKE(MONOP_EXPR(MONOP_EXPR(node)));
+        } else if (NODE_TYPE(expr) == NT_BINOP) {
+            node_st *left = BINOP_LEFT(expr);
+            node_st *right = BINOP_RIGHT(expr);
+
+            switch (BINOP_OP(expr)) {
+            case BO_add:
+            case BO_sub:
+                if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
+                    TAKE(MONOP_EXPR(node));
+                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
+                    BINOP_OP(node) = BINOP_OP(node) == BO_add ? BO_sub : BO_add;
+                }
+                break;
+            case BO_mul:
+                if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
+                    TAKE(MONOP_EXPR(node));
+                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
+                }
+                break;
+            case BO_div:
+                if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
+                    TAKE(MONOP_EXPR(node));
+                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
+                } else if (NODE_TYPE(right) == NT_INT ||
+                           NODE_TYPE(right) == NT_FLOAT) {
+                    TAKE(MONOP_EXPR(node));
+                    BINOP_RIGHT(node) = ASTmonop(BINOP_RIGHT(node), MO_neg);
+                }
+                break;
+            case BO_mod:
+                if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
+                    TAKE(MONOP_EXPR(node));
+                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
+                }
+            default:
+                break;
+            }
         }
         break;
     case MO_not:
-        if (NODE_TYPE(MONOP_EXPR(node)) == NT_MONOP &&
-            MONOP_OP(MONOP_EXPR(node)) == MO_not) {
+        if (NODE_TYPE(expr) == NT_MONOP && MONOP_OP(expr) == MO_not) {
             TAKE(MONOP_EXPR(MONOP_EXPR(node)))
-        } else if (NODE_TYPE(MONOP_EXPR(node)) == NT_BINOP) {
-            switch (BINOP_OP(MONOP_EXPR(node))) {
+        } else if (NODE_TYPE(expr) == NT_BINOP) {
+            switch (BINOP_OP(expr)) {
             case BO_lt:
                 TAKE(MONOP_EXPR(node));
                 BINOP_OP(node) = BO_ge;
