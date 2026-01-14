@@ -13,8 +13,7 @@ node_st *DDEprogram(node_st *node) {
 }
 
 node_st *DDEdecls(node_st *node) {
-    DECLS_NEXT(node) = TRAVopt(DECLS_NEXT(node));
-    DECLS_DECL(node) = TRAVdo(DECLS_DECL(node));
+    TRAVchildren(node);
 
     node_st *decl = DECLS_DECL(node);
     if (NODE_TYPE(decl) == NT_VARDECL) {
