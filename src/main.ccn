@@ -160,6 +160,14 @@ enum BinOpKind {
     }
 };
 
+nodeset Node {
+    nodes = Decl | Stmt | ArrExpr | { Stmts, Exprs, Id },
+
+    attributes {
+        string file
+    }
+};
+
 root node Program {
     children {
         Decls decls { constructor, mandatory }

@@ -77,7 +77,7 @@ void emit_message_with_span(span span, level level, char *format, ...) {
     va_emit_message(level, format, ap);
     va_end(ap);
 
-    FILE *file = fopen(globals.input_file, "r");
+    FILE *file = fopen(span.file, "r");
     if (file == NULL)
         return;
 
@@ -86,9 +86,10 @@ void emit_message_with_span(span span, level level, char *format, ...) {
     fprintf(stderr,
             ANSI_BRIGHT_BLUE "%*s-->" ANSI_RESET " %s:%d:%d\n" ANSI_BRIGHT_BLUE
                              "%*s|\n",
-            lineno_width, "", globals.input_file, span.bl + 1, span.bc + 1,
+            lineno_width, "", span.file, span.bl + 1, span.bc + 1,
             lineno_width + 1, "");
 
+    bool nl = true;
     int lineno = 0;
     char line[256];
 
@@ -98,9 +99,12 @@ void emit_message_with_span(span span, level level, char *format, ...) {
                     lineno_width, lineno + 1, line);
         }
 
-        if (line[STRlen(line) - 1] == '\n')
-            lineno++;
+        nl = line[STRlen(line) - 1] == '\n';
+        lineno += nl;
     }
+
+    if (!nl)
+        fputc('\n', stderr);
 
     fclose(file);
 

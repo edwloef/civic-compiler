@@ -8,6 +8,8 @@
 #include "globals/globals.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
+#include "palm/str.h"
+#include "palm/memory.h"
 #include "parser.h"
 
 int yylex();
@@ -601,16 +603,26 @@ void add_loc_to_node(node_st *node, YYLTYPE loc) {
     NODE_BCOL(node) = loc.first_column;
     NODE_ELINE(node) = loc.last_line;
     NODE_ECOL(node) = loc.last_column;
+    if (!NODE_FILE(node))
+        NODE_FILE(node) = STRcpy(globals.file);
 }
 
 node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
-    yyin = fopen(globals.input_file, "r");
+
+    char *cmd = STRfmt("cpp -traditional-cpp %s 2> /dev/null", globals.input_file);
+    yyin = popen(cmd, "r");
+    MEMfree(cmd);
+
     if (yyin == NULL) {
         emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+        abort_on_error();
     } else {
         yyparse();
     }
-    abort_on_error();
+
+    MEMfree(globals.file);
+    globals.file = NULL;
+
     return parseresult;
 }

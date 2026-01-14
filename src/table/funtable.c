@@ -41,6 +41,7 @@ void funtable_insert(funtable *self, funtable_entry e, node_st *id) {
             emit_message_with_span(entry.span, L_INFO,
                                    "function '%s' previously declared here",
                                    e.name);
+            funtype_free(e.ty);
             return;
         }
     }

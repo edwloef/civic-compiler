@@ -1,5 +1,4 @@
-#ifndef __CIVIC_H
-#define __CIVIC_H
+#pragma once
 
 extern void printInt(int val);
 extern void printFloat(float val);
@@ -9,5 +8,3 @@ extern float scanFloat();
 
 extern void printSpaces(int num);
 extern void printNewlines(int num);
-
-#endif

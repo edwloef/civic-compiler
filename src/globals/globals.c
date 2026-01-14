@@ -2,4 +2,4 @@
 
 #include "globals/globals.h"
 
-struct globals globals = {0, 0, NULL, NULL};
+struct globals globals = {0, 0, NULL, NULL, NULL};

@@ -3,6 +3,7 @@
 struct globals {
     int line;
     int col;
+    char *file;
     char *input_file;
     char *output_file;
 };

@@ -1,11 +1,13 @@
 %{
 
+#include <ctype.h>
 #include <limits.h>
 
 #include "ccn/ccn.h"
 #include "error/error.h"
 #include "error/span.h"
 #include "globals/globals.h"
+#include "palm/memory.h"
 #include "palm/str.h"
 #include "parser.h"
 
@@ -27,6 +29,24 @@ void token_action();
 %x comment
 
 %%
+
+"# "[0-9]+" \"".*"\"".*\n                                {
+                                                           yytext += 2;
+                                                           int len = 0;
+                                                           while (isdigit(yytext[len]))
+                                                               len++;
+                                                           yytext[len] = 0;
+                                                           globals.line = atoi(yytext);
+                                                           globals.line = globals.line == 0 ? 0 : globals.line - 1;
+                                                           globals.col = 0;
+                                                           yytext += len + 2;
+                                                           len = 0;
+                                                           while (yytext[len] != '"')
+                                                               len++;
+                                                           yytext[len] = 0;
+                                                           MEMfree(globals.file);
+                                                           globals.file = STRcpy(yytext);
+                                                         }
 
 "("                                                      { FILTER(PAREN_L);   }
 ")"                                                      { FILTER(PAREN_R);   }
@@ -62,7 +82,7 @@ void token_action();
 "extern"                                                 { FILTER(KW_EXTERN); }
 "export"                                                 { FILTER(KW_EXPORT); }
 "if"                                                     { FILTER(KW_IF);     }
-"else"                                                   { FILTER(KW_ELSE);     }
+"else"                                                   { FILTER(KW_ELSE);   }
 "while"                                                  { FILTER(KW_WHILE);  }
 "do"                                                     { FILTER(KW_DO);     }
 "for"                                                    { FILTER(KW_FOR);    }
@@ -133,7 +153,7 @@ void token_action() {
 }
 
 void yyerror(char const *error) {
-    span s = {yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column};
+    span s = {yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column, globals.file};
     emit_message_with_span(s, L_ERROR, "%s", error);
     abort_on_error();
 }
