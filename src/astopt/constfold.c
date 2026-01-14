@@ -17,6 +17,7 @@
 #define BOOL_MONOP(op) op BOOL_VAL(MONOP_EXPR(node))
 
 node_st *AOCFmonop(node_st *node) {
+    TRAVchildren(node);
     switch (MONOP_OP(node)) {
     case MO_pos:
         switch (NODE_TYPE(MONOP_EXPR(node))) {
@@ -55,6 +56,7 @@ node_st *AOCFmonop(node_st *node) {
 #define BOOL_BINOP(op) BOOL_VAL(BINOP_LEFT(node)) op BOOL_VAL(BINOP_RIGHT(node))
 
 node_st *AOCFbinop(node_st *node) {
+    TRAVchildren(node);
     if (NODE_TYPE(BINOP_LEFT(node)) != NODE_TYPE(BINOP_RIGHT(node)))
         return node;
 
@@ -193,6 +195,7 @@ node_st *AOCFbinop(node_st *node) {
 }
 
 node_st *AOCFcast(node_st *node) {
+    TRAVchildren(node);
     switch (CAST_TY(node)) {
     case TY_int:
         switch (NODE_TYPE(CAST_EXPR(node))) {
