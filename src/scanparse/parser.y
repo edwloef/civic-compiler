@@ -603,8 +603,8 @@ void add_loc_to_node(node_st *node, YYLTYPE loc) {
     NODE_BCOL(node) = loc.first_column;
     NODE_ELINE(node) = loc.last_line;
     NODE_ECOL(node) = loc.last_column;
-    if (!NODE_FILE(node))
-        NODE_FILE(node) = STRcpy(globals.file);
+    if (!NODE_FILENAME(node))
+        NODE_FILENAME(node) = STRcpy(globals.file);
 }
 
 node_st *scanparse(node_st *root) {
