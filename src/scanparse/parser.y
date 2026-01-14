@@ -18,7 +18,7 @@ extern FILE *yyin;
 node_st *rev_vardecls(node_st *root);
 YYLTYPE span_locs(YYLTYPE lhs, YYLTYPE rhs);
 void add_loc_to_node(node_st *node, YYLTYPE loc);
-void yyerror(char *errname);
+void yyerror(char const *errname);
 
 %}
 
@@ -31,18 +31,54 @@ void yyerror(char *errname);
     node_st *node;
 }
 
+%define parse.error verbose
 %define parse.trace
 %locations
 
-%token PAREN_L PAREN_R BRACKET_L BRACKET_R BRACE_L BRACE_R COMMA SEMICOLON
-%token BANG PLUS MINUS STAR SLASH PERCENT LE LT GE GT EQ NE AND OR ASSIGN
-%token KW_EXTERN KW_EXPORT KW_IF KW_ELSE KW_WHILE KW_DO KW_FOR KW_RETURN
-%token TY_INT TY_FLOAT TY_BOOL TY_VOID
+%token PAREN_L "("
+%token PAREN_R ")"
+%token BRACKET_L "["
+%token BRACKET_R "]"
+%token BRACE_L "{"
+%token BRACE_R "}"
 
-%token <cbool> LIT_BOOL
-%token <cint> LIT_INT
-%token <cfloat> LIT_FLOAT
-%token <cstr> ID
+%token COMMA ","
+%token SEMICOLON ";"
+
+%token BANG "!"
+%token PLUS "+"
+%token MINUS "-"
+%token STAR "*"
+%token SLASH "/"
+%token PERCENT "%"
+%token LE "<="
+%token LT "<"
+%token GE ">="
+%token GT ">"
+%token EQ "=="
+%token NE "!="
+%token AND "&&"
+%token OR "||"
+%token ASSIGN "="
+
+%token TY_INT "int"
+%token TY_FLOAT "float"
+%token TY_BOOL "bool"
+%token TY_VOID "void"
+
+%token KW_EXTERN "extern"
+%token KW_EXPORT "export"
+%token KW_IF "if"
+%token KW_ELSE "else"
+%token KW_WHILE "while"
+%token KW_DO "do"
+%token KW_FOR "for"
+%token KW_RETURN "return"
+
+%token <cbool> LIT_BOOL "boolean literal"
+%token <cint> LIT_INT "integer literal"
+%token <cfloat> LIT_FLOAT "floating point literal"
+%token <cstr> ID "identifier"
 
 %type <node> decls stmts exprs arrexprs ids params
 %type <node> program decl stmt expr arrexpr block varref id
@@ -50,13 +86,13 @@ void yyerror(char *errname);
 %type <basic_type> basictype
 
 %precedence "none"
-%precedence KW_ELSE
-%left OR
-%left AND
-%left EQ NE
-%left LT LE GT GE
-%left PLUS MINUS
-%left STAR SLASH PERCENT
+%precedence "else"
+%left "||"
+%left "&&"
+%left "==" "!="
+%left "<" "<=" ">" ">="
+%left "+" "-"
+%left "*" "/" "%"
 %precedence "monop"
 
 %start program
@@ -79,29 +115,29 @@ decls: decl decls
        }
      ;
 
-decl: KW_EXTERN funheader SEMICOLON
+decl: "extern" funheader ";"
       {
         $$ = $2;
         FUNDECL_EXTERNAL($$) = true;
       }
-    | KW_EXTERN basictype id SEMICOLON
+    | "extern" basictype id ";"
       {
         $$ = ASTvardecl(ASTtype(NULL, $2), $3, NULL);
         VARDECL_EXTERNAL($$) = true;
         VARDECL_GLOBAL($$) = true;
       }
-    | KW_EXTERN basictype BRACKET_L ids BRACKET_R id SEMICOLON
+    | "extern" basictype "[" ids "]" id ";"
       {
         $$ = ASTvardecl(ASTtype($4, $2), $6, NULL);
         VARDECL_EXTERNAL($$) = true;
         VARDECL_GLOBAL($$) = true;
       }
-    | KW_EXPORT fundef
+    | "export" fundef
       {
         $$ = $2;
         FUNDECL_EXPORTED($$) = true;
       }
-    | KW_EXPORT vardecl
+    | "export" vardecl
       {
         $$ = $2;
         VARDECL_EXPORTED($$) = true;
@@ -130,61 +166,61 @@ stmts: stmt stmts
        }
      ;
 
-stmt: id PAREN_L exprs PAREN_R SEMICOLON
+stmt: id "(" exprs ")" ";"
       {
         $$ = ASTcall($1, $3);
         @$ = span_locs(@1, @4);
         add_loc_to_node($$, @$);
       }
-    | id PAREN_L PAREN_R SEMICOLON
+    | id "(" ")" ";"
       {
         $$ = ASTcall($1, NULL);
         @$ = span_locs(@1, @3);
         add_loc_to_node($$, @$);
       }
-    | varref ASSIGN arrexpr SEMICOLON
+    | varref "=" arrexpr ";"
       {
         $$ = ASTassign($1, $3);
         @$ = span_locs(@1, @3);
         add_loc_to_node($$, @$);
       }
-    | KW_IF PAREN_L expr PAREN_R block %prec "none"
+    | "if" "(" expr ")" block %prec "none"
       {
         $$ = ASTifelse($3, $5, NULL);
         add_loc_to_node($$, @$);
       }
-    | KW_IF PAREN_L expr PAREN_R block KW_ELSE block
+    | "if" "(" expr ")" block "else" block
       {
         $$ = ASTifelse($3, $5, $7);
         add_loc_to_node($$, @$);
       }
-    | KW_WHILE PAREN_L expr PAREN_R block
+    | "while" "(" expr ")" block
       {
         $$ = ASTwhile($3, $5);
         add_loc_to_node($$, @$);
       }
-    | KW_DO block KW_WHILE PAREN_L expr PAREN_R SEMICOLON
+    | "do" block "while" "(" expr ")" ";"
       {
         $$ = ASTdowhile($2, $5);
         @$ = span_locs(@1, @6);
         add_loc_to_node($$, @$);
       }
-    | KW_FOR PAREN_L TY_INT id ASSIGN expr COMMA expr PAREN_R block
+    | "for" "(" "int" id "=" expr "," expr ")" block
       {
         $$ = ASTfor($4, $6, $8, ASTint(1), $10);
         add_loc_to_node($$, @$);
       }
-    | KW_FOR PAREN_L TY_INT id ASSIGN expr COMMA expr COMMA expr PAREN_R block
+    | "for" "(" "int" id "=" expr "," expr "," expr ")" block
       {
         $$ = ASTfor($4, $6, $8, $10, $12);
         add_loc_to_node($$, @$);
       }
-    | KW_RETURN SEMICOLON
+    | "return" ";"
       {
         $$ = ASTreturn(NULL);
         add_loc_to_node($$, @1);
       }
-    | KW_RETURN expr SEMICOLON
+    | "return" expr ";"
       {
         $$ = ASTreturn($2);
         @$ = span_locs(@1, @2);
@@ -192,7 +228,7 @@ stmt: id PAREN_L exprs PAREN_R SEMICOLON
       }
     ;
 
-exprs: expr COMMA exprs
+exprs: expr "," exprs
        {
          $$ = ASTexprs($1, $3);
        }
@@ -202,102 +238,102 @@ exprs: expr COMMA exprs
        }
      ;
 
-expr: PAREN_L basictype PAREN_R expr %prec "monop"
+expr: "(" basictype ")" expr %prec "monop"
       {
         $$ = ASTcast($4, $2);
         add_loc_to_node($$, @$);
       }
-    | PLUS expr %prec "monop"
+    | "+" expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_pos);
         add_loc_to_node($$, @$);
       }
-    | MINUS expr %prec "monop"
+    | "-" expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_neg);
         add_loc_to_node($$, @$);
       }
-    | BANG expr %prec "monop"
+    | "!" expr %prec "monop"
       {
         $$ = ASTmonop($2, MO_not);
         add_loc_to_node($$, @$);
       }
-    | expr STAR expr
+    | expr "*" expr
       {
         $$ = ASTbinop($1, $3, BO_mul);
         add_loc_to_node($$, @$);
       }
-    | expr SLASH expr
+    | expr "/" expr
       {
         $$ = ASTbinop($1, $3, BO_div);
         add_loc_to_node($$, @$);
       }
-    | expr PERCENT expr
+    | expr "%" expr
       {
         $$ = ASTbinop($1, $3, BO_mod);
         add_loc_to_node($$, @$);
       }
-    | expr PLUS expr
+    | expr "+" expr
       {
         $$ = ASTbinop($1, $3, BO_add);
         add_loc_to_node($$, @$);
       }
-    | expr MINUS expr
+    | expr "-" expr
       {
         $$ = ASTbinop($1, $3, BO_sub);
         add_loc_to_node($$, @$);
       }
-    | expr LT expr
+    | expr "<" expr
       {
         $$ = ASTbinop($1, $3, BO_lt);
         add_loc_to_node($$, @$);
       }
-    | expr LE expr
+    | expr "<=" expr
       {
         $$ = ASTbinop($1, $3, BO_le);
         add_loc_to_node($$, @$);
       }
-    | expr GT expr
+    | expr ">" expr
       {
         $$ = ASTbinop($1, $3, BO_gt);
         add_loc_to_node($$, @$);
       }
-    | expr GE expr
+    | expr ">=" expr
       {
         $$ = ASTbinop($1, $3, BO_ge);
         add_loc_to_node($$, @$);
       }
-    | expr EQ expr
+    | expr "==" expr
       {
         $$ = ASTbinop($1, $3, BO_eq);
         add_loc_to_node($$, @$);
       }
-    | expr NE expr
+    | expr "!=" expr
       {
         $$ = ASTbinop($1, $3, BO_ne);
         add_loc_to_node($$, @$);
       }
-    | expr AND expr
+    | expr "&&" expr
       {
         $$ = ASTbinop($1, $3, BO_and);
         add_loc_to_node($$, @$);
       }
-    | expr OR expr
+    | expr "||" expr
       {
         $$ = ASTbinop($1, $3, BO_or);
         add_loc_to_node($$, @$);
       }
-    | PAREN_L expr PAREN_R
+    | "(" expr ")"
       {
         $$ = $2;
         add_loc_to_node($$, @$);
       }
-    | id PAREN_L exprs PAREN_R
+    | id "(" exprs ")"
       {
         $$ = ASTcall($1, $3);
         add_loc_to_node($$, @$);
       }
-    | id PAREN_L PAREN_R
+    | id "(" ")"
       {
         $$ = ASTcall($1, NULL);
         add_loc_to_node($$, @$);
@@ -307,24 +343,24 @@ expr: PAREN_L basictype PAREN_R expr %prec "monop"
         $$ = $1;
         add_loc_to_node($$, @$);
       }
-    | LIT_INT
+    | "integer literal"
       {
         $$ = ASTint($1);
         add_loc_to_node($$, @$);
       }
-    | LIT_FLOAT
+    | "floating point literal"
       {
         $$ = ASTfloat($1);
         add_loc_to_node($$, @$);
       }
-    | LIT_BOOL
+    | "boolean literal"
       {
         $$ = ASTbool($1);
         add_loc_to_node($$, @$);
       }
     ;
 
-arrexprs: arrexpr COMMA arrexprs
+arrexprs: arrexpr "," arrexprs
           {
             $$ = ASTarrexprs($1, $3);
             add_loc_to_node($$, @$);
@@ -341,7 +377,7 @@ arrexpr: expr
            $$ = $1;
            add_loc_to_node($$, @$);
          }
-       | BRACKET_L arrexprs BRACKET_R
+       | "[" arrexprs "]"
          {
            $$ = $2;
            add_loc_to_node($$, @$);
@@ -358,19 +394,19 @@ vardecls: vardecls vardecl
           }
         ;
 
-vardecl: basictype id SEMICOLON
+vardecl: basictype id ";"
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, NULL);
          }
-       | basictype BRACKET_L exprs BRACKET_R id SEMICOLON
+       | basictype "[" exprs "]" id ";"
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, NULL);
          }
-       | basictype id ASSIGN expr SEMICOLON
+       | basictype id "=" expr ";"
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, $4);
          }
-      | basictype BRACKET_L exprs BRACKET_R id ASSIGN arrexpr SEMICOLON
+      | basictype "[" exprs "]" id "=" arrexpr ";"
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, $7);
          }
@@ -386,29 +422,29 @@ fundefs: fundef fundefs
          }
        ;
 
-fundef: funheader BRACE_L BRACE_R
+fundef: funheader "{" "}"
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody(NULL, NULL);
         }
-      | funheader BRACE_L vardecls BRACE_R
+      | funheader "{" vardecls "}"
         {
           $3 = rev_vardecls($3);
 
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, NULL);
         }
-      | funheader BRACE_L fundefs BRACE_R
+      | funheader "{" fundefs "}"
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, NULL);
         }
-      | funheader BRACE_L stmts BRACE_R
+      | funheader "{" stmts "}"
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody(NULL, $3);
         }
-      | funheader BRACE_L vardecls fundefs BRACE_R
+      | funheader "{" vardecls fundefs "}"
         {
           $3 = rev_vardecls($3);
 
@@ -419,19 +455,19 @@ fundef: funheader BRACE_L BRACE_R
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, NULL);
         }
-      | funheader BRACE_L vardecls stmts BRACE_R
+      | funheader "{" vardecls stmts "}"
         {
           $3 = rev_vardecls($3);
 
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, $4);
         }
-      | funheader BRACE_L fundefs stmts BRACE_R
+      | funheader "{" fundefs stmts "}"
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody($3, $4);
         }
-      | funheader BRACE_L vardecls fundefs stmts BRACE_R
+      | funheader "{" vardecls fundefs stmts "}"
         {
           $3 = rev_vardecls($3);
 
@@ -444,19 +480,19 @@ fundef: funheader BRACE_L BRACE_R
         }
       ;
 
-funheader: basictype id PAREN_L params PAREN_R
+funheader: basictype id "(" params ")"
            {
              $$ = ASTfundecl($2, $4, $1);
            }
-         | TY_VOID id PAREN_L params PAREN_R
+         | "void" id "(" params ")"
            {
              $$ = ASTfundecl($2, $4, TY_void);
            }
-         | basictype id PAREN_L PAREN_R
+         | basictype id "(" ")"
            {
              $$ = ASTfundecl($2, NULL, $1);
            }
-         | TY_VOID id PAREN_L PAREN_R
+         | "void" id "(" ")"
            {
              $$ = ASTfundecl($2, NULL, TY_void);
            }
@@ -466,17 +502,17 @@ block: stmt
        {
          $$ = ASTstmts($1, NULL);
        }
-     | BRACE_L stmts BRACE_R
+     | "{" stmts "}"
        {
          $$ = $2;
        }
-     | BRACE_L BRACE_R
+     | "{" "}"
        {
          $$ = NULL;
        }
      ;
 
-varref: id BRACKET_L exprs BRACKET_R
+varref: id "[" exprs "]"
         {
           $$ = ASTvarref($1, $3);
         }
@@ -486,18 +522,18 @@ varref: id BRACKET_L exprs BRACKET_R
         }
       ;
 
-id: ID
+id: "identifier"
     {
       $$ = ASTid($1);
       add_loc_to_node($$, @$);
     }
   ;
 
-params: basictype id COMMA params
+params: basictype id "," params
         {
           $$ = ASTparams(ASTparam(ASTtype(NULL, $1), $2), $4);
         }
-      | basictype BRACKET_L ids BRACKET_R id COMMA params
+      | basictype "[" ids "]" id "," params
         {
           $$ = ASTparams(ASTparam(ASTtype($3, $1), $5), $7);
         }
@@ -505,13 +541,13 @@ params: basictype id COMMA params
         {
           $$ = ASTparams(ASTparam(ASTtype(NULL, $1), $2), NULL);
         }
-      | basictype BRACKET_L ids BRACKET_R id
+      | basictype "[" ids "]" id
         {
           $$ = ASTparams(ASTparam(ASTtype($3, $1), $5), NULL);
         }
       ;
 
-ids: id COMMA ids
+ids: id "," ids
      {
        $$ = ASTexprs(ASTvarref($1, NULL), $3);
      }
@@ -521,15 +557,15 @@ ids: id COMMA ids
      }
    ;
 
-basictype: TY_BOOL
+basictype: "bool"
            {
              $$ = TY_bool;
            }
-         | TY_INT
+         | "int"
            {
              $$ = TY_int;
            }
-         | TY_FLOAT
+         | "float"
            {
              $$ = TY_float;
            }

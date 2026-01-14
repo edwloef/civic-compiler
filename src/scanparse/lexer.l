@@ -9,7 +9,7 @@
 #include "palm/str.h"
 #include "parser.h"
 
-void yyerror(char *err);
+void yyerror(char const *err);
 void token_action();
 
 #define FILTER(token) \
@@ -132,7 +132,7 @@ void token_action() {
     yylloc.last_column = globals.col + yyleng - 1;
 }
 
-void yyerror(char *error) {
+void yyerror(char const *error) {
     span s = {yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column};
     emit_message_with_span(s, L_ERROR, "%s", error);
     abort_on_error();
