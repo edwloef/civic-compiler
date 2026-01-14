@@ -610,17 +610,25 @@ void add_loc_to_node(node_st *node, YYLTYPE loc) {
 node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
 
+    yyin = fopen(globals.input_file, "r");
+    if (yyin == NULL) {
+        emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+        abort_on_error();
+    }
+    fclose(yyin);
+
     char *cmd = STRfmt("cpp -traditional-cpp %s 2> /dev/null", globals.input_file);
     yyin = popen(cmd, "r");
     MEMfree(cmd);
 
     if (yyin == NULL) {
-        emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+        emit_message(L_ERROR, "couldn't start c preprocessor: %s (os error %d)\n", strerror(errno), errno);
         abort_on_error();
     } else {
         yyparse();
     }
 
+    pclose(yyin);
     MEMfree(globals.file);
     globals.file = NULL;
 
