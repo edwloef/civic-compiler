@@ -405,10 +405,14 @@ vardecl: basictype id ";"
        | basictype id "=" expr ";"
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, $4);
+           @$ = span_locs(@1, @4);
+           add_loc_to_node($$, @$);
          }
       | basictype "[" exprs "]" id "=" arrexpr ";"
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, $7);
+           @$ = span_locs(@1, @7);
+           add_loc_to_node($$, @$);
          }
        ;
 
