@@ -25,6 +25,15 @@ node_st *AOTarrexprs(node_st *node) {
     return node;
 }
 
+node_st *AOTexprs(node_st *node) {
+    TRAVchildren(node);
+
+    EXPRS_TRANSP(node) = EXPR_TRANSP(EXPRS_EXPR(node)) &&
+                         (!EXPRS_NEXT(node) || EXPRS_TRANSP(EXPRS_NEXT(node)));
+
+    return node;
+}
+
 node_st *AOTfundecl(node_st *node) {
     if (!FUNDECL_EXTERNAL(node)) {
         int prev = DATA_AOT_GET()->min_level;
@@ -102,7 +111,8 @@ node_st *AOTcall(node_st *node) {
     funtable_ref r = {CALL_N(node), CALL_L(node)};
     funtable_entry *e = funtable_get(DATA_AOT_GET()->funtable, r);
 
-    CALL_TRANSP(node) = e->transp;
+    CALL_TRANSP(node) =
+        e->transp && (!CALL_EXPRS(node) || EXPRS_TRANSP(CALL_EXPRS(node)));
 
     if (!e->transp) {
         DATA_AOT_GET()->min_level =
@@ -115,7 +125,8 @@ node_st *AOTcall(node_st *node) {
 node_st *AOTvarref(node_st *node) {
     TRAVchildren(node);
 
-    VARREF_TRANSP(node) = true;
+    VARREF_TRANSP(node) =
+        !VARREF_EXPRS(node) || EXPRS_TRANSP(VARREF_EXPRS(node));
 
     return node;
 }
