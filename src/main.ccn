@@ -111,6 +111,11 @@ phase Desugar {
 
 cycle AstOpt {
     actions {
+        traversal Reassoc {
+            uid = AOR,
+            nodes = { Binop }
+        };
+
         traversal ConstFold {
             uid = AOCF,
             nodes = { Monop, Binop, Cast }
