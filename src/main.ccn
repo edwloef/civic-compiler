@@ -105,6 +105,11 @@ phase Desugar {
                 user vartable_ptr vartable
             }
         };
+
+        traversal DimReduce {
+            uid = DDR,
+            nodes = { VarRef }
+        };
     }
 };
 

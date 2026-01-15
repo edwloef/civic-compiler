@@ -21,7 +21,9 @@ void funtype_push(funtype *self, vartype e) {
     self->buf[self->len++] = e;
 }
 
-void funtype_free(funtype self) { MEMfree(self.buf); }
+void funtype_free(funtype self) {
+    MEMfree(self.buf);
+}
 
 funtable *funtable_new(funtable *parent) {
     funtable *n = MEMmalloc(sizeof(funtable));

@@ -2,7 +2,9 @@
 #include "error/error.h"
 
 void AUinit(void) {}
-void AUfini(void) { abort_on_error(); }
+void AUfini(void) {
+    abort_on_error();
+}
 
 static void AUlint_vartable(vartable *vartable) {
     for (int i = 0; i < vartable->len; i++) {

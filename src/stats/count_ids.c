@@ -4,7 +4,9 @@
 #include "palm/memory.h"
 #include "palm/str.h"
 
-void SCIinit(void) { DATA_SCI_GET()->count = HTnew_String(256); }
+void SCIinit(void) {
+    DATA_SCI_GET()->count = HTnew_String(256);
+}
 
 void SCIfini(void) {
     htable_st_ptr count = DATA_SCI_GET()->count;

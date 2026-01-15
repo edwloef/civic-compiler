@@ -11,8 +11,7 @@
 
 static void AOTCFdiverges(node_st *node) {
     if (STMTS_NEXT(node)) {
-        CCNfree(STMTS_NEXT(node));
-        STMTS_NEXT(node) = NULL;
+        STMTS_NEXT(node) = CCNfree(STMTS_NEXT(node));
         CCNcycleNotify();
     }
 }
@@ -32,8 +31,7 @@ static node_st *AOTCFinlinestmts(node_st *node, node_st *stmts) {
 }
 
 static node_st *AOTCFnoop(node_st *node) {
-    CCNfree(STMTS_STMT(node));
-    STMTS_STMT(node) = NULL;
+    STMTS_STMT(node) = CCNfree(STMTS_STMT(node));
     return AOTCFinlinestmts(node, NULL);
 }
 
@@ -99,8 +97,7 @@ node_st *AOTCFstmts(node_st *node) {
                 ((INT_VAL(FOR_LOOP_START(stmt)) >
                   INT_VAL(FOR_LOOP_END(stmt))) ==
                  (INT_VAL(FOR_LOOP_STEP(stmt)) > 0))) {
-                CCNfree(STMTS_STMT(node));
-                STMTS_STMT(node) = NULL;
+                STMTS_STMT(node) = CCNfree(STMTS_STMT(node));
                 node = AOTCFinlinestmts(node, NULL);
             } else if (INT_VAL(FOR_LOOP_END(stmt)) -
                            INT_VAL(FOR_LOOP_START(stmt)) <=
