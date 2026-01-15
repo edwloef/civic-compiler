@@ -1,4 +1,9 @@
 #include "ccn/ccn.h"
+#include "globals/globals.h"
+
+#define CHECK_FASSOCIATIVE_MATH()                                              \
+    if (ARREXPR_RESOLVED_TY(node) == TY_float && !globals.fassociative_math)   \
+        return node;
 
 node_st *AORbinop(node_st *node) {
     TRAVchildren(node);
@@ -11,6 +16,7 @@ node_st *AORbinop(node_st *node) {
     case BO_sub:
         if (NODE_TYPE(right) == NT_BINOP) {
             if (BINOP_OP(right) == BO_add || BINOP_OP(right) == BO_sub) {
+                CHECK_FASSOCIATIVE_MATH();
                 // (x + (y + z)) => ((x + y) + z)
                 // (x + (y - z)) => ((x + y) - z)
                 // (x - (y + z)) => ((x - y) - z)
@@ -27,6 +33,7 @@ node_st *AORbinop(node_st *node) {
                    NODE_TYPE(right) == NT_BOOL) {
             if (NODE_TYPE(left) == NT_BINOP &&
                 (BINOP_OP(left) == BO_add || BINOP_OP(left) == BO_sub)) {
+                CHECK_FASSOCIATIVE_MATH();
                 // ((x + y) + 7) => ((x + 7) + y)
                 // ((x + y) - 7) => ((x - 7) + y)
                 // ((x - y) + 7) => ((x + 7) - y)
@@ -52,6 +59,7 @@ node_st *AORbinop(node_st *node) {
     case BO_mul:
         if (NODE_TYPE(right) == NT_BINOP) {
             if (BINOP_OP(right) == BO_mul) {
+                CHECK_FASSOCIATIVE_MATH();
                 // (x * (y * z)) => ((x * y) * z)
                 BINOP_RIGHT(node) = BINOP_LEFT(right);
                 BINOP_LEFT(right) = node;
@@ -60,6 +68,7 @@ node_st *AORbinop(node_st *node) {
         } else if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT ||
                    NODE_TYPE(right) == NT_BOOL) {
             if (NODE_TYPE(left) == NT_BINOP && BINOP_OP(left) == BO_mul) {
+                CHECK_FASSOCIATIVE_MATH();
                 // ((x * y) * 7) => ((x * 7) * y)
                 node_st *tmp = BINOP_RIGHT(left);
                 BINOP_RIGHT(left) = right;

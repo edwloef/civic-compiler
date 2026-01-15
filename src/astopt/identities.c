@@ -148,7 +148,7 @@ node_st *AOIbinop(node_st *node) {
                    (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
                    (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
             // ({0, 0.0, false} + x) => x
-            // ({0, 0.0, false} - x) => (-x)
+            // ({0, 0.0} - x) => (-x)
             if (BINOP_OP(node) == BO_sub) {
                 BINOP_RIGHT(node) = ASTmonop(BINOP_RIGHT(node), MO_neg);
             }

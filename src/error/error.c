@@ -48,7 +48,7 @@ void abort_on_error(void) {
         emit_message(
             L_ERROR, "couldn't compile '%s' due to %d previous error%s\n",
             globals.input_file, error_count, error_count > 1 ? "s" : "");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 
