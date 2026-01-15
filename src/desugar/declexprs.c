@@ -22,9 +22,8 @@ node_st *DDEdecls(node_st *node) {
 
         for (node_st *expr = TYPE_EXPRS(VARDECL_TY(decl)); expr;
              expr = EXPRS_NEXT(expr)) {
-            if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_INT ||
-                (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
-                 !VARREF_EXPRS(EXPRS_EXPR(expr)))) {
+            if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
+                !VARREF_EXPRS(EXPRS_EXPR(expr))) {
                 continue;
             }
 
