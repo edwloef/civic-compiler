@@ -57,7 +57,10 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
 }
 
 node_st *vartable_temp_var(vartable *self, vartype ty) {
-    char *name = STRfmt("_%d", self->len);
+    int n = 0;
+    for (vartable *parent = self; parent; parent = parent->parent)
+        n++;
+    char *name = STRfmt("_%d_%d", n, self->len);
     vartable_entry e = {name,  ty,    0,    0, {0, 0, 0, 0, NULL},
                         false, false, false};
     vartable_push(self, e);
