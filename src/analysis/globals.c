@@ -39,10 +39,9 @@ node_st *AGvardecl(node_st *node) {
 
     for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
          expr = EXPRS_NEXT(expr)) {
-        vartable_entry e = {ID_VAL(VARREF_ID(EXPRS_EXPR(expr))),
-                            {TY_int, 0},
-                            SPAN(VARREF_ID(EXPRS_EXPR(expr))),
-                            false};
+        vartable_entry e = {
+            ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, 0,     0,
+            SPAN(VARREF_ID(EXPRS_EXPR(expr))),   true,        false, false};
         vartable_insert(DATA_AG_GET()->vartable, e,
                         VARREF_ID(EXPRS_EXPR(expr)));
     }
@@ -55,7 +54,11 @@ node_st *AGvardecl(node_st *node) {
 
     vartable_entry e = {ID_VAL(VARDECL_ID(node)),
                         {TYPE_TY(VARDECL_TY(node)), dims},
+                        0,
+                        0,
                         SPAN(VARDECL_ID(node)),
+                        true,
+                        false,
                         false};
     vartable_insert(DATA_AG_GET()->vartable, e, VARDECL_ID(node));
 

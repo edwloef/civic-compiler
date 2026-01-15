@@ -28,8 +28,9 @@ node_st *AFfundecl(node_st *node) {
         funtype_push(&ty, e);
     }
 
-    funtable_entry e = {ID_VAL(FUNDECL_ID(node)), ty, false, 0,
-                        SPAN(FUNDECL_ID(node))};
+    funtable_entry e = {
+        ID_VAL(FUNDECL_ID(node)), ty, false, 0, 0, FUNDECL_EXPORTED(node),
+        SPAN(FUNDECL_ID(node))};
     funtable_insert(DATA_AF_GET()->funtable, e, FUNDECL_ID(node));
     FUNDECL_L(node) = DATA_AF_GET()->funtable->len - 1;
 

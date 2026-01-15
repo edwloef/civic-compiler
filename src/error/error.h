@@ -18,4 +18,5 @@ typedef enum { L_ERROR, L_WARNING, L_INFO } level;
 
 void abort_on_error(void);
 void emit_message(level level, char *format, ...);
-void emit_message_with_span(span span, level level, char *format, ...);
+void emit_message_with_span(span span, level level, char *format, ...)
+    __attribute__((format(printf, 3, 4)));

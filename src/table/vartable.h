@@ -13,7 +13,11 @@ typedef struct {
 typedef struct {
     char *name;
     vartype ty;
+    int read_count;
+    int write_count;
     span span;
+    bool external;
+    bool exported;
     bool loopvar;
 } vartable_entry;
 

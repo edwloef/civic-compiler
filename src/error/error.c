@@ -71,6 +71,9 @@ void emit_message(level level, char *format, ...) {
 }
 
 void emit_message_with_span(span span, level level, char *format, ...) {
+    if (level != L_ERROR && !STReq(globals.input_file, span.file))
+        return;
+
     va_list ap;
 
     va_start(ap, format);

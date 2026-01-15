@@ -2,14 +2,6 @@
 #include "error/error.h"
 #include "print/print.h"
 
-node_st *ADprogram(node_st *node) {
-    TRAVchildren(node);
-
-    abort_on_error();
-
-    return node;
-}
-
 node_st *ADstmts(node_st *node) {
     TRAVchildren(node);
 

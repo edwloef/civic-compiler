@@ -40,10 +40,9 @@ node_st *ARfunbody(node_st *node) {
 node_st *ARparam(node_st *node) {
     for (node_st *expr = TYPE_EXPRS(PARAM_TY(node)); expr;
          expr = EXPRS_NEXT(expr)) {
-        vartable_entry e = {ID_VAL(VARREF_ID(EXPRS_EXPR(expr))),
-                            {TY_int, 0},
-                            SPAN(VARREF_ID(EXPRS_EXPR(expr))),
-                            false};
+        vartable_entry e = {
+            ID_VAL(VARREF_ID(EXPRS_EXPR(expr))), {TY_int, 0}, 0,     0,
+            SPAN(VARREF_ID(EXPRS_EXPR(expr))),   false,       false, false};
         vartable_insert(DATA_AR_GET()->vartable, e,
                         VARREF_ID(EXPRS_EXPR(expr)));
     }
@@ -56,7 +55,11 @@ node_st *ARparam(node_st *node) {
 
     vartable_entry e = {ID_VAL(PARAM_ID(node)),
                         {TYPE_TY(PARAM_TY(node)), dims},
+                        0,
+                        0,
                         SPAN(PARAM_ID(node)),
+                        false,
+                        false,
                         false};
     vartable_insert(DATA_AR_GET()->vartable, e, PARAM_ID(node));
 
@@ -78,7 +81,11 @@ node_st *ARvardecl(node_st *node) {
 
     vartable_entry e = {ID_VAL(VARDECL_ID(node)),
                         {TYPE_TY(VARDECL_TY(node)), dims},
+                        0,
+                        VARDECL_EXPR(node) != NULL,
                         SPAN(VARDECL_ID(node)),
+                        false,
+                        VARDECL_EXPORTED(node),
                         false};
     vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node));
 
@@ -92,8 +99,8 @@ node_st *ARfor(node_st *node) {
     TRAVloop_end(node);
     TRAVloop_step(node);
 
-    vartable_entry e = {
-        ID_VAL(FOR_ID(node)), {TY_int, 0}, SPAN(FOR_ID(node)), false};
+    vartable_entry e = {ID_VAL(FOR_ID(node)), {TY_int, 0}, 0,     0,
+                        SPAN(FOR_ID(node)),   false,       false, false};
     vartable_push(DATA_AR_GET()->vartable, e);
 
     vartable_ref r = {0, DATA_AR_GET()->vartable->len - 1};
