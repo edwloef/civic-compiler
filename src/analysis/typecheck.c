@@ -185,8 +185,9 @@ node_st *ATCvardecl(node_st *node) {
         }
     }
 
-    if (VARDECL_EXPR(node))
+    if (VARDECL_EXPR(node)) {
         ATCcheckassign(RESOLVED_TY(VARDECL_EXPR(node)), ty, node);
+    }
 
     return node;
 }

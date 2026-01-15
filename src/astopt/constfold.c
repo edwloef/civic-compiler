@@ -57,8 +57,9 @@ node_st *AOCFmonop(node_st *node) {
 
 node_st *AOCFbinop(node_st *node) {
     TRAVchildren(node);
-    if (NODE_TYPE(BINOP_LEFT(node)) != NODE_TYPE(BINOP_RIGHT(node)))
+    if (NODE_TYPE(BINOP_LEFT(node)) != NODE_TYPE(BINOP_RIGHT(node))) {
         return node;
+    }
 
     switch (BINOP_OP(node)) {
     case BO_lt:

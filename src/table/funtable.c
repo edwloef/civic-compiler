@@ -89,16 +89,22 @@ funtable_ref funtable_resolve(funtable *self, node_st *call) {
 
 static funtable_entry error = {.name = "error", .ty = {.ty = TY_error}};
 funtable_entry *funtable_get(funtable *self, funtable_ref r) {
-    if (r.n == -1 && r.l == -1)
+    if (r.n == -1 && r.l == -1) {
         return &error;
-    for (int i = 0; i < r.n; i++)
+    }
+
+    for (int i = 0; i < r.n; i++) {
         self = self->parent;
+    }
+
     return &self->buf[r.l];
 }
 
 void funtable_free(funtable *self) {
-    for (int i = 0; i < self->len; i++)
+    for (int i = 0; i < self->len; i++) {
         funtype_free(self->buf[i].ty);
+    }
+
     MEMfree(self->buf);
     MEMfree(self);
 }

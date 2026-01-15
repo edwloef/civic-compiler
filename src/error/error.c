@@ -53,8 +53,9 @@ void abort_on_error(void) {
 }
 
 static void va_emit_message(level level, char *format, va_list ap) {
-    if (level == L_ERROR)
+    if (level == L_ERROR) {
         error_count++;
+    }
 
     fprintf(stderr, "%s%s" ANSI_RESET, color_of_level(level),
             message_of_level(level));
@@ -71,8 +72,9 @@ void emit_message(level level, char *format, ...) {
 }
 
 void emit_message_with_span(span span, level level, char *format, ...) {
-    if (level != L_ERROR && !STReq(globals.input_file, span.file))
+    if (level != L_ERROR && !STReq(globals.input_file, span.file)) {
         return;
+    }
 
     va_list ap;
 
@@ -81,8 +83,9 @@ void emit_message_with_span(span span, level level, char *format, ...) {
     va_end(ap);
 
     FILE *file = fopen(span.file, "r");
-    if (file == NULL)
+    if (file == NULL) {
         return;
+    }
 
     int lineno_width = log10(span.el + 1) + 1;
 
@@ -106,8 +109,9 @@ void emit_message_with_span(span span, level level, char *format, ...) {
         lineno += nl;
     }
 
-    if (!nl)
+    if (!nl) {
         fputc('\n', stderr);
+    }
 
     fclose(file);
 
@@ -116,8 +120,9 @@ void emit_message_with_span(span span, level level, char *format, ...) {
     char *color = color_of_level(level);
     if (span.bl == span.el) {
         fprintf(stderr, "%*s%s", span.bc + 1, "", color);
-        for (int i = 0; i <= span.ec - span.bc; i++)
+        for (int i = 0; i <= span.ec - span.bc; i++) {
             fputc('^', stderr);
+        }
     } else {
         fprintf(stderr, "\n%*s|", lineno_width + 1, "");
     }

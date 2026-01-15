@@ -58,8 +58,10 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
 
 node_st *vartable_temp_var(vartable *self, vartype ty) {
     int n = 0;
-    for (vartable *parent = self->parent; parent; parent = parent->parent)
+    for (vartable *parent = self->parent; parent; parent = parent->parent) {
         n++;
+    }
+
     char *name = STRfmt("_%d_%d", n, self->len);
     vartable_entry e = {name,  ty,    0,    0, {0, 0, 0, 0, NULL},
                         false, false, false};
@@ -69,10 +71,14 @@ node_st *vartable_temp_var(vartable *self, vartype ty) {
 
 static vartable_entry error = {.name = "error", .ty = {.ty = TY_error}};
 vartable_entry *vartable_get(vartable *self, vartable_ref r) {
-    if (r.n == -1 && r.l == -1)
+    if (r.n == -1 && r.l == -1) {
         return &error;
-    for (int i = 0; i < r.n; i++)
+    }
+
+    for (int i = 0; i < r.n; i++) {
         self = self->parent;
+    }
+
     return &self->buf[r.l];
 }
 

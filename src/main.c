@@ -8,8 +8,9 @@
 
 static void Usage(char *program) {
     char *program_bin = strrchr(program, '/');
-    if (program_bin)
+    if (program_bin) {
         program = program_bin + 1;
+    }
 
     printf("Usage: %s [OPTION...] <civic file>\n", program);
     printf("Options:\n");

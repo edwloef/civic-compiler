@@ -4,8 +4,9 @@ node_st *DDRvarref(node_st *node) {
     TRAVchildren(node);
 
     node_st *exprs = VARREF_EXPRS(node);
-    if (!exprs)
+    if (!exprs) {
         return node;
+    }
 
     for (node_st *right = EXPRS_NEXT(exprs); right; right = EXPRS_NEXT(right)) {
         EXPRS_EXPR(exprs) =
