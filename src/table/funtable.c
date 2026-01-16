@@ -51,7 +51,7 @@ funtable_ref funtable_push(funtable *self, funtable_entry e) {
 
     self->buf[self->len++] = e;
 
-    return (funtable_ref){self->len - 1, 0};
+    return (funtable_ref){0, self->len - 1};
 }
 
 funtable_ref funtable_resolve(funtable *self, node_st *call) {

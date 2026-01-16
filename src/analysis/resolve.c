@@ -112,9 +112,7 @@ node_st *ARfor(node_st *node) {
                         false,
                         false,
                         false};
-    vartable_push(DATA_AR_GET()->vartable, e);
-
-    vartable_ref r = {0, DATA_AR_GET()->vartable->len - 1};
+    vartable_ref r = vartable_push(DATA_AR_GET()->vartable, e);
 
     TRAVstmts(node);
 

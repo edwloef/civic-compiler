@@ -51,7 +51,7 @@ vartable_ref vartable_push(vartable *self, vartable_entry e) {
 
     self->buf[self->len++] = e;
 
-    return (vartable_ref){self->len - 1, 0};
+    return (vartable_ref){0, self->len - 1};
 }
 
 vartable_ref vartable_resolve(vartable *self, node_st *id) {
@@ -84,9 +84,8 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
     vartable_entry e = {
         name, vartype_new(ty), {0, 0, 0, 0, NULL}, 0, 0, false, false, false,
         false};
-    vartable_push(self, e);
     node_st *ref = ASTvarref(ASTid(name), NULL);
-    VARREF_L(ref) = self->len - 1;
+    VARREF_L(ref) = vartable_push(self, e).l;
     return ref;
 }
 
