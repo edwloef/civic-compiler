@@ -77,16 +77,7 @@ phase Analysis {
 
         traversal Divergence {
             uid = AD,
-            nodes = { Stmts, FunDecl, IfElse, While, DoWhile, Return }
-        };
-
-        traversal Usage {
-            uid = AU,
-            nodes = { Program, FunDecl, FunBody, Assign, Call, VarRef },
-            travdata {
-                user funtable_ptr funtable,
-                user vartable_ptr vartable
-            }
+            nodes = { Program, Stmts, FunDecl, IfElse, While, DoWhile, Return }
         };
     }
 };
@@ -397,6 +388,7 @@ node VarRef {
     },
 
     attributes {
+        bool write,
         int n,
         int l
     }

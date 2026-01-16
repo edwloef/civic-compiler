@@ -183,6 +183,7 @@ stmt: id "(" exprs ")" ";"
       }
     | varref "=" arrexpr ";"
       {
+        VARREF_WRITE($1) = true;
         $$ = ASTassign($1, $3);
         @$ = span_locs(@1, @3);
         add_loc_to_node($$, @$);
