@@ -36,7 +36,7 @@ funtable_ref funtable_insert(funtable *self, funtable_entry e, node_st *id) {
                                    "function '%s' previously declared here",
                                    e.name);
             funtype_free(e.ty);
-            return (funtable_ref){-1, -1};
+            return (funtable_ref){0, -1};
         }
     }
 
@@ -66,8 +66,7 @@ funtable_ref funtable_resolve(funtable *self, node_st *call) {
             funtable_entry entry = self->buf[l];
             if (entry.ty.len == param_count &&
                 STReq(entry.name, ID_VAL(CALL_ID(call)))) {
-                funtable_ref r = {n, l};
-                return r;
+                return (funtable_ref){n, l};
             }
         }
 
@@ -77,12 +76,12 @@ funtable_ref funtable_resolve(funtable *self, node_st *call) {
 
     ERROR(call, "can't resolve function '%s' with %d parameters",
           ID_VAL(CALL_ID(call)), param_count);
-    return (funtable_ref){-1, -1};
+    return (funtable_ref){0, -1};
 }
 
 static funtable_entry error = {.name = "error", .ty = {.ty = TY_error}};
 funtable_entry *funtable_get(funtable *self, funtable_ref r) {
-    if (r.n == -1 && r.l == -1) {
+    if (r.l == -1) {
         return &error;
     }
 

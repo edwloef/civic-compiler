@@ -36,7 +36,7 @@ vartable_ref vartable_insert(vartable *self, vartable_entry e, node_st *id) {
                                    "variable '%s' previously declared here",
                                    e.name);
             vartype_free(e.ty);
-            return (vartable_ref){-1, -1};
+            return (vartable_ref){0, -1};
         }
     }
 
@@ -60,8 +60,7 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
         for (int l = self->len - 1; l >= 0; l--) {
             vartable_entry entry = self->buf[l];
             if (!entry.loopvar && STReq(entry.name, ID_VAL(id))) {
-                vartable_ref r = {n, l};
-                return r;
+                return (vartable_ref){n, l};
             }
         }
 
@@ -70,8 +69,7 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
     }
 
     ERROR(id, "can't resolve variable '%s'", ID_VAL(id));
-    vartable_ref r = {-1, -1};
-    return r;
+    return (vartable_ref){0, -1};
 }
 
 node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
@@ -91,7 +89,7 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
 
 static vartable_entry error = {.name = "error", .ty = {.ty = TY_error}};
 vartable_entry *vartable_get(vartable *self, vartable_ref r) {
-    if (r.n == -1 && r.l == -1) {
+    if (r.l == -1) {
         return &error;
     }
 

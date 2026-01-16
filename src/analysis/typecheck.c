@@ -10,7 +10,7 @@ static thin_vartype RESOLVED_TY(node_st *node) {
 }
 
 static void ATCcheckassign(thin_vartype from, vartype to, node_st *node) {
-    if (from.ty == TY_error) {
+    if (from.ty == TY_error || to.ty == TY_error) {
         return;
     }
 
