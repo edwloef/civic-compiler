@@ -3,13 +3,11 @@
 #include "table/vartable.h"
 
 typedef struct {
-    int n;
-    int l;
+    int n, l;
 } funtable_ref;
 
 typedef struct {
-    int len;
-    int cap;
+    int len, cap;
     thin_vartype *buf;
     enum BasicType ty;
 } funtype;
@@ -23,17 +21,14 @@ void funtype_free(funtype self);
 typedef struct {
     char *name;
     funtype ty;
-    bool exported;
-    bool transp;
-    int min_level;
-    int call_count;
     span span;
+    int call_count, min_level;
+    bool exported, transp;
 } funtable_entry;
 
 typedef struct funtable funtable;
 struct funtable {
-    int len;
-    int cap;
+    int len, cap;
     funtable_entry *buf;
     funtable *parent;
 };

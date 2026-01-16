@@ -4,11 +4,7 @@
 #include "table/table.h"
 
 vartype vartype_new(enum BasicType ty) {
-    vartype n;
-    n.len = 0;
-    n.cap = 0;
-    n.buf = NULL;
-    n.ty = ty;
+    vartype n = {0, 0, NULL, ty};
     return n;
 }
 
@@ -27,10 +23,7 @@ void vartype_free(vartype self) {
 
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));
-    n->len = 0;
-    n->cap = 0;
-    n->buf = NULL;
-    n->parent = parent;
+    *n = (vartable){0, 0, NULL, parent};
     return n;
 }
 
@@ -88,8 +81,9 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
     }
 
     char *name = STRfmt("_%d_%d", n, self->len);
-    vartable_entry e = {name,  vartype_new(ty), 0,    0, {0, 0, 0, 0, NULL},
-                        false, false,           false};
+    vartable_entry e = {
+        name, vartype_new(ty), {0, 0, 0, 0, NULL}, 0, 0, false, false, false,
+        false};
     vartable_push(self, e);
     node_st *ref = ASTvarref(ASTid(name), NULL);
     VARREF_L(ref) = self->len - 1;

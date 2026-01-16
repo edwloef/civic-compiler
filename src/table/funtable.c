@@ -4,12 +4,7 @@
 #include "table/table.h"
 
 funtype funtype_new(enum BasicType ty) {
-    funtype n;
-    n.len = 0;
-    n.cap = 0;
-    n.buf = NULL;
-    n.ty = ty;
-    return n;
+    return (funtype){0, 0, NULL, ty};
 }
 
 void funtype_push(funtype *self, thin_vartype e) {
@@ -27,10 +22,7 @@ void funtype_free(funtype self) {
 
 funtable *funtable_new(funtable *parent) {
     funtable *n = MEMmalloc(sizeof(funtable));
-    n->len = 0;
-    n->cap = 0;
-    n->buf = NULL;
-    n->parent = parent;
+    *n = (funtable){0, 0, NULL, parent};
     return n;
 }
 

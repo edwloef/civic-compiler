@@ -44,19 +44,27 @@ node_st *ARparam(node_st *node) {
          expr = EXPRS_NEXT(expr)) {
         vartable_entry e = {ID_VAL(VARREF_ID(EXPRS_EXPR(expr))),
                             vartype_new(TY_int),
-                            0,
-                            0,
                             SPAN(VARREF_ID(EXPRS_EXPR(expr))),
+                            0,
+                            0,
                             false,
                             false,
+                            true,
                             false};
         vartable_ref r = vartable_insert(DATA_AR_GET()->vartable, e,
                                          VARREF_ID(EXPRS_EXPR(expr)));
         vartype_push(&ty, r);
     }
 
-    vartable_entry e = {ID_VAL(PARAM_ID(node)), ty,    0,     0,
-                        SPAN(PARAM_ID(node)),   false, false, false};
+    vartable_entry e = {ID_VAL(PARAM_ID(node)),
+                        ty,
+                        SPAN(PARAM_ID(node)),
+                        0,
+                        0,
+                        false,
+                        false,
+                        true,
+                        false};
     vartable_insert(DATA_AR_GET()->vartable, e, PARAM_ID(node));
 
     return node;
@@ -77,11 +85,12 @@ node_st *ARvardecl(node_st *node) {
 
     vartable_entry e = {ID_VAL(VARDECL_ID(node)),
                         ty,
-                        0,
-                        VARDECL_EXPR(node) != NULL,
                         SPAN(VARDECL_ID(node)),
+                        0,
+                        VARDECL_EXPR(node) ? 1 : 0,
                         false,
                         VARDECL_EXPORTED(node),
+                        false,
                         false};
     vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node));
 
@@ -97,9 +106,10 @@ node_st *ARfor(node_st *node) {
 
     vartable_entry e = {ID_VAL(FOR_ID(node)),
                         vartype_new(TY_int),
-                        0,
-                        0,
                         SPAN(FOR_ID(node)),
+                        0,
+                        0,
+                        false,
                         false,
                         false,
                         false};

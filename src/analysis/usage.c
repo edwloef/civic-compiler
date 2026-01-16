@@ -15,7 +15,7 @@ static void AUlint_vartable(vartable *vartable) {
 
         if (e->read_count == 0) {
             if (e->write_count != 0) {
-                if (!e->external) {
+                if (!e->external && (!e->param || e->ty.len == 0)) {
                     emit_message_with_span(
                         e->span, L_WARNING,
                         "variable '%s' is never read from, only written to",
@@ -60,7 +60,7 @@ node_st *AUfundecl(node_st *node) {
     DATA_AU_GET()->vartable = FUNDECL_VARTABLE(node);
 
     if (FUNDECL_BODY(node)) {
-        TRAVchildren(node);
+        FUNDECL_BODY(node) = TRAVdo(FUNDECL_BODY(node));
         AUlint_vartable(DATA_AU_GET()->vartable);
     }
 

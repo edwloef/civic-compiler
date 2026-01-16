@@ -6,13 +6,11 @@
 #include "error/span.h"
 
 typedef struct {
-    int n;
-    int l;
+    int n, l;
 } vartable_ref;
 
 typedef struct {
-    int len;
-    int cap;
+    int len, cap;
     vartable_ref *buf;
     enum BasicType ty;
 } vartype;
@@ -31,18 +29,14 @@ void vartype_free(vartype self);
 typedef struct {
     char *name;
     vartype ty;
-    int read_count;
-    int write_count;
     span span;
-    bool external;
-    bool exported;
-    bool loopvar;
+    int read_count, write_count;
+    bool external, exported, param, loopvar;
 } vartable_entry;
 
 typedef struct vartable vartable;
 struct vartable {
-    int len;
-    int cap;
+    int len, cap;
     vartable_entry *buf;
     vartable *parent;
 };
