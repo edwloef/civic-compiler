@@ -3,15 +3,20 @@
 #include "table/vartable.h"
 
 typedef struct {
+    int n;
+    int l;
+} funtable_ref;
+
+typedef struct {
     int len;
     int cap;
-    vartype *buf;
+    thin_vartype *buf;
     enum BasicType ty;
 } funtype;
 
-funtype funtype_new(enum BasicType);
+funtype funtype_new(enum BasicType ty);
 
-void funtype_push(funtype *self, vartype e);
+void funtype_push(funtype *self, thin_vartype e);
 
 void funtype_free(funtype self);
 
@@ -33,14 +38,9 @@ struct funtable {
     funtable *parent;
 };
 
-typedef struct {
-    int n;
-    int l;
-} funtable_ref;
-
 funtable *funtable_new(funtable *parent);
 
-void funtable_push(funtable *self, funtable_entry e);
+funtable_ref funtable_push(funtable *self, funtable_entry e);
 
 funtable_entry *funtable_get(funtable *self, funtable_ref r);
 

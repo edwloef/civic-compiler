@@ -3,6 +3,28 @@
 #include "palm/str.h"
 #include "table/table.h"
 
+vartype vartype_new(enum BasicType ty) {
+    vartype n;
+    n.len = 0;
+    n.cap = 0;
+    n.buf = NULL;
+    n.ty = ty;
+    return n;
+}
+
+void vartype_push(vartype *self, vartable_ref e) {
+    if (self->len == self->cap) {
+        self->cap = self->cap ? self->cap * 2 : 4;
+        self->buf = MEMrealloc(self->buf, self->cap * sizeof(vartable_ref));
+    }
+
+    self->buf[self->len++] = e;
+}
+
+void vartype_free(vartype self) {
+    MEMfree(self.buf);
+}
+
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));
     n->len = 0;
@@ -12,7 +34,7 @@ vartable *vartable_new(vartable *parent) {
     return n;
 }
 
-void vartable_insert(vartable *self, vartable_entry e, node_st *id) {
+vartable_ref vartable_insert(vartable *self, vartable_entry e, node_st *id) {
     for (int l = self->len - 1; l >= 0; l--) {
         vartable_entry entry = self->buf[l];
         if (!entry.loopvar && STReq(entry.name, e.name)) {
@@ -20,20 +42,23 @@ void vartable_insert(vartable *self, vartable_entry e, node_st *id) {
             emit_message_with_span(entry.span, L_INFO,
                                    "variable '%s' previously declared here",
                                    e.name);
-            return;
+            vartype_free(e.ty);
+            return (vartable_ref){-1, -1};
         }
     }
 
-    vartable_push(self, e);
+    return vartable_push(self, e);
 }
 
-void vartable_push(vartable *self, vartable_entry e) {
+vartable_ref vartable_push(vartable *self, vartable_entry e) {
     if (self->len == self->cap) {
         self->cap = self->cap ? self->cap * 2 : 4;
         self->buf = MEMrealloc(self->buf, self->cap * sizeof(vartable_entry));
     }
 
     self->buf[self->len++] = e;
+
+    return (vartable_ref){self->len - 1, 0};
 }
 
 vartable_ref vartable_resolve(vartable *self, node_st *id) {
@@ -56,17 +81,19 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
     return r;
 }
 
-node_st *vartable_temp_var(vartable *self, vartype ty) {
+node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
     int n = 0;
     for (vartable *parent = self->parent; parent; parent = parent->parent) {
         n++;
     }
 
     char *name = STRfmt("_%d_%d", n, self->len);
-    vartable_entry e = {name,  ty,    0,    0, {0, 0, 0, 0, NULL},
-                        false, false, false};
+    vartable_entry e = {name,  vartype_new(ty), 0,    0, {0, 0, 0, 0, NULL},
+                        false, false,           false};
     vartable_push(self, e);
-    return ASTvarref(ASTid(name), NULL);
+    node_st *ref = ASTvarref(ASTid(name), NULL);
+    VARREF_L(ref) = self->len - 1;
+    return ref;
 }
 
 static vartable_entry error = {.name = "error", .ty = {.ty = TY_error}};
@@ -83,6 +110,10 @@ vartable_entry *vartable_get(vartable *self, vartable_ref r) {
 }
 
 void vartable_free(vartable *self) {
+    for (int i = 0; i < self->len; i++) {
+        vartype_free(self->buf[i].ty);
+    }
+
     MEMfree(self->buf);
     MEMfree(self);
 }

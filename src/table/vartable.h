@@ -6,9 +6,27 @@
 #include "error/span.h"
 
 typedef struct {
+    int n;
+    int l;
+} vartable_ref;
+
+typedef struct {
+    int len;
+    int cap;
+    vartable_ref *buf;
+    enum BasicType ty;
+} vartype;
+
+typedef struct {
     enum BasicType ty;
     int dims;
-} vartype;
+} thin_vartype;
+
+vartype vartype_new(enum BasicType ty);
+
+void vartype_push(vartype *self, vartable_ref e);
+
+void vartype_free(vartype self);
 
 typedef struct {
     char *name;
@@ -29,14 +47,9 @@ struct vartable {
     vartable *parent;
 };
 
-typedef struct {
-    int n;
-    int l;
-} vartable_ref;
-
 vartable *vartable_new(vartable *parent);
 
-void vartable_push(vartable *self, vartable_entry e);
+vartable_ref vartable_push(vartable *self, vartable_entry e);
 
 vartable_entry *vartable_get(vartable *self, vartable_ref r);
 

@@ -12,10 +12,10 @@ funtype funtype_new(enum BasicType ty) {
     return n;
 }
 
-void funtype_push(funtype *self, vartype e) {
+void funtype_push(funtype *self, thin_vartype e) {
     if (self->len == self->cap) {
         self->cap = self->cap ? self->cap * 2 : 4;
-        self->buf = MEMrealloc(self->buf, self->cap * sizeof(funtable_entry));
+        self->buf = MEMrealloc(self->buf, self->cap * sizeof(thin_vartype));
     }
 
     self->buf[self->len++] = e;
@@ -34,7 +34,7 @@ funtable *funtable_new(funtable *parent) {
     return n;
 }
 
-void funtable_insert(funtable *self, funtable_entry e, node_st *id) {
+funtable_ref funtable_insert(funtable *self, funtable_entry e, node_st *id) {
     for (int l = self->len - 1; l >= 0; l--) {
         funtable_entry entry = self->buf[l];
         if (entry.ty.len == e.ty.len && STReq(entry.name, e.name)) {
@@ -44,20 +44,22 @@ void funtable_insert(funtable *self, funtable_entry e, node_st *id) {
                                    "function '%s' previously declared here",
                                    e.name);
             funtype_free(e.ty);
-            return;
+            return (funtable_ref){-1, -1};
         }
     }
 
-    funtable_push(self, e);
+    return funtable_push(self, e);
 }
 
-void funtable_push(funtable *self, funtable_entry e) {
+funtable_ref funtable_push(funtable *self, funtable_entry e) {
     if (self->len == self->cap) {
         self->cap = self->cap ? self->cap * 2 : 4;
         self->buf = MEMrealloc(self->buf, self->cap * sizeof(funtable_entry));
     }
 
     self->buf[self->len++] = e;
+
+    return (funtable_ref){self->len - 1, 0};
 }
 
 funtable_ref funtable_resolve(funtable *self, node_st *call) {
@@ -83,8 +85,7 @@ funtable_ref funtable_resolve(funtable *self, node_st *call) {
 
     ERROR(call, "can't resolve function '%s' with %d parameters",
           ID_VAL(CALL_ID(call)), param_count);
-    funtable_ref r = {-1, -1};
-    return r;
+    return (funtable_ref){-1, -1};
 }
 
 static funtable_entry error = {.name = "error", .ty = {.ty = TY_error}};

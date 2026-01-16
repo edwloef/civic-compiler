@@ -21,7 +21,7 @@ static node_st *AOTCFinlinestmts(node_st *node, node_st *stmts) {
 
     if (stmts) {
         node_st *tmp = stmts;
-        while (tmp) {
+        while (STMTS_NEXT(tmp)) {
             tmp = STMTS_NEXT(tmp);
         }
         STMTS_NEXT(tmp) = node;

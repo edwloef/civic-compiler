@@ -20,19 +20,25 @@ node_st *DDEdecls(node_st *node) {
         node_st *root = NULL;
         node_st *decls = NULL;
 
+        vartable_ref r = {0, VARDECL_L(decl)};
+
+        int i = 0;
         for (node_st *expr = TYPE_EXPRS(VARDECL_TY(decl)); expr;
-             expr = EXPRS_NEXT(expr)) {
+             expr = EXPRS_NEXT(expr), i++) {
             if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
                 !VARREF_EXPRS(EXPRS_EXPR(expr))) {
                 continue;
             }
 
-            node_st *ref = vartable_temp_var(DATA_DDE_GET()->vartable,
-                                             (vartype){TY_int, 0});
+            node_st *ref = vartable_temp_var(DATA_DDE_GET()->vartable, TY_int);
             node_st *decl =
                 ASTvardecl(ASTtype(NULL, TY_int), CCNcopy(VARREF_ID(ref)),
                            EXPRS_EXPR(expr));
+            VARDECL_L(decl) = VARREF_L(ref);
             EXPRS_EXPR(expr) = ref;
+
+            vartable_get(DATA_DDE_GET()->vartable, r)->ty.buf[i] =
+                (vartable_ref){VARREF_N(ref), VARREF_L(ref)};
 
             if (root) {
                 DECLS_NEXT(decls) = ASTdecls(decl, NULL);

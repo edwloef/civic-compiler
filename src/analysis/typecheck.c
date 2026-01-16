@@ -4,35 +4,35 @@
 #include "palm/dbug.h"
 #include "print/print.h"
 
-static vartype RESOLVED_TY(node_st *node) {
-    vartype ty = {ARREXPR_RESOLVED_TY(node), ARREXPR_RESOLVED_DIMS(node)};
-    return ty;
+static thin_vartype RESOLVED_TY(node_st *node) {
+    return (thin_vartype){ARREXPR_RESOLVED_TY(node),
+                          ARREXPR_RESOLVED_DIMS(node)};
 }
 
-static void ATCcheckassign(vartype from, vartype to, node_st *node) {
+static void ATCcheckassign(thin_vartype from, vartype to, node_st *node) {
     if (from.ty == TY_error) {
         return;
     }
 
-    if (to.dims != 0 && from.dims != to.dims) {
+    if (to.len != 0 && from.dims != to.len) {
         if (from.dims == 0) {
             if (from.ty != to.ty) {
                 ERROR(
                     node,
                     "can't spread value of type '%s' into %d-dimensional array "
                     "of type '%s'",
-                    fmt_BasicType(from.ty), to.dims, fmt_BasicType(to.ty));
+                    fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
             }
         } else {
             ERROR(node,
                   "can't assign %d-dimensional array of type '%s' to "
                   "%d-dimensional array of type '%s'",
-                  from.dims, fmt_BasicType(from.ty), to.dims,
+                  from.dims, fmt_BasicType(from.ty), to.len,
                   fmt_BasicType(to.ty));
         }
     } else if (from.ty != to.ty) {
         if (from.dims == 0) {
-            if (to.dims == 0) {
+            if (to.len == 0) {
                 ERROR(node,
                       "can't assign value of type '%s' to value of type '%s'",
                       fmt_BasicType(from.ty), fmt_BasicType(to.ty));
@@ -41,13 +41,13 @@ static void ATCcheckassign(vartype from, vartype to, node_st *node) {
                     node,
                     "can't spread value of type '%s' into %d-dimensional array "
                     "of type '%s'",
-                    fmt_BasicType(from.ty), to.dims, fmt_BasicType(to.ty));
+                    fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
             }
         } else {
             ERROR(node,
                   "can't assign %d-dimensional array of type '%s' to "
                   "%d-dimensional array of type '%s'",
-                  from.dims, fmt_BasicType(from.ty), to.dims,
+                  from.dims, fmt_BasicType(from.ty), to.len,
                   fmt_BasicType(to.ty));
         }
     }
@@ -68,11 +68,11 @@ node_st *ATCprogram(node_st *node) {
 
 node_st *ATCarrexprs(node_st *node) {
     bool error = false;
-    vartype self_ty = {TY_void, 0};
+    thin_vartype self_ty = {TY_void, 0};
 
     for (node_st *expr = node; expr; expr = ARREXPRS_NEXT(expr)) {
         TRAVexpr(expr);
-        vartype resolved_ty = RESOLVED_TY(ARREXPRS_EXPR(expr));
+        thin_vartype resolved_ty = RESOLVED_TY(ARREXPRS_EXPR(expr));
 
         if (resolved_ty.ty == TY_error) {
             error = true;
@@ -80,11 +80,12 @@ node_st *ATCarrexprs(node_st *node) {
         }
 
         if (self_ty.ty == TY_void) {
-            self_ty = resolved_ty;
+            self_ty.ty = resolved_ty.ty;
+            self_ty.dims = resolved_ty.dims;
             continue;
         }
 
-        if (self_ty.dims == resolved_ty.dims && self_ty.ty == resolved_ty.ty) {
+        if (self_ty.ty == resolved_ty.ty && self_ty.dims == resolved_ty.dims) {
             continue;
         }
 
@@ -164,7 +165,7 @@ node_st *ATCvardecl(node_st *node) {
 
     for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
          expr = EXPRS_NEXT(expr)) {
-        vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
+        thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
         if (resolved_ty.ty != TY_error) {
             if (resolved_ty.dims == 0) {
                 if (resolved_ty.ty != TY_int) {
@@ -172,14 +173,14 @@ node_st *ATCvardecl(node_st *node) {
                         EXPRS_EXPR(expr),
                         "can't declare %d-dimensional array of type '%s' with "
                         "length of value of type '%s'",
-                        ty.dims, fmt_BasicType(ty.ty),
+                        ty.len, fmt_BasicType(ty.ty),
                         fmt_BasicType(resolved_ty.ty));
                 }
             } else {
                 ERROR(EXPRS_EXPR(expr),
                       "can't declare %d-dimensional array of type '%s' with "
                       "length of %d-dimensional array of type '%s'",
-                      ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
+                      ty.len, fmt_BasicType(ty.ty), resolved_ty.dims,
                       fmt_BasicType(resolved_ty.ty));
             }
         }
@@ -204,8 +205,7 @@ node_st *ATCassign(node_st *node) {
                                "loop variable '%s' declared here", e->name);
     }
 
-    ATCcheckassign(RESOLVED_TY(ASSIGN_EXPR(node)),
-                   RESOLVED_TY(ASSIGN_REF(node)), node);
+    ATCcheckassign(RESOLVED_TY(ASSIGN_EXPR(node)), e->ty, node);
 
     return node;
 }
@@ -213,7 +213,7 @@ node_st *ATCassign(node_st *node) {
 node_st *ATCifelse(node_st *node) {
     TRAVchildren(node);
 
-    vartype resolved_ty = RESOLVED_TY(IFELSE_EXPR(node));
+    thin_vartype resolved_ty = RESOLVED_TY(IFELSE_EXPR(node));
     if (resolved_ty.ty != TY_bool) {
         if (resolved_ty.dims == 0) {
             ERROR(
@@ -235,7 +235,7 @@ node_st *ATCifelse(node_st *node) {
 node_st *ATCwhile(node_st *node) {
     TRAVchildren(node);
 
-    vartype resolved_ty = RESOLVED_TY(WHILE_EXPR(node));
+    thin_vartype resolved_ty = RESOLVED_TY(WHILE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
         if (resolved_ty.ty != TY_bool) {
             if (resolved_ty.dims == 0) {
@@ -259,7 +259,7 @@ node_st *ATCwhile(node_st *node) {
 node_st *ATCdowhile(node_st *node) {
     TRAVchildren(node);
 
-    vartype resolved_ty = RESOLVED_TY(DOWHILE_EXPR(node));
+    thin_vartype resolved_ty = RESOLVED_TY(DOWHILE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
         if (resolved_ty.ty != TY_bool) {
             if (resolved_ty.dims == 0) {
@@ -282,7 +282,7 @@ node_st *ATCdowhile(node_st *node) {
 node_st *ATCfor(node_st *node) {
     TRAVchildren(node);
 
-    vartype start_ty = RESOLVED_TY(FOR_LOOP_START(node));
+    thin_vartype start_ty = RESOLVED_TY(FOR_LOOP_START(node));
     if (start_ty.ty != TY_error) {
         if (start_ty.ty != TY_int) {
             if (start_ty.dims == 0) {
@@ -299,7 +299,7 @@ node_st *ATCfor(node_st *node) {
         }
     }
 
-    vartype end_ty = RESOLVED_TY(FOR_LOOP_END(node));
+    thin_vartype end_ty = RESOLVED_TY(FOR_LOOP_END(node));
     if (end_ty.ty != TY_error) {
         if (end_ty.ty != TY_int) {
             if (end_ty.dims == 0) {
@@ -316,7 +316,7 @@ node_st *ATCfor(node_st *node) {
         }
     }
 
-    vartype step_ty = RESOLVED_TY(FOR_LOOP_STEP(node));
+    thin_vartype step_ty = RESOLVED_TY(FOR_LOOP_STEP(node));
     if (step_ty.ty != TY_error) {
         if (step_ty.ty != TY_int) {
             if (step_ty.dims == 0) {
@@ -340,7 +340,7 @@ node_st *ATCreturn(node_st *node) {
     TRAVchildren(node);
 
     if (RETURN_EXPR(node)) {
-        vartype resolved_ty = RESOLVED_TY(RETURN_EXPR(node));
+        thin_vartype resolved_ty = RESOLVED_TY(RETURN_EXPR(node));
         if (DATA_ATC_GET()->ret_ty == TY_void) {
             ERROR(node,
                   "can't return value from function without return value");
@@ -374,7 +374,7 @@ node_st *ATCreturn(node_st *node) {
 node_st *ATCmonop(node_st *node) {
     TRAVchildren(node);
 
-    vartype resolved_ty = RESOLVED_TY(MONOP_EXPR(node));
+    thin_vartype resolved_ty = RESOLVED_TY(MONOP_EXPR(node));
 
     MONOP_RESOLVED_DIMS(node) = 0;
 
@@ -422,8 +422,8 @@ node_st *ATCmonop(node_st *node) {
 node_st *ATCbinop(node_st *node) {
     TRAVchildren(node);
 
-    vartype left_ty = RESOLVED_TY(BINOP_LEFT(node));
-    vartype right_ty = RESOLVED_TY(BINOP_RIGHT(node));
+    thin_vartype left_ty = RESOLVED_TY(BINOP_LEFT(node));
+    thin_vartype right_ty = RESOLVED_TY(BINOP_RIGHT(node));
 
     BINOP_RESOLVED_DIMS(node) = 0;
 
@@ -534,7 +534,7 @@ node_st *ATCbinop(node_st *node) {
 node_st *ATCcast(node_st *node) {
     TRAVchildren(node);
 
-    vartype resolved_ty = RESOLVED_TY(CAST_EXPR(node));
+    thin_vartype resolved_ty = RESOLVED_TY(CAST_EXPR(node));
 
     if (resolved_ty.ty != TY_error) {
         if (resolved_ty.dims != 0) {
@@ -564,8 +564,8 @@ node_st *ATCcall(node_st *node) {
 
     node_st *arg = CALL_EXPRS(node);
     for (int i = 0; i < ty.len; i++) {
-        vartype expected_ty = ty.buf[i];
-        vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(arg));
+        thin_vartype expected_ty = ty.buf[i];
+        thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(arg));
         if (resolved_ty.ty != TY_error) {
             if ((expected_ty.dims != resolved_ty.dims ||
                  expected_ty.ty != resolved_ty.ty)) {
@@ -617,22 +617,22 @@ node_st *ATCvarref(node_st *node) {
     vartype ty = vartable_get(DATA_ATC_GET()->vartable, r)->ty;
 
     for (node_st *expr = VARREF_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
-        if (ty.ty != TY_error && ty.dims != 0) {
-            vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
+        if (ty.ty != TY_error && ty.len != 0) {
+            thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
             if (resolved_ty.ty != TY_error) {
                 if (resolved_ty.dims == 0) {
                     if (resolved_ty.ty != TY_int) {
                         ERROR(EXPRS_EXPR(expr),
                               "can't index into %d-dimensional array of type "
                               "'%s' with value of type '%s'",
-                              ty.dims, fmt_BasicType(ty.ty),
+                              ty.len, fmt_BasicType(ty.ty),
                               fmt_BasicType(resolved_ty.ty));
                     }
                 } else {
                     ERROR(EXPRS_EXPR(node),
                           "can't index into %d-dimensional array of type '%s' "
                           "with %d-dimensional array of type '%s'",
-                          ty.dims, fmt_BasicType(ty.ty), resolved_ty.dims,
+                          ty.len, fmt_BasicType(ty.ty), resolved_ty.dims,
                           fmt_BasicType(resolved_ty.ty));
                 }
             }
@@ -645,20 +645,20 @@ node_st *ATCvarref(node_st *node) {
     }
 
     if (ty.ty == TY_error) {
-    } else if (index_count <= ty.dims) {
-        ty.dims -= index_count;
-    } else if (ty.dims == 0) {
+    } else if (index_count <= ty.len) {
+        ty.len -= index_count;
+    } else if (ty.len == 0) {
         ERROR(node, "can't index into value of type '%s'",
               fmt_BasicType(ty.ty));
     } else {
         ERROR(node,
               "can't index %d times into %d-dimensional array of type '%s'",
-              index_count, ty.dims, fmt_BasicType(ty.ty));
-        ty.dims = 0;
+              index_count, ty.len, fmt_BasicType(ty.ty));
+        ty.len = 0;
     }
 
     VARREF_RESOLVED_TY(node) = ty.ty;
-    VARREF_RESOLVED_DIMS(node) = ty.dims;
+    VARREF_RESOLVED_DIMS(node) = ty.len;
 
     return node;
 }

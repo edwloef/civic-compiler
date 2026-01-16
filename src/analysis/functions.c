@@ -24,7 +24,7 @@ node_st *AFfundecl(node_st *node) {
             dims++;
         }
 
-        vartype e = {TYPE_TY(PARAM_TY(PARAMS_PARAM(param))), dims};
+        thin_vartype e = {TYPE_TY(PARAM_TY(PARAMS_PARAM(param))), dims};
         funtype_push(&ty, e);
     }
 
