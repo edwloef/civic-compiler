@@ -1,6 +1,7 @@
 %{
 
 #include <errno.h>
+#include <signal.h>
 #include <string.h>
 
 #include "ccn/ccn.h"
@@ -607,6 +608,22 @@ void add_loc_to_node(node_st *node, YYLTYPE loc) {
         NODE_FILENAME(node) = STRcpy(globals.file);
 }
 
+int cpp_status = 0;
+
+void yyerror(char const *error) {
+    if (cpp_status) {
+        exit(cpp_status);
+    }
+
+    span s = {yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column, globals.file};
+    emit_message_with_span(s, L_ERROR, "%s", error);
+    abort_on_error();
+}
+
+void sigchld_handler(int sig) {
+    cpp_status = sig;
+}
+
 node_st *scanparse(node_st *root) {
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
 
@@ -617,7 +634,8 @@ node_st *scanparse(node_st *root) {
     }
     fclose(yyin);
 
-    char *cmd = STRfmt("cpp -traditional-cpp %s 2> /dev/null", globals.input_file);
+    char *cmd = STRfmt("cpp -traditional-cpp %s", globals.input_file);
+    signal(SIGCHLD, sigchld_handler);
     yyin = popen(cmd, "r");
     MEMfree(cmd);
 
@@ -626,6 +644,10 @@ node_st *scanparse(node_st *root) {
         abort_on_error();
     } else {
         yyparse();
+    }
+
+    if (cpp_status) {
+        exit(cpp_status);
     }
 
     pclose(yyin);
