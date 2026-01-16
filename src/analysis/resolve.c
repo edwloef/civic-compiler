@@ -92,9 +92,8 @@ node_st *ARvardecl(node_st *node) {
                         VARDECL_EXPORTED(node),
                         false,
                         false};
-    vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node));
-
-    VARDECL_L(node) = DATA_AR_GET()->vartable->len - 1;
+    VARDECL_L(node) =
+        vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node)).l;
 
     return node;
 }

@@ -64,9 +64,8 @@ node_st *AGvardecl(node_st *node) {
                         false,
                         false,
                         false};
-    vartable_insert(DATA_AG_GET()->vartable, e, VARDECL_ID(node));
-
-    VARDECL_L(node) = DATA_AG_GET()->vartable->len - 1;
+    VARDECL_L(node) =
+        vartable_insert(DATA_AG_GET()->vartable, e, VARDECL_ID(node)).l;
 
     return node;
 }

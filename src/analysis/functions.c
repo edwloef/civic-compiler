@@ -29,10 +29,10 @@ node_st *AFfundecl(node_st *node) {
     }
 
     funtable_entry e = {
-        ID_VAL(FUNDECL_ID(node)), ty, SPAN(FUNDECL_ID(node)), false, 0, 0,
-        FUNDECL_EXPORTED(node)};
-    funtable_insert(DATA_AF_GET()->funtable, e, FUNDECL_ID(node));
-    FUNDECL_L(node) = DATA_AF_GET()->funtable->len - 1;
+        ID_VAL(FUNDECL_ID(node)), ty,   SPAN(FUNDECL_ID(node)), 0, 0,
+        FUNDECL_EXPORTED(node),   false};
+    FUNDECL_L(node) =
+        funtable_insert(DATA_AF_GET()->funtable, e, FUNDECL_ID(node)).l;
 
     TRAVchildren(node);
 
