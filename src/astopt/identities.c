@@ -1,4 +1,13 @@
 #include "ccn/ccn.h"
+#include "globals/globals.h"
+
+#define CHECK_FFINITE_MATH_ONLY()                                              \
+    if (ARREXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)   \
+        return node;
+
+#define CHECK_FNO_SIGNED_ZEROS()                                               \
+    if (ARREXPR_RESOLVED_TY(node) == TY_float && globals.fsigned_zeros)        \
+        return node;
 
 #define TAKE(n)                                                                \
     {                                                                          \
@@ -147,6 +156,7 @@ node_st *AOIbinop(node_st *node) {
         } else if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
                    (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
                    (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
+            CHECK_FNO_SIGNED_ZEROS();
             // ({0, 0.0, false} + x) => x
             // ({0, 0.0} - x) => (-x)
             if (BINOP_OP(node) == BO_sub) {
@@ -178,6 +188,8 @@ node_st *AOIbinop(node_st *node) {
             ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
              (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
              (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false))) {
+            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FNO_SIGNED_ZEROS();
             // ({0, 0.0, false} * x) => {0, 0.0, false} | x no side effects
             TAKE(BINOP_LEFT(node));
             break;

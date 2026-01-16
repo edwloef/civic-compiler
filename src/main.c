@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "ccn/ccn.h"
+#include "error/error.h"
 #include "globals/globals.h"
 
 static void Usage(char *program) {
@@ -20,12 +21,21 @@ static void Usage(char *program) {
     printf("  -b --breakpoint <breakpoint>  Set a breakpoint.\n");
     printf("  -s --structure                Pretty print the structure of the "
            "compiler.\n");
-    printf("  --f[no]associative-math       Enable/disable floating-point "
-           "associativity\n");
+    printf("  -f[no]associative-math        Allow re-association of "
+           "floating-point operations. Requires -fno-signed-zeros.\n");
+    printf("  -f[no]finite-math-only        Allow optimizations for "
+           "floating-point arithmetic that assume arguments are not NaNs or "
+           "+-Infs.\n");
+    printf("  -f[no]signed-zeros            Allow optimizations for "
+           "floating-point arithmetic that ignore the signedness of zero.\n");
 }
 
 #define FASSOCIATIVE_MATH 256
 #define FNO_ASSOCIATIVE_MATH 257
+#define FFINITE_MATH_ONLY 258
+#define FNO_FINITE_MATH_ONLY 259
+#define FSIGNED_ZEROS 260
+#define FNO_SIGNED_ZEROS 261
 
 static struct option options[] = {
     {"help", no_argument, 0, 'h'},
@@ -34,9 +44,13 @@ static struct option options[] = {
     {"structure", no_argument, 0, 's'},
     {"fassociative-math", no_argument, 0, FASSOCIATIVE_MATH},
     {"fno-associative-math", no_argument, 0, FNO_ASSOCIATIVE_MATH},
+    {"ffinite-math-only", no_argument, 0, FASSOCIATIVE_MATH},
+    {"fno-finite-math-only", no_argument, 0, FNO_ASSOCIATIVE_MATH},
+    {"fsigned-zeros", no_argument, 0, FASSOCIATIVE_MATH},
+    {"fno-signed-zeros", no_argument, 0, FNO_ASSOCIATIVE_MATH},
     {0, 0, 0, 0}};
 
-static int ProcessArgs(int argc, char *argv[]) {
+static void ProcessArgs(int argc, char *argv[]) {
     int c;
 
     while ((c = getopt_long_only(argc, argv, "ho:b:s", options, NULL)) != -1) {
@@ -63,6 +77,18 @@ static int ProcessArgs(int argc, char *argv[]) {
         case FNO_ASSOCIATIVE_MATH:
             globals.fassociative_math = false;
             break;
+        case FFINITE_MATH_ONLY:
+            globals.ffinite_math_only = true;
+            break;
+        case FNO_FINITE_MATH_ONLY:
+            globals.ffinite_math_only = false;
+            break;
+        case FSIGNED_ZEROS:
+            globals.fsigned_zeros = true;
+            break;
+        case FNO_SIGNED_ZEROS:
+            globals.fsigned_zeros = false;
+            break;
         default:
             Usage(argv[0]);
             exit(EXIT_FAILURE);
@@ -76,12 +102,14 @@ static int ProcessArgs(int argc, char *argv[]) {
 
     globals.input_file = argv[optind];
 
-    return 0;
+    if (globals.fassociative_math && globals.fsigned_zeros) {
+        emit_message(L_ERROR, "-fassociative-math requires -fno-signed-zeros");
+        abort_on_error();
+    }
 }
 
 void BreakpointHandler(node_st *root) {
     TRAVstart(root, TRAV_PRT);
-    return;
 }
 
 int main(int argc, char **argv) {
