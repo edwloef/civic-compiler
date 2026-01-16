@@ -26,7 +26,7 @@ node_st *DDRvarref(node_st *node) {
     int i = 0;
     for (node_st *right = EXPRS_NEXT(exprs); right;
          right = EXPRS_NEXT(right), i++) {
-        vartable_ref r = e->ty.buf[i];
+        vartable_ref r = e->ty.buf[e->ty.len - i - 1];
         char *name = vartable_get(DATA_DDR_GET()->vartable, r)->name;
 
         node_st *dim = ASTvarref(ASTid(STRcpy(name)), NULL);
