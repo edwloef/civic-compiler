@@ -620,8 +620,8 @@ void yyerror(char const *error) {
     abort_on_error();
 }
 
-void sigchld_handler(int sig) {
-    cpp_status = sig;
+void sigchld_handler(int sig, siginfo_t *si, void *context) {
+    cpp_status = si->si_status;
 }
 
 node_st *scanparse(node_st *root) {
@@ -635,7 +635,13 @@ node_st *scanparse(node_st *root) {
     fclose(yyin);
 
     char *cmd = STRfmt("cpp -traditional-cpp %s", globals.input_file);
-    signal(SIGCHLD, sigchld_handler);
+
+    struct sigaction sa;
+    sa.sa_sigaction = sigchld_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART|SA_SIGINFO|SA_NOCLDWAIT;
+    sigaction(SIGCHLD, &sa, NULL);
+
     yyin = popen(cmd, "r");
     MEMfree(cmd);
 
