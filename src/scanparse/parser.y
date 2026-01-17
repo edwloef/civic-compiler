@@ -158,7 +158,7 @@ decl: "extern" funheader ";"
     | stmt
       {
         yylloc = @1;
-        yyerror("encountered unexpected statement in declaration position");
+        yyerror("unexpected statement, expected declaration");
       }
     ;
 
@@ -180,7 +180,7 @@ stmt: expr ";"
             $$ = $1;
         } else {
             yylloc = @1;
-            yyerror("encountered unexpected expression in statement position");
+            yyerror("unexpected expression, expected statement");
         }
       }
     | varref "=" expr ";"
@@ -430,7 +430,12 @@ fundefs: fundef fundefs
          }
        ;
 
-fundef: funheader "{" "}"
+fundef: funheader ";"
+        {
+          yylloc = @1;
+          yyerror("unexpected function declaration, expected function definition");
+        }
+      | funheader "{" "}"
         {
           $$ = $1;
           FUNDECL_BODY($$) = ASTfunbody(NULL, NULL);
