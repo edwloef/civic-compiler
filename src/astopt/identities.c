@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "ccn/ccn.h"
 #include "globals/globals.h"
 
@@ -154,9 +156,9 @@ node_st *AOIbinop(node_st *node) {
             TAKE(BINOP_LEFT(node));
             break;
         } else if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
-                   (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
+                   (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0 &&
+                    (!globals.fsigned_zeros || signbit(FLOAT_VAL(left)))) ||
                    (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
-            CHECK_FNO_SIGNED_ZEROS();
             // ({0, 0.0, false} + x) => x
             // ({0, 0.0} - x) => (-x)
             if (BINOP_OP(node) == BO_sub) {
