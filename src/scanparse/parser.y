@@ -169,17 +169,14 @@ stmts: stmt stmts
        }
      ;
 
-stmt: id "(" exprs ")" ";"
+stmt: expr ";"
       {
-        $$ = ASTcall($1, $3);
-        @$ = span_locs(@1, @4);
-        add_loc_to_node($$, @$);
-      }
-    | id "(" ")" ";"
-      {
-        $$ = ASTcall($1, NULL);
-        @$ = span_locs(@1, @3);
-        add_loc_to_node($$, @$);
+        if (NODE_TYPE($1) == NT_CALL) {
+            $$ = $1;
+        } else {
+            yylloc = @1;
+            yyerror("encountered unexpected expression in statement position");
+        }
       }
     | varref "=" expr ";"
       {
