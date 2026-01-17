@@ -1,0 +1,4 @@
+void foo() {
+    int[2] a;
+    int[1, 2] b = [a];
+}

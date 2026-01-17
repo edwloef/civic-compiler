@@ -94,6 +94,14 @@ node_st *ATCarrexprs(node_st *node) {
             continue;
         }
 
+        if (resolved_ty.dims != 0 &&
+            NODE_TYPE(ARREXPRS_EXPR(expr)) != NT_ARREXPRS) {
+            ERROR(ARREXPRS_EXPR(expr),
+                  "can't use %d-dimensional array of type '%s' as scalar value "
+                  "in array literal",
+                  resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+        }
+
         if (self_ty.ty == TY_void) {
             self_ty.ty = resolved_ty.ty;
             self_ty.dims = resolved_ty.dims;
