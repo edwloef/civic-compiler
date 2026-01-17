@@ -107,28 +107,27 @@ node_st *ATCarrexprs(node_st *node) {
         if (self_ty.dims == 0) {
             if (resolved_ty.dims == 0) {
                 ERROR(ARREXPRS_EXPR(expr),
-                      "encountered inconsistent array expression containing "
-                      "value of type '%s' and value of type '%s'",
+                      "encountered inconsistent array literal containing value "
+                      "of type '%s' and value of type '%s'",
                       fmt_BasicType(self_ty.ty), fmt_BasicType(resolved_ty.ty));
             } else {
                 ERROR(ARREXPRS_EXPR(expr),
-                      "encountered inconsistent array expression containing "
-                      "value of type '%s' and %d-dimensional array of type "
-                      "'%s'",
+                      "encountered inconsistent array literal containing value "
+                      "of type '%s' and %d-dimensional array of type '%s'",
                       fmt_BasicType(self_ty.ty), resolved_ty.dims,
                       fmt_BasicType(resolved_ty.ty));
             }
         } else {
             if (resolved_ty.dims == 0) {
                 ERROR(ARREXPRS_EXPR(expr),
-                      "encountered inconsistent array expression containing "
+                      "encountered inconsistent array literal containing "
                       "%d-dimensional array of type '%s' and value of type "
                       "'%s'",
                       self_ty.dims, fmt_BasicType(self_ty.ty),
                       fmt_BasicType(resolved_ty.ty));
             } else {
                 ERROR(ARREXPRS_EXPR(expr),
-                      "encountered inconsistent array expression containing "
+                      "encountered inconsistent array literal containing "
                       "%d-dimensional array of type '%s' and %d-dimensional "
                       "array of type '%s'",
                       self_ty.dims, fmt_BasicType(self_ty.ty), resolved_ty.dims,
