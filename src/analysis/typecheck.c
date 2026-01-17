@@ -5,8 +5,7 @@
 #include "print/print.h"
 
 static thin_vartype RESOLVED_TY(node_st *node) {
-    return (thin_vartype){ARREXPR_RESOLVED_TY(node),
-                          ARREXPR_RESOLVED_DIMS(node)};
+    return (thin_vartype){EXPR_RESOLVED_TY(node), EXPR_RESOLVED_DIMS(node)};
 }
 
 static void ATCcheckassign(node_st *from_node, vartype to, node_st *node) {

@@ -4,11 +4,11 @@
 #include "globals/globals.h"
 
 #define CHECK_FFINITE_MATH_ONLY()                                              \
-    if (ARREXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)   \
+    if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
         return node;
 
 #define CHECK_FNO_SIGNED_ZEROS()                                               \
-    if (ARREXPR_RESOLVED_TY(node) == TY_float && globals.fsigned_zeros)        \
+    if (EXPR_RESOLVED_TY(node) == TY_float && globals.fsigned_zeros)           \
         return node;
 
 #define TAKE(n)                                                                \
@@ -32,7 +32,7 @@
 #define WRAP(o)                                                                \
     {                                                                          \
         node = ASTmonop(node, o);                                              \
-        MONOP_TRANSP(node) = ARREXPR_TRANSP(MONOP_EXPR(node));                 \
+        MONOP_TRANSP(node) = EXPR_TRANSP(MONOP_EXPR(node));                    \
         CCNcycleNotify();                                                      \
     }
 
@@ -150,7 +150,7 @@ node_st *AOIbinop(node_st *node) {
     switch (BINOP_OP(node)) {
     case BO_add:
     case BO_sub:
-        if (ARREXPR_TRANSP(right) && NODE_TYPE(left) == NT_BOOL &&
+        if (EXPR_TRANSP(right) && NODE_TYPE(left) == NT_BOOL &&
             BOOL_VAL(left) == true) {
             // (true + x) => true | x no side effects
             TAKE(BINOP_LEFT(node));
@@ -186,7 +186,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_mul:
-        if (ARREXPR_TRANSP(right) &&
+        if (EXPR_TRANSP(right) &&
             ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
              (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
              (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false))) {
@@ -246,7 +246,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_mod:
-        if (ARREXPR_TRANSP(left) && NODE_TYPE(right) == NT_INT &&
+        if (EXPR_TRANSP(left) && NODE_TYPE(right) == NT_INT &&
             INT_VAL(BINOP_RIGHT(node)) == 1) {
             // (x % 1) => 1 | x no side effects
             TAKE(BINOP_RIGHT(node));

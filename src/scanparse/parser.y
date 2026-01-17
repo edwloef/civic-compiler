@@ -84,7 +84,7 @@ void yyerror(char const *errname);
 %token <cstr> ID "identifier"
 
 %type <node> decls stmts exprs arrexprs ids params
-%type <node> program decl stmt expr arrexpr block varref id
+%type <node> program decl stmt expr block varref id
 %type <node> vardecl vardecls fundef fundefs funheader
 %type <basic_type> basictype
 
@@ -181,7 +181,7 @@ stmt: id "(" exprs ")" ";"
         @$ = span_locs(@1, @3);
         add_loc_to_node($$, @$);
       }
-    | varref "=" arrexpr ";"
+    | varref "=" expr ";"
       {
         VARREF_WRITE($1) = true;
         $$ = ASTassign($1, $3);
@@ -362,36 +362,29 @@ expr: "(" basictype ")" expr %prec "monop"
         $$ = ASTbool($1);
         add_loc_to_node($$, @$);
       }
+    | "[" arrexprs "]"
+      {
+        $$ = $2;
+        add_loc_to_node($$, @$);
+      }
+    | "[" "]"
+      {
+        yylloc = @$;
+        yyerror("array literals must be non-empty");
+      }
     ;
 
-arrexprs: arrexpr "," arrexprs
+arrexprs: expr "," arrexprs
           {
             $$ = ASTarrexprs($1, $3);
             add_loc_to_node($$, @$);
           }
-        | arrexpr
+        | expr
           {
             $$ = ASTarrexprs($1, NULL);
             add_loc_to_node($$, @$);
           }
         ;
-
-arrexpr: expr
-         {
-           $$ = $1;
-           add_loc_to_node($$, @$);
-         }
-       | "[" arrexprs "]"
-         {
-           $$ = $2;
-           add_loc_to_node($$, @$);
-         }
-       | "[" "]"
-         {
-           yylloc = @$;
-           yyerror("array literals must be non-empty");
-         }
-       ;
 
 vardecls: vardecls vardecl
           {
@@ -411,13 +404,13 @@ vardecl: basictype id ";"
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, NULL);
          }
-       | basictype id "=" arrexpr ";"
+       | basictype id "=" expr ";"
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, $4);
            @$ = span_locs(@1, @4);
            add_loc_to_node($$, @$);
          }
-      | basictype "[" exprs "]" id "=" arrexpr ";"
+      | basictype "[" exprs "]" id "=" expr ";"
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, $7);
            @$ = span_locs(@1, @7);

@@ -67,7 +67,7 @@ phase Analysis {
 
         traversal TypeCheck {
             uid = ATC,
-            nodes = ArrExpr | Stmt | { Program, FunDecl, FunBody, VarDecl },
+            nodes = Expr | Stmt | { Program, FunDecl, FunBody, VarDecl },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
@@ -121,7 +121,7 @@ cycle AstOpt {
 
         traversal Transp {
             uid = AOT,
-            nodes = ArrExpr | { Program, FunDecl, FunBody, Assign, Exprs },
+            nodes = Expr | { Program, FunDecl, FunBody, Assign, Exprs },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
@@ -218,22 +218,20 @@ node Exprs {
     }
 };
 
-nodeset Expr = { Monop, Binop, Cast, Call, VarRef, Int, Float, Bool };
-
-node ArrExprs {
-    children {
-        ArrExpr expr { constructor, mandatory },
-        ArrExprs next { constructor }
-    }
-};
-
-nodeset ArrExpr {
-    nodes = Expr | { ArrExprs },
+nodeset Expr {
+    nodes = { ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
 
     attributes {
         BasicType resolved_ty,
         int resolved_dims,
         bool transp
+    }
+};
+
+node ArrExprs {
+    children {
+        Expr expr { constructor, mandatory },
+        ArrExprs next { constructor }
     }
 };
 
@@ -282,7 +280,7 @@ node VarDecl {
     children {
         Type ty { constructor, mandatory },
         Id id { constructor, mandatory },
-        ArrExpr expr { constructor }
+        Expr expr { constructor }
     },
 
     attributes {
@@ -296,7 +294,7 @@ node VarDecl {
 node Assign {
     children {
         VarRef ref { constructor, mandatory },
-        ArrExpr expr { constructor, mandatory }
+        Expr expr { constructor, mandatory }
     }
 };
 

@@ -19,7 +19,7 @@ node_st *AOTarrexprs(node_st *node) {
     TRAVchildren(node);
 
     ARREXPRS_TRANSP(node) =
-        ARREXPR_TRANSP(ARREXPRS_EXPR(node)) &&
+        EXPR_TRANSP(ARREXPRS_EXPR(node)) &&
         (!ARREXPRS_NEXT(node) || ARREXPRS_TRANSP(ARREXPRS_NEXT(node)));
 
     return node;

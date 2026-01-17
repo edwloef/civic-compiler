@@ -65,8 +65,8 @@ node_st *AOTCFstmts(node_st *node) {
             IFELSE_ELSE_BLOCK(stmt) = tmp;
 
             CCNcycleNotify();
-        } else if (ARREXPR_TRANSP(IFELSE_EXPR(stmt)) &&
-                   !IFELSE_IF_BLOCK(stmt) && !IFELSE_ELSE_BLOCK(stmt)) {
+        } else if (EXPR_TRANSP(IFELSE_EXPR(stmt)) && !IFELSE_IF_BLOCK(stmt) &&
+                   !IFELSE_ELSE_BLOCK(stmt)) {
             node = AOTCFinlinestmts(node, NULL);
         }
         break;

@@ -2,7 +2,7 @@
 #include "globals/globals.h"
 
 #define CHECK_FASSOCIATIVE_MATH()                                              \
-    if (ARREXPR_RESOLVED_TY(node) == TY_float && !globals.fassociative_math)   \
+    if (EXPR_RESOLVED_TY(node) == TY_float && !globals.fassociative_math)      \
         return node;
 
 node_st *AORbinop(node_st *node) {
@@ -93,7 +93,7 @@ node_st *AORbinop(node_st *node) {
     case BO_and:
     case BO_or:
         if ((NODE_TYPE(right) == NT_BOOL &&
-             (ARREXPR_TRANSP(left) || (BINOP_OP(node) == BO_or)))) {
+             (EXPR_TRANSP(left) || (BINOP_OP(node) == BO_or)))) {
             // (x && true) => (true && x)
             // (x && false) => (false && x) | x no side effects
             // (x || true) => (true || x) | x no side effects
