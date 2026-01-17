@@ -388,8 +388,7 @@ arrexpr: expr
          }
        | "[" "]"
          {
-           yylloc.first_line = @1.first_line;
-           yylloc.first_column = @1.first_column;
+           yylloc = @$;
            yyerror("array literals must be non-empty");
          }
        ;
