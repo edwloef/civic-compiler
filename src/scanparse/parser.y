@@ -406,7 +406,7 @@ vardecl: basictype id ";"
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, NULL);
          }
-       | basictype id "=" expr ";"
+       | basictype id "=" arrexpr ";"
          {
            $$ = ASTvardecl(ASTtype(NULL, $1), $2, $4);
            @$ = span_locs(@1, @4);
