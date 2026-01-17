@@ -9,47 +9,37 @@ static thin_vartype RESOLVED_TY(node_st *node) {
                           ARREXPR_RESOLVED_DIMS(node)};
 }
 
-static void ATCcheckassign(thin_vartype from, vartype to, node_st *node) {
+static void ATCcheckassign(node_st *from_node, vartype to, node_st *node) {
+    thin_vartype from = RESOLVED_TY(from_node);
     if (from.ty == TY_error || to.ty == TY_error) {
         return;
     }
 
-    if (to.len != 0 && from.dims != to.len) {
+    if (to.len == 0) {
         if (from.dims == 0) {
             if (from.ty != to.ty) {
-                ERROR(
-                    node,
-                    "can't spread value of type '%s' into %d-dimensional array "
-                    "of type '%s'",
-                    fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
-            }
-        } else {
-            ERROR(node,
-                  "can't assign %d-dimensional array of type '%s' to "
-                  "%d-dimensional array of type '%s'",
-                  from.dims, fmt_BasicType(from.ty), to.len,
-                  fmt_BasicType(to.ty));
-        }
-    } else if (from.ty != to.ty) {
-        if (from.dims == 0) {
-            if (to.len == 0) {
                 ERROR(node,
                       "can't assign value of type '%s' to value of type '%s'",
                       fmt_BasicType(from.ty), fmt_BasicType(to.ty));
-            } else {
-                ERROR(
-                    node,
-                    "can't spread value of type '%s' into %d-dimensional array "
-                    "of type '%s'",
-                    fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
             }
         } else {
             ERROR(node,
-                  "can't assign %d-dimensional array of type '%s' to "
-                  "%d-dimensional array of type '%s'",
-                  from.dims, fmt_BasicType(from.ty), to.len,
-                  fmt_BasicType(to.ty));
+                  "can't assign %d-dimensional array of type '%s' to value of "
+                  "type '%s'",
+                  from.dims, fmt_BasicType(from.ty), fmt_BasicType(to.ty));
         }
+    } else if (from.dims == 0) {
+        if (from.ty != to.ty) {
+            ERROR(node,
+                  "can't spread value of type '%s' into %d-dimensional array "
+                  "of type '%s'",
+                  fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
+        }
+    } else if (NODE_TYPE(from_node) != NT_ARREXPRS || from.dims != to.len) {
+        ERROR(node,
+              "can't assign %d-dimensional array of type '%s' to "
+              "%d-dimensional array of type '%s'",
+              from.dims, fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
     }
 }
 
@@ -187,7 +177,7 @@ node_st *ATCvardecl(node_st *node) {
     }
 
     if (VARDECL_EXPR(node)) {
-        ATCcheckassign(RESOLVED_TY(VARDECL_EXPR(node)), ty, node);
+        ATCcheckassign(VARDECL_EXPR(node), ty, node);
     }
 
     return node;
@@ -205,7 +195,7 @@ node_st *ATCassign(node_st *node) {
                                "loop variable '%s' declared here", e->name);
     }
 
-    ATCcheckassign(RESOLVED_TY(ASSIGN_EXPR(node)), e->ty, node);
+    ATCcheckassign(ASSIGN_EXPR(node), e->ty, node);
 
     return node;
 }
@@ -645,8 +635,9 @@ node_st *ATCvarref(node_st *node) {
     }
 
     if (ty.ty == TY_error) {
-    } else if (index_count <= ty.len) {
-        ty.len -= index_count;
+    } else if (index_count == 0) {
+    } else if (index_count == ty.len) {
+        ty.len = 0;
     } else if (ty.len == 0) {
         ERROR(node, "can't index into value of type '%s'",
               fmt_BasicType(ty.ty));

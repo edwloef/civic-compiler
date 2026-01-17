@@ -523,10 +523,12 @@ block: stmt
 varref: id "[" exprs "]"
         {
           $$ = ASTvarref($1, $3);
+          add_loc_to_node($$, @$);
         }
       | id
         {
           $$ = ASTvarref($1, NULL);
+          add_loc_to_node($$, @$);
         }
       ;
 
