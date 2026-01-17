@@ -35,7 +35,8 @@ static void ATCcheckassign(node_st *from_node, vartype to, node_st *node) {
                   "of type '%s'",
                   fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
         }
-    } else if (NODE_TYPE(from_node) != NT_ARREXPRS || from.dims != to.len) {
+    } else if (NODE_TYPE(from_node) != NT_ARREXPRS || from.ty != to.ty ||
+               from.dims != to.len) {
         ERROR(node,
               "can't assign %d-dimensional array of type '%s' to "
               "%d-dimensional array of type '%s'",
