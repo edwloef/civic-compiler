@@ -155,6 +155,11 @@ decl: "extern" funheader ";"
         $$ = $1;
         VARDECL_GLOBAL($$) = true;
       }
+    | stmt
+      {
+        yylloc = @1;
+        yyerror("encountered unexpected statement in declaration position");
+      }
     ;
 
 stmts: stmt stmts
@@ -407,7 +412,7 @@ vardecl: basictype id ";"
            @$ = span_locs(@1, @4);
            add_loc_to_node($$, @$);
          }
-      | basictype "[" exprs "]" id "=" expr ";"
+       | basictype "[" exprs "]" id "=" expr ";"
          {
            $$ = ASTvardecl(ASTtype($3, $1), $5, $7);
            @$ = span_locs(@1, @7);
