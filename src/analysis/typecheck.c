@@ -35,8 +35,32 @@ static void ATCcheckassign(node_st *from_node, vartype to, node_st *node) {
                   "of type '%s'",
                   fmt_BasicType(from.ty), to.len, fmt_BasicType(to.ty));
         }
-    } else if (NODE_TYPE(from_node) != NT_ARREXPRS || from.ty != to.ty ||
-               from.dims != to.len) {
+    } else if (NODE_TYPE(from_node) == NT_ARREXPRS) {
+        if (from.dims < to.len) {
+            if (from.ty != to.ty) {
+                ERROR(node,
+                      "can't spread %d-dimensional array literal of type '%s' "
+                      "into %d-dimensional array of type '%s'",
+                      from.dims, fmt_BasicType(from.ty), to.len,
+                      fmt_BasicType(to.ty));
+            }
+        } else if (from.dims == to.len) {
+            if (from.ty != to.ty) {
+                ERROR(
+                    node,
+                    "can't assign %d-dimensional array literal of type '%s' to "
+                    "%d-dimensional array of type '%s'",
+                    from.dims, fmt_BasicType(from.ty), to.len,
+                    fmt_BasicType(to.ty));
+            }
+        } else {
+            ERROR(node,
+                  "can't assign %d-dimensional array literal of type '%s' to "
+                  "%d-dimensional array of type '%s'",
+                  from.dims, fmt_BasicType(from.ty), to.len,
+                  fmt_BasicType(to.ty));
+        }
+    } else {
         ERROR(node,
               "can't assign %d-dimensional array of type '%s' to "
               "%d-dimensional array of type '%s'",
@@ -563,13 +587,13 @@ node_st *ATCcall(node_st *node) {
                 if (expected_ty.dims == 0) {
                     if (resolved_ty.dims == 0) {
                         ERROR(EXPRS_EXPR(arg),
-                              "expected parameter of type '%s', found argument "
-                              "of type '%s'",
+                              "expected value of type '%s', found value of "
+                              "type '%s'",
                               fmt_BasicType(expected_ty.ty),
                               fmt_BasicType(resolved_ty.ty));
                     } else {
                         ERROR(EXPRS_EXPR(arg),
-                              "expected parameter of type '%s', found "
+                              "expected value of type '%s', found "
                               "%d-dimensional array of type '%s'",
                               fmt_BasicType(expected_ty.ty), resolved_ty.dims,
                               fmt_BasicType(resolved_ty.ty));
@@ -578,7 +602,7 @@ node_st *ATCcall(node_st *node) {
                     if (resolved_ty.dims == 0) {
                         ERROR(EXPRS_EXPR(arg),
                               "expected %d-dimensional array of type '%s', "
-                              "found argument of type '%s'",
+                              "found value of type '%s'",
                               expected_ty.dims, fmt_BasicType(expected_ty.ty),
                               fmt_BasicType(resolved_ty.ty));
                     } else {
