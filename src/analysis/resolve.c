@@ -12,17 +12,25 @@ static void ARlint_vartable_usage(vartable *vartable) {
         }
 
         if (e->read_count == 0) {
-            if (e->write_count != 0) {
-                if (!e->external && (!e->param || e->ty.len == 0)) {
+            if (e->write_count == 0) {
+                emit_message_with_span(
+                    e->span, L_WARNING,
+                    "variable '%s' is never read from or written to", e->name);
+            } else {
+                if (!e->external && !e->exported &&
+                    !(e->param && e->ty.len != 0)) {
                     emit_message_with_span(
                         e->span, L_WARNING,
                         "variable '%s' is never read from, only written to",
                         e->name);
                 }
-            } else {
+            }
+        } else if (e->write_count == 0) {
+            if (!e->external && !e->exported && !e->param) {
                 emit_message_with_span(
                     e->span, L_WARNING,
-                    "variable '%s' is never read from or written to", e->name);
+                    "variable '%s' is never written to, only read from",
+                    e->name);
             }
         }
     }
@@ -192,6 +200,9 @@ node_st *ARvarref(node_st *node) {
     vartable_entry *e = vartable_get(DATA_AR_GET()->vartable, r);
     if (e->ty.ty != TY_error) {
         if (VARREF_WRITE(node)) {
+            e->write_count++;
+        } else if (e->ty.len != 0 && !VARREF_EXPRS(node)) {
+            e->read_count++;
             e->write_count++;
         } else {
             e->read_count++;
