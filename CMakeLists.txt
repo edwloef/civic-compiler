@@ -42,6 +42,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/trivialcontrolflow.c
     src/desugar/casts.c
     src/desugar/declexprs.c
+    src/desugar/arraydecls.c
     src/desugar/dimreduce.c
     src/error/error.c
     src/free/free.c

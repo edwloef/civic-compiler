@@ -97,6 +97,15 @@ phase Desugar {
             }
         };
 
+        traversal ArrayDecls {
+            uid = DAD,
+            nodes = { Program, FunBody, Decls, VarRef, Call, FunDecl },
+            travdata {
+                Stmts stmts,
+                user vartable_ptr vartable
+            }
+        };
+
         traversal DimReduce {
             uid = DDR,
             nodes = { Program, FunDecl, VarRef },
@@ -232,6 +241,20 @@ node ArrExprs {
     children {
         Expr expr { constructor, mandatory },
         ArrExprs next { constructor }
+    }
+};
+
+node Malloc {
+    children {
+        Expr size { constructor, mandatory }
+    },
+
+    attributes {
+        BasicType ty { constructor }
+    },
+
+    lifetime {
+        allowed (Desugar.ArrayDecls -> )
     }
 };
 

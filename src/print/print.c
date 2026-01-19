@@ -312,6 +312,13 @@ node_st *PRTcast(node_st *node) {
     return node;
 }
 
+node_st *PRTmalloc(node_st *node) {
+    printf("malloc(");
+    TRAVsize(node);
+    printf(")");
+    return node;
+}
+
 node_st *PRTid(node_st *node) {
     printf("%s", ID_VAL(node));
 

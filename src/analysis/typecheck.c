@@ -631,6 +631,12 @@ node_st *ATCcall(node_st *node) {
     return node;
 }
 
+node_st *ATCmalloc(node_st *node) {
+    TRAVchildren(node);
+
+    return node;
+}
+
 node_st *ATCvarref(node_st *node) {
     TRAVchildren(node);
 

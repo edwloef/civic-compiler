@@ -105,6 +105,12 @@ node_st *AOTcast(node_st *node) {
     return node;
 }
 
+node_st *AOTmalloc(node_st *node) {
+    TRAVchildren(node);
+
+    return node;
+}
+
 node_st *AOTcall(node_st *node) {
     TRAVchildren(node);
 
