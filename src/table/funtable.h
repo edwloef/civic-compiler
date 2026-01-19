@@ -23,7 +23,7 @@ typedef struct {
     funtype ty;
     span span;
     int call_count, min_level;
-    bool exported, transp;
+    bool external, exported, transp;
 } funtable_entry;
 
 typedef struct funtable funtable;
