@@ -637,7 +637,7 @@ node_st *ATCcall(node_st *node) {
 }
 
 node_st *ATCmalloc(node_st *node) {
-    TRAVchildren(node);
+    DBUG_ASSERT(false, "Unreachable.");
 
     return node;
 }

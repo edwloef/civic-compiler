@@ -40,7 +40,20 @@ node_st *PVassign(node_st *node) {
 }
 
 node_st *PVifelse(node_st *node) {
-    TRAVchildren(node);
+    IFELSE_EXPR(node) = TRAVdo(IFELSE_EXPR(node));
+
+    node_st *before = DATA_PV_GET()->expr;
+
+    IFELSE_IF_BLOCK(node) = TRAVopt(IFELSE_IF_BLOCK(node));
+
+    node_st *after = DATA_PV_GET()->expr;
+    DATA_PV_GET()->expr = before;
+
+    IFELSE_ELSE_BLOCK(node) = TRAVopt(IFELSE_ELSE_BLOCK(node));
+
+    if (DATA_PV_GET()->expr) {
+        DATA_PV_GET()->expr = after;
+    }
 
     return node;
 }
