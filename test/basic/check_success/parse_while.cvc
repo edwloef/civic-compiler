@@ -1,0 +1,7 @@
+extern int bar(int x);
+
+void foo(int x) {
+    while (x < 3) {
+        x = bar(x);
+    }
+}

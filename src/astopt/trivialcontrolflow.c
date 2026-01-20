@@ -62,15 +62,6 @@ node_st *AOTCFstmts(node_st *node) {
             node = AOTCFinlinestmts(node, NULL);
         }
         break;
-    case NT_WHILE:
-        if (NODE_TYPE(WHILE_EXPR(stmt)) == NT_BOOL) {
-            if (BOOL_VAL(WHILE_EXPR(stmt)) == true) {
-                AOTCFdiverges(node);
-            } else {
-                node = AOTCFnoop(node);
-            }
-        }
-        break;
     case NT_DOWHILE:
         if (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL) {
             if (BOOL_VAL(DOWHILE_EXPR(stmt)) == true) {

@@ -92,6 +92,11 @@ phase Desugar {
             nodes = { Cast }
         };
 
+        traversal DelWhile {
+            uid = DDW,
+            nodes = { While }
+        };
+
         traversal VarDecls {
             uid = DVD,
             nodes = { Program, FunDecl, FunBody, Decls, VarRef, Call },
@@ -337,6 +342,10 @@ node While {
     children {
         Expr expr { constructor },
         Stmts stmts { constructor }
+    },
+
+    lifetime {
+        allowed ( -> Desugar.DelWhile]
     }
 };
 
