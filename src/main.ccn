@@ -129,7 +129,10 @@ cycle AstOpt {
     actions {
         traversal CopyProp {
             uid = AOCP,
-            nodes = { Stmts }
+            nodes = { Program, FunDecl, Stmts },
+            travdata {
+                user vartable_ptr vartable
+            }
         };
 
         traversal Reassoc {
@@ -154,11 +157,20 @@ cycle AstOpt {
     }
 };
 
+traversal CountWrites {
+    uid = CW,
+    nodes = { Program, FunDecl, VarRef },
+    travdata {
+        user vartable_ptr vartable
+    }
+};
+
 traversal PropagateValue {
     uid = PV,
     nodes = Stmt | { VarRef },
     travdata {
         Expr expr,
+        int write_count,
         int n,
         int l
     }

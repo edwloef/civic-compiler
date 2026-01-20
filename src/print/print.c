@@ -99,7 +99,7 @@ node_st *PRTstmts(node_st *node) {
         printf(";\n");
     }
 
-    TRAVopt(STMTS_NEXT(node));
+    TRAVnext(node);
 
     return node;
 }
@@ -144,7 +144,7 @@ node_st *PRTfundecl(node_st *node) {
     printf("%s ", fmt_BasicType(FUNDECL_TY(node)));
     TRAVid(node);
     printf("(");
-    TRAVopt(FUNDECL_PARAMS(node));
+    TRAVparams(node);
     printf(")");
 
     if (FUNDECL_BODY(node)) {
@@ -243,9 +243,9 @@ node_st *PRTifelse(node_st *node) {
     printf("if (");
     TRAVexpr(node);
     printf(") {\n");
-    WITH_INDENT(TRAVopt(IFELSE_IF_BLOCK(node)));
+    WITH_INDENT(TRAVif_block(node));
     printf("} else {\n");
-    WITH_INDENT(TRAVopt(IFELSE_ELSE_BLOCK(node)));
+    WITH_INDENT(TRAVelse_block(node));
     printf("}\n");
 
     return node;
@@ -255,7 +255,7 @@ node_st *PRTwhile(node_st *node) {
     printf("while (");
     TRAVexpr(node);
     printf(") {\n");
-    WITH_INDENT(TRAVopt(WHILE_STMTS(node)));
+    WITH_INDENT(TRAVstmts(node));
     printf("}\n");
 
     return node;
@@ -263,7 +263,7 @@ node_st *PRTwhile(node_st *node) {
 
 node_st *PRTdowhile(node_st *node) {
     printf("do {\n");
-    WITH_INDENT(TRAVopt(DOWHILE_STMTS(node)));
+    WITH_INDENT(TRAVstmts(node));
     printf("} while (");
     TRAVexpr(node);
     printf(");\n");
@@ -281,7 +281,7 @@ node_st *PRTfor(node_st *node) {
     printf(", ");
     TRAVloop_step(node);
     printf(") {\n");
-    WITH_INDENT(TRAVopt(FOR_STMTS(node)));
+    WITH_INDENT(TRAVstmts(node));
     printf("}\n");
 
     return node;

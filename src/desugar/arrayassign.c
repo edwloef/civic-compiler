@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "ccngen/trav.h"
 #include "macros.h"
 #include "palm/str.h"
 #include "table/table.h"
@@ -98,8 +99,8 @@ node_st *DAAfundecl(node_st *node) {
 }
 
 node_st *DAAstmts(node_st *node) {
-    STMTS_NEXT(node) = TRAVopt(STMTS_NEXT(node));
-    STMTS_STMT(node) = TRAVdo(STMTS_STMT(node));
+    TRAVnext(node);
+    TRAVstmt(node);
 
     if (!STMTS_STMT(node)) {
         if (STMTS_NEXT(node)) {

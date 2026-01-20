@@ -69,12 +69,14 @@ node_st *DVDdecls(node_st *node) {
         for (node_st *expr = TYPE_EXPRS(VARDECL_TY(decl)); expr;
              expr = EXPRS_NEXT(expr), i++) {
             node_st *ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
-            node_st *decl = ASTassign(CCNcopy(ref), EXPRS_EXPR(expr));
-            VARREF_WRITE(ASSIGN_REF(decl)) = true;
-            EXPRS_EXPR(expr) = ref;
 
             vartable_ref tr = {VARREF_N(ref), VARREF_L(ref)};
             vartable_get(DATA_DVD_GET()->vartable, r)->ty.buf[i] = tr;
+
+            VARREF_N(ref) = DATA_DVD_GET()->vartable->parent == NULL;
+            node_st *decl = ASTassign(CCNcopy(ref), EXPRS_EXPR(expr));
+            VARREF_WRITE(ASSIGN_REF(decl)) = true;
+            EXPRS_EXPR(expr) = ref;
 
             if (root) {
                 STMTS_NEXT(stmts) = ASTstmts(decl, NULL);
