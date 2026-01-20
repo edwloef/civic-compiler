@@ -23,11 +23,6 @@ static node_st *AOTCFinlinestmts(node_st *node, node_st *stmts) {
     }
 }
 
-static node_st *AOTCFnoop(node_st *node) {
-    STMTS_STMT(node) = CCNfree(STMTS_STMT(node));
-    return AOTCFinlinestmts(node, NULL);
-}
-
 node_st *AOTCFstmts(node_st *node) {
     TRAVchildren(node);
 
@@ -57,9 +52,6 @@ node_st *AOTCFstmts(node_st *node) {
             IFELSE_ELSE_BLOCK(stmt) = tmp;
 
             CCNcycleNotify();
-        } else if (EXPR_TRANSP(IFELSE_EXPR(stmt)) && !IFELSE_IF_BLOCK(stmt) &&
-                   !IFELSE_ELSE_BLOCK(stmt)) {
-            node = AOTCFinlinestmts(node, NULL);
         }
         break;
     case NT_DOWHILE:
@@ -90,19 +82,10 @@ node_st *AOTCFstmts(node_st *node) {
                 FOR_STMTS(stmt) = NULL;
                 node = AOTCFinlinestmts(node, stmts);
             }
-        } else if (EXPR_TRANSP(FOR_LOOP_START(stmt)) &&
-                   EXPR_TRANSP(FOR_LOOP_END(stmt)) &&
-                   EXPR_TRANSP(FOR_LOOP_STEP(stmt)) && !FOR_STMTS(stmt)) {
-            node = AOTCFnoop(node);
         }
         break;
     case NT_RETURN:
         AOTCFdiverges(node);
-        break;
-    case NT_CALL:
-        if (CALL_TRANSP(stmt)) {
-            node = AOTCFnoop(node);
-        }
         break;
     default:
         break;

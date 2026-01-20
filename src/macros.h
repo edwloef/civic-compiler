@@ -20,6 +20,5 @@
     {                                                                          \
         node = ASTmonop(node, o);                                              \
         MONOP_RESOLVED_TY(node) = EXPR_RESOLVED_TY(MONOP_EXPR(node));          \
-        MONOP_TRANSP(node) = EXPR_TRANSP(MONOP_EXPR(node));                    \
         CCNcycleNotify();                                                      \
     }

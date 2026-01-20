@@ -4,14 +4,6 @@
 #include "globals/globals.h"
 #include "macros.h"
 
-#define CHECK_FFINITE_MATH_ONLY()                                              \
-    if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
-        return node;
-
-#define CHECK_FNO_SIGNED_ZEROS()                                               \
-    if (EXPR_RESOLVED_TY(node) == TY_float && globals.fsigned_zeros)           \
-        return node;
-
 node_st *AOImonop(node_st *node) {
     TRAVchildren(node);
 
@@ -126,15 +118,10 @@ node_st *AOIbinop(node_st *node) {
     switch (BINOP_OP(node)) {
     case BO_add:
     case BO_sub:
-        if (EXPR_TRANSP(right) && NODE_TYPE(left) == NT_BOOL &&
-            BOOL_VAL(left) == true) {
-            // (true + x) => true | x no side effects
-            TAKE(BINOP_LEFT(node));
-            break;
-        } else if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
-                   (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0 &&
-                    (!globals.fsigned_zeros || signbit(FLOAT_VAL(left)))) ||
-                   (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
+        if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
+            (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0 &&
+             (!globals.fsigned_zeros || signbit(FLOAT_VAL(left)))) ||
+            (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
             // ({0, 0.0, false} + x) => x
             // ({0, 0.0} - x) => (-x)
             if (BINOP_OP(node) == BO_sub) {
@@ -162,17 +149,8 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_mul:
-        if (EXPR_TRANSP(right) &&
-            ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
-             (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
-             (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false))) {
-            CHECK_FFINITE_MATH_ONLY();
-            CHECK_FNO_SIGNED_ZEROS();
-            // ({0, 0.0, false} * x) => {0, 0.0, false} | x no side effects
-            TAKE(BINOP_LEFT(node));
-            break;
-        } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_not &&
-                   NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_not) {
+        if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_not &&
+            NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_not) {
             // ((!x) * (!y)) => (!(x + y))
             BINOP_OP(node) = BO_add;
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
@@ -222,11 +200,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_mod:
-        if (EXPR_TRANSP(left) && NODE_TYPE(right) == NT_INT &&
-            INT_VAL(BINOP_RIGHT(node)) == 1) {
-            // (x % 1) => 1 | x no side effects
-            TAKE(BINOP_RIGHT(node));
-        } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_neg) {
+        if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_neg) {
             // ((-x) % y) => (-(x % y))
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             WRAP(MO_neg);

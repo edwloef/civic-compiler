@@ -92,11 +92,8 @@ node_st *AORbinop(node_st *node) {
         break;
     case BO_and:
     case BO_or:
-        if ((NODE_TYPE(right) == NT_BOOL &&
-             (EXPR_TRANSP(left) || (BINOP_OP(node) == BO_or)))) {
+        if ((NODE_TYPE(right) == NT_BOOL && (BINOP_OP(node) == BO_or))) {
             // (x && true) => (true && x)
-            // (x && false) => (false && x) | x no side effects
-            // (x || true) => (true || x) | x no side effects
             // (x || false) => (false || x)
             BINOP_LEFT(node) = right;
             BINOP_RIGHT(node) = left;

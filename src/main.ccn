@@ -137,17 +137,6 @@ cycle AstOpt {
             nodes = { Monop, Binop, Cast }
         };
 
-        traversal Transp {
-            uid = AOT,
-            nodes = Expr | { Program, FunDecl, FunBody, Assign, Exprs },
-            travdata {
-                user funtable_ptr funtable,
-                user vartable_ptr vartable,
-                int level,
-                int min_level
-            }
-        };
-
         traversal TrivialControlFlow {
             uid = AOTCF,
             nodes = { Stmts }
