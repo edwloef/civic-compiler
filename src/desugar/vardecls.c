@@ -70,6 +70,7 @@ node_st *DVDdecls(node_st *node) {
              expr = EXPRS_NEXT(expr), i++) {
             node_st *ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
             node_st *decl = ASTassign(CCNcopy(ref), EXPRS_EXPR(expr));
+            VARREF_WRITE(ASSIGN_REF(decl)) = true;
             EXPRS_EXPR(expr) = ref;
 
             vartable_ref tr = {VARREF_N(ref), VARREF_L(ref)};

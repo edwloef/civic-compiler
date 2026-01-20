@@ -22,6 +22,7 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
     if (ref_dims == EXPR_RESOLVED_DIMS(expr)) {
         if (ref_dims == 0) {
             VARREF_EXPRS(ref) = DAArev_exprs(VARREF_EXPRS(ref));
+            VARREF_WRITE(ref) = true;
             return ASTstmts(ASTassign(ref, expr), NULL);
         } else {
             node_st *stmts = NULL;
@@ -135,6 +136,7 @@ node_st *DAAassign(node_st *node) {
         node_st *ref =
             vartable_temp_var(DATA_DAA_GET()->vartable, EXPR_RESOLVED_TY(expr));
         node_st *assign = ASTassign(CCNcopy(ref), expr);
+        VARREF_WRITE(ASSIGN_REF(assign)) = true;
         ASSIGN_EXPR(node) = ref;
 
         DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
@@ -173,6 +175,7 @@ node_st *DAAarrexprs(node_st *node) {
     node_st *ref =
         vartable_temp_var(DATA_DAA_GET()->vartable, EXPR_RESOLVED_TY(expr));
     node_st *assign = ASTassign(CCNcopy(ref), expr);
+    VARREF_WRITE(ASSIGN_REF(assign)) = true;
     ARREXPRS_EXPR(node) = ref;
 
     DATA_DAA_GET()->stmts = ASTstmts(assign, DATA_DAA_GET()->stmts);
