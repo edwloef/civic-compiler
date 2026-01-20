@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "palm/str.h"
+#include "table/table.h"
 
 #define TAKE(n)                                                                \
     {                                                                          \
@@ -66,7 +67,35 @@ node_st *DVDdecls(node_st *node) {
 
     node_st *decl = DECLS_DECL(node);
     if (NODE_TYPE(decl) == NT_VARDECL) {
+        node_st *root = NULL;
+        node_st *stmts = NULL;
+
         vartable_ref r = {0, VARDECL_L(decl)};
+
+        int i = 0;
+        for (node_st *expr = TYPE_EXPRS(VARDECL_TY(decl)); expr;
+             expr = EXPRS_NEXT(expr), i++) {
+            if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
+                !VARREF_EXPRS(EXPRS_EXPR(expr))) {
+                continue;
+            }
+
+            node_st *ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
+            node_st *decl = ASTassign(CCNcopy(ref), EXPRS_EXPR(expr));
+            EXPRS_EXPR(expr) = ref;
+
+            vartable_ref tr = {VARREF_N(ref), VARREF_L(ref)};
+            vartable_get(DATA_DVD_GET()->vartable, r)->ty.buf[i] = tr;
+
+            if (root) {
+                STMTS_NEXT(stmts) = ASTstmts(decl, NULL);
+                stmts = STMTS_NEXT(stmts);
+            } else {
+                stmts = ASTstmts(decl, NULL);
+                root = stmts;
+            }
+        }
+
         vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
         r.n = DATA_DVD_GET()->vartable->parent == NULL;
 
@@ -99,6 +128,11 @@ node_st *DVDdecls(node_st *node) {
             node_st *assign = ASTassign(ref, malloc);
 
             DATA_DVD_GET()->stmts = ASTstmts(assign, DATA_DVD_GET()->stmts);
+        }
+
+        if (stmts) {
+            STMTS_NEXT(stmts) = DATA_DVD_GET()->stmts;
+            DATA_DVD_GET()->stmts = root;
         }
 
         TAKE(DECLS_NEXT(node));

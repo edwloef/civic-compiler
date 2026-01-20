@@ -89,14 +89,6 @@ phase Desugar {
             nodes = { Cast }
         };
 
-        traversal ArrayDecls {
-            uid = DAD,
-            nodes = { Program, Decls, FunDecl },
-            travdata {
-                user vartable_ptr vartable
-            }
-        };
-
         traversal VarDecls {
             uid = DVD,
             nodes = { Program, FunDecl, FunBody, Decls, VarRef, Call },
