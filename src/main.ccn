@@ -440,7 +440,7 @@ node Int {
 
 node Float {
     attributes {
-        float val { constructor }
+        double val { constructor }
     }
 };
 

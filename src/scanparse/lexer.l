@@ -108,7 +108,7 @@ void token_action();
 
 (([0-9]+(\.[0-9]*)?)|([0-9]*\.[0-9]+))([Ee][+-]?[0-9]+)? {
                                                            errno = 0;
-                                                           yylval.cfloat = strtof(yytext, NULL);
+                                                           yylval.cfloat = strtod(yytext, NULL);
                                                            if (errno == ERANGE)
                                                                yyerror("floating point literal out of range");
                                                            FILTER(LIT_FLOAT);

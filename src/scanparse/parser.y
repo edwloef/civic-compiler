@@ -28,7 +28,7 @@ void yyerror(char const *errname);
 %union {
     bool cbool;
     int cint;
-    float cfloat;
+    double cfloat;
     char *cstr;
     enum BasicType basic_type;
     node_st *node;

@@ -356,7 +356,7 @@ node_st *PRTint(node_st *node) {
 }
 
 node_st *PRTfloat(node_st *node) {
-    printf("%f", FLOAT_VAL(node));
+    printf("%lf", FLOAT_VAL(node));
 
     return node;
 }
