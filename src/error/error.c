@@ -76,14 +76,23 @@ void emit_message_with_span(span span, level level, char *format, ...) {
         return;
     }
 
+    FILE *file = NULL;
+
+    if (!globals.quiet) {
+        file = fopen(span.file, "r");
+    }
+
+    if (!file) {
+        fprintf(stderr, "%s:%d:%d: ", span.file, span.bl + 1, span.bc + 1);
+    }
+
     va_list ap;
 
     va_start(ap, format);
     va_emit_message(level, format, ap);
     va_end(ap);
 
-    FILE *file = fopen(span.file, "r");
-    if (file == NULL) {
+    if (!file) {
         return;
     }
 

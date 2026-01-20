@@ -18,6 +18,8 @@ static void Usage(char *program) {
     printf("  -h --help                     This help message.\n");
     printf("  -o --output <output>          Output assembly to output file "
            "instead of STDOUT.\n");
+    printf(
+        "  -q --quiet                    Make compiler output less verbose.");
     printf("  -b --breakpoint <breakpoint>  Set a breakpoint.\n");
     printf("  -s --structure                Pretty print the structure of the "
            "compiler.\n");
@@ -40,6 +42,7 @@ static void Usage(char *program) {
 static struct option options[] = {
     {"help", no_argument, 0, 'h'},
     {"output", required_argument, 0, 'o'},
+    {"quiet", no_argument, 0, 'q'},
     {"breakpoint", required_argument, 0, 'b'},
     {"structure", no_argument, 0, 's'},
     {"fassociative-math", no_argument, 0, FASSOCIATIVE_MATH},
@@ -60,6 +63,9 @@ static void ProcessArgs(int argc, char *argv[]) {
             exit(EXIT_SUCCESS);
         case 'o':
             globals.output_file = optarg;
+            break;
+        case 'q':
+            globals.quiet = true;
             break;
         case 'b':
             if (isdigit(optarg[0])) {

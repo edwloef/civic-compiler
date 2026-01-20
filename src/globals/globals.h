@@ -10,6 +10,8 @@ struct globals {
     char *input_file;
     char *output_file;
 
+    bool quiet;
+
     bool fassociative_math;
     bool ffinite_math_only;
     bool fsigned_zeros;
