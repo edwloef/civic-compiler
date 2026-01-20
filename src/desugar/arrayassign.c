@@ -144,7 +144,7 @@ node_st *DAAassign(node_st *node) {
         node_st *assign = ASTassign(CCNcopy(ref), expr);
         ASSIGN_EXPR(node) = ref;
 
-        DATA_DAA_GET()->stmts = ASTstmts(assign, DATA_DAA_GET()->stmts);
+        DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
     }
 
     vartable_ref r = {VARREF_N(ASSIGN_REF(node)), VARREF_L(ASSIGN_REF(node))};

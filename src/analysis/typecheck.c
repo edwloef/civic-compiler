@@ -585,6 +585,11 @@ node_st *ATCcall(node_st *node) {
 
     node_st *arg = CALL_EXPRS(node);
     for (int i = 0; i < ty.len; i++) {
+        if (NODE_TYPE(EXPRS_EXPR(arg)) == NT_ARREXPRS) {
+            ERROR(EXPRS_EXPR(arg),
+                  "array literals are not allowed outside of assignments");
+        }
+
         thin_vartype expected_ty = ty.buf[i];
         thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(arg));
         if (resolved_ty.ty != TY_error) {
