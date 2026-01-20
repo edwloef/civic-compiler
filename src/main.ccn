@@ -87,8 +87,8 @@ phase Analysis {
 
 phase Desugar {
     actions {
-        traversal Casts {
-            uid = DC,
+        traversal BoolCasts {
+            uid = DBC,
             nodes = { Cast }
         };
 

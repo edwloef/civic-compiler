@@ -1,7 +1,7 @@
 #include "ccn/ccn.h"
 #include "macros.h"
 
-node_st *DCcast(node_st *node) {
+node_st *DBCcast(node_st *node) {
     TRAVchildren(node);
 
     if (CAST_TY(node) == TY_bool) {
