@@ -1,14 +1,7 @@
 #include "ccn/ccn.h"
+#include "macros.h"
 #include "palm/str.h"
 #include "table/table.h"
-
-#define TAKE(n)                                                                \
-    {                                                                          \
-        node_st *tmp = n;                                                      \
-        n = NULL;                                                              \
-        CCNfree(node);                                                         \
-        node = tmp;                                                            \
-    }
 
 void DVDinit(void) {}
 void DVDfini(void) {}

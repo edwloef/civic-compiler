@@ -1,14 +1,7 @@
 #include "ccn/ccn.h"
+#include "macros.h"
 #include "palm/str.h"
 #include "table/table.h"
-
-#define TAKE(n)                                                                \
-    {                                                                          \
-        node_st *tmp = n;                                                      \
-        n = NULL;                                                              \
-        CCNfree(node);                                                         \
-        node = tmp;                                                            \
-    }
 
 static node_st *DAArev_exprs(node_st *root) {
     node_st *curr = root;

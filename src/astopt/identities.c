@@ -2,6 +2,7 @@
 
 #include "ccn/ccn.h"
 #include "globals/globals.h"
+#include "macros.h"
 
 #define CHECK_FFINITE_MATH_ONLY()                                              \
     if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
@@ -10,31 +11,6 @@
 #define CHECK_FNO_SIGNED_ZEROS()                                               \
     if (EXPR_RESOLVED_TY(node) == TY_float && globals.fsigned_zeros)           \
         return node;
-
-#define TAKE(n)                                                                \
-    {                                                                          \
-        node_st *tmp = n;                                                      \
-        n = NULL;                                                              \
-        CCNfree(node);                                                         \
-        CCNcycleNotify();                                                      \
-        node = tmp;                                                            \
-    }
-
-#define SWAP(n, e)                                                             \
-    {                                                                          \
-        node_st *tmp = n;                                                      \
-        n = e;                                                                 \
-        e = NULL;                                                              \
-        CCNfree(tmp);                                                          \
-        CCNcycleNotify();                                                      \
-    }
-
-#define WRAP(o)                                                                \
-    {                                                                          \
-        node = ASTmonop(node, o);                                              \
-        MONOP_TRANSP(node) = EXPR_TRANSP(MONOP_EXPR(node));                    \
-        CCNcycleNotify();                                                      \
-    }
 
 node_st *AOImonop(node_st *node) {
     TRAVchildren(node);

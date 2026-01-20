@@ -1,12 +1,5 @@
 #include "ccn/ccn.h"
-
-#define TAKE(n)                                                                \
-    {                                                                          \
-        node_st *tmp = n;                                                      \
-        n = NULL;                                                              \
-        CCNfree(node);                                                         \
-        node = tmp;                                                            \
-    }
+#include "macros.h"
 
 node_st *DCcast(node_st *node) {
     TRAVchildren(node);

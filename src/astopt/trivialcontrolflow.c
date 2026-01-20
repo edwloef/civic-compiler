@@ -1,13 +1,5 @@
 #include "ccn/ccn.h"
-
-#define TAKE(n)                                                                \
-    {                                                                          \
-        node_st *tmp = n;                                                      \
-        n = NULL;                                                              \
-        CCNfree(node);                                                         \
-        CCNcycleNotify();                                                      \
-        node = tmp;                                                            \
-    }
+#include "macros.h"
 
 static void AOTCFdiverges(node_st *node) {
     if (STMTS_NEXT(node)) {
