@@ -89,26 +89,35 @@ phase Desugar {
             nodes = { Cast }
         };
 
-        traversal DeclExprs {
-            uid = DDE,
+        traversal ArrayDecls {
+            uid = DAD,
             nodes = { Program, Decls, FunDecl },
             travdata {
                 user vartable_ptr vartable
             }
         };
 
-        traversal ArrayDecls {
-            uid = DAD,
-            nodes = { Program, FunBody, Decls, VarRef, Call, FunDecl },
+        traversal VarDecls {
+            uid = DVD,
+            nodes = { Program, FunDecl, FunBody, Decls, VarRef, Call },
             travdata {
-                Stmts stmts,
-                user vartable_ptr vartable
+                user vartable_ptr vartable,
+                Stmts stmts
+            }
+        };
+
+        traversal ArrayAssign {
+            uid = DAA,
+            nodes = { Program, FunDecl, Stmts, Assign, ArrExprs },
+            travdata {
+                user vartable_ptr vartable,
+                Stmts stmts
             }
         };
 
         traversal DimReduce {
             uid = DDR,
-            nodes = { Program, FunDecl, VarRef },
+            nodes = { Program, FunDecl, VarRef, Malloc },
             travdata {
                 user vartable_ptr vartable
             }
@@ -228,7 +237,7 @@ node Exprs {
 };
 
 nodeset Expr {
-    nodes = { ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool },
+    nodes = { ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool, Malloc },
 
     attributes {
         BasicType resolved_ty,
@@ -246,15 +255,11 @@ node ArrExprs {
 
 node Malloc {
     children {
-        Expr size { constructor, mandatory }
-    },
-
-    attributes {
-        BasicType ty { constructor }
+        Exprs exprs { constructor, mandatory }
     },
 
     lifetime {
-        allowed (Desugar.ArrayDecls -> )
+        allowed (Desugar.VarDecls -> )
     }
 };
 
@@ -311,6 +316,10 @@ node VarDecl {
         bool external,
         bool global,
         int l
+    },
+
+    lifetime {
+        allowed ( -> Desugar.VarDecls]
     }
 };
 

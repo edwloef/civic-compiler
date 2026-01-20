@@ -313,8 +313,8 @@ node_st *PRTcast(node_st *node) {
 }
 
 node_st *PRTmalloc(node_st *node) {
-    printf("malloc(");
-    TRAVsize(node);
+    printf("__malloc(");
+    TRAVexprs(node);
     printf(")");
     return node;
 }
