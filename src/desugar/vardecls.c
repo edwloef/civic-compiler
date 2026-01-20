@@ -85,14 +85,6 @@ node_st *DVDdecls(node_st *node) {
         }
 
         if (TYPE_EXPRS(VARDECL_TY(decl))) {
-            if (!DATA_DVD_GET()->vartable->parent) {
-                vartable_ref r = {0, VARDECL_L(decl)};
-                vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
-                for (int i = 0; i < e->ty.len; i++) {
-                    e->ty.buf[i].n++;
-                }
-            }
-
             node_st *ref = ASTvarref(CCNcopy(VARDECL_ID(decl)), NULL);
             VARREF_N(ref) = r.n;
             VARREF_L(ref) = r.l;

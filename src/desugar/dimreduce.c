@@ -55,12 +55,13 @@ node_st *DDRvarref(node_st *node) {
     int i = e->ty.len - 1;
     for (node_st *right = EXPRS_NEXT(exprs); right;
          right = EXPRS_NEXT(right), i--) {
-        vartable_ref r = e->ty.buf[i];
-        char *name = vartable_get(DATA_DDR_GET()->vartable, r)->name;
+        vartable_ref dr = e->ty.buf[i];
+        dr.n += r.n;
+        char *name = vartable_get(DATA_DDR_GET()->vartable, dr)->name;
 
         node_st *dim = ASTvarref(ASTid(STRcpy(name)), NULL);
-        VARREF_N(dim) = r.n;
-        VARREF_L(dim) = r.l;
+        VARREF_N(dim) = dr.n;
+        VARREF_L(dim) = dr.l;
         VARREF_RESOLVED_TY(dim) = TY_int;
 
         EXPRS_EXPR(exprs) = ASTbinop(ASTbinop(EXPRS_EXPR(exprs), dim, BO_mul),
