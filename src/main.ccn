@@ -9,7 +9,10 @@ start phase RootPhase {
 };
 
 traversal Print {
-    uid = PRT
+    uid = PRT,
+    travdata {
+        int indent
+    }
 };
 
 phase Stats {
