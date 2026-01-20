@@ -36,6 +36,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/analysis/resolve.c
     src/analysis/typecheck.c
     src/astopt/constfold.c
+    src/astopt/copyprop.c
     src/astopt/identities.c
     src/astopt/reassoc.c
     src/astopt/trivialcontrolflow.c

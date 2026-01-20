@@ -127,6 +127,11 @@ phase Desugar {
 
 cycle AstOpt {
     actions {
+        traversal CopyProp {
+            uid = AOCP,
+            nodes = { Stmts }
+        };
+
         traversal Reassoc {
             uid = AOR,
             nodes = { Binop }
@@ -146,6 +151,16 @@ cycle AstOpt {
             uid = AOI,
             nodes = { Monop, Binop, Cast }
         };
+    }
+};
+
+traversal PropagateValue {
+    uid = PV,
+    nodes = Stmt | { VarRef },
+    travdata {
+        Expr expr,
+        int n,
+        int l
     }
 };
 

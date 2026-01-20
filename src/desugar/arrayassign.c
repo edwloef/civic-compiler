@@ -165,12 +165,7 @@ node_st *DAAassign(node_st *node) {
 node_st *DAAarrexprs(node_st *node) {
     TRAVchildren(node);
 
-    if (NODE_TYPE(ARREXPRS_EXPR(node)) == NT_ARREXPRS ||
-        NODE_TYPE(ARREXPRS_EXPR(node)) == NT_INT ||
-        NODE_TYPE(ARREXPRS_EXPR(node)) == NT_FLOAT ||
-        NODE_TYPE(ARREXPRS_EXPR(node)) == NT_BOOL ||
-        (NODE_TYPE(ARREXPRS_EXPR(node)) == NT_VARREF &&
-         !VARREF_EXPRS(ARREXPRS_EXPR(node)))) {
+    if (NODE_TYPE(ARREXPRS_EXPR(node)) == NT_ARREXPRS) {
         return node;
     }
 

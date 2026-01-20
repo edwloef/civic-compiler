@@ -68,11 +68,6 @@ node_st *DVDdecls(node_st *node) {
         int i = 0;
         for (node_st *expr = TYPE_EXPRS(VARDECL_TY(decl)); expr;
              expr = EXPRS_NEXT(expr), i++) {
-            if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
-                !VARREF_EXPRS(EXPRS_EXPR(expr))) {
-                continue;
-            }
-
             node_st *ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
             node_st *decl = ASTassign(CCNcopy(ref), EXPRS_EXPR(expr));
             EXPRS_EXPR(expr) = ref;

@@ -65,25 +65,6 @@ node_st *AOTCFstmts(node_st *node) {
             }
         }
         break;
-    case NT_FOR:
-        if (NODE_TYPE(FOR_LOOP_START(stmt)) == NT_INT &&
-            NODE_TYPE(FOR_LOOP_END(stmt)) == NT_INT &&
-            NODE_TYPE(FOR_LOOP_STEP(stmt)) == NT_INT) {
-            if (INT_VAL(FOR_LOOP_START(stmt)) == INT_VAL(FOR_LOOP_END(stmt)) ||
-                ((INT_VAL(FOR_LOOP_START(stmt)) >
-                  INT_VAL(FOR_LOOP_END(stmt))) ==
-                 (INT_VAL(FOR_LOOP_STEP(stmt)) > 0))) {
-                STMTS_STMT(node) = CCNfree(STMTS_STMT(node));
-                node = AOTCFinlinestmts(node, NULL);
-            } else if (INT_VAL(FOR_LOOP_END(stmt)) -
-                           INT_VAL(FOR_LOOP_START(stmt)) <=
-                       INT_VAL(FOR_LOOP_STEP(stmt))) {
-                node_st *stmts = FOR_STMTS(stmt);
-                FOR_STMTS(stmt) = NULL;
-                node = AOTCFinlinestmts(node, stmts);
-            }
-        }
-        break;
     case NT_RETURN:
         AOTCFdiverges(node);
         break;

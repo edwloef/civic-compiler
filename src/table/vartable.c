@@ -73,12 +73,8 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
 }
 
 node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
-    int n = 0;
-    for (vartable *parent = self->parent; parent; parent = parent->parent) {
-        n++;
-    }
-
-    char *name = STRfmt("_%d_%d", n, self->len);
+    static int temp_var_index = 0;
+    char *name = STRfmt("_%d", temp_var_index++);
     vartable_entry e = {
         name, vartype_new(ty), {0, 0, 0, 0, NULL}, 0, 0, false, false, false,
         false};
