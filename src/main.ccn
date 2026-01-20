@@ -147,7 +147,7 @@ cycle AstOpt {
 
         traversal Identities {
             uid = AOI,
-            nodes = { Monop, Binop }
+            nodes = { Monop, Binop, Cast }
         };
     }
 };

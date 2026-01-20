@@ -311,3 +311,22 @@ node_st *AOIbinop(node_st *node) {
 
     return node;
 }
+
+node_st *AOIcast(node_st *node) {
+    TRAVchildren(node);
+
+    if (CAST_TY(node) == EXPR_RESOLVED_TY(CAST_EXPR(node))) {
+        // ((int) intval) => intval
+        // ((float) floatval) => floatval
+        // ((bool) boolval) => boolval
+        TAKE(CAST_EXPR(node));
+    } else if (CAST_TY(node) == TY_int) {
+        if (NODE_TYPE(CAST_EXPR(node)) == NT_CAST &&
+            CAST_TY(CAST_EXPR(node)) == TY_float) {
+            // ((int) ((float) x)) => (int) x
+            SWAP(CAST_EXPR(node), CAST_EXPR(tmp));
+        }
+    }
+
+    return node;
+}
