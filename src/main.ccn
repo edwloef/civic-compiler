@@ -127,6 +127,14 @@ phase Desugar {
 
 cycle AstOpt {
     actions {
+        traversal CountWrites {
+            uid = CW,
+            nodes = { Program, FunDecl, VarRef },
+            travdata {
+                user vartable_ptr vartable
+            }
+        };
+
         traversal CopyProp {
             uid = AOCP,
             nodes = { Program, FunDecl, Stmts },
@@ -157,19 +165,22 @@ cycle AstOpt {
     }
 };
 
-traversal CountWrites {
-    uid = CW,
-    nodes = { Program, FunDecl, VarRef },
-    travdata {
-        user vartable_ptr vartable
-    }
-};
-
 traversal PropagateValue {
     uid = PV,
     nodes = Stmt | { VarRef },
     travdata {
         Expr expr,
+        int write_count,
+        int n,
+        int l
+    }
+};
+
+traversal ValuePropagatable {
+    uid = VP,
+    nodes = { Call, VarRef },
+    travdata {
+        bool propagatable,
         int write_count,
         int n,
         int l
