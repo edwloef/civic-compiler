@@ -127,6 +127,22 @@ phase Desugar {
 
 cycle AstOpt {
     actions {
+        traversal CountCalls {
+            uid = AOCC,
+            nodes = { Program, FunBody, Call },
+            travdata {
+                user funtable_ptr funtable
+            }
+        };
+
+        traversal DeadFunctions {
+            uid = AODF,
+            nodes = { Program, Decls, FunBody },
+            travdata {
+                user funtable_ptr funtable
+            }
+        };
+
         traversal CountWrites {
             uid = AOCW,
             nodes = { Program, FunDecl, VarRef },

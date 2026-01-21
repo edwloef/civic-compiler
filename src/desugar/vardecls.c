@@ -14,19 +14,22 @@ node_st *DVDprogram(node_st *node) {
     node_st *decl = ASTfundecl(ASTid(STRcpy("__init")), NULL, TY_void);
     node_st *body = ASTfunbody(NULL, DATA_DVD_GET()->stmts);
 
+    FUNDECL_EXPORTED(decl) = true;
     FUNDECL_BODY(decl) = body;
 
     FUNDECL_VARTABLE(decl) = vartable_new(PROGRAM_VARTABLE(node));
     FUNBODY_FUNTABLE(body) = funtable_new(PROGRAM_FUNTABLE(node));
 
-    funtable_push(PROGRAM_FUNTABLE(node), (funtable_entry){"__init",
-                                                           funtype_new(TY_void),
-                                                           {0, 0, 0, 0, NULL},
-                                                           1,
-                                                           0,
-                                                           false,
-                                                           false,
-                                                           false});
+    funtable_ref r = funtable_push(PROGRAM_FUNTABLE(node),
+                                   (funtable_entry){"__init",
+                                                    funtype_new(TY_void),
+                                                    {0, 0, 0, 0, NULL},
+                                                    1,
+                                                    0,
+                                                    false,
+                                                    true});
+
+    FUNDECL_L(decl) = r.l;
 
     PROGRAM_DECLS(node) = ASTdecls(decl, PROGRAM_DECLS(node));
 

@@ -4,6 +4,15 @@ void AOCRinit(void) {}
 void AOCRfini(void) {}
 
 node_st *AOCRprogram(node_st *node) {
+    for (int i = 0; i < PROGRAM_VARTABLE(node)->len; i++) {
+        vartable_entry *e = &PROGRAM_VARTABLE(node)->buf[i];
+        if (e->exported || e->external) {
+            e->read_count = 2;
+        } else {
+            e->read_count = 0;
+        }
+    }
+
     DATA_AOCR_GET()->vartable = PROGRAM_VARTABLE(node);
 
     TRAVchildren(node);

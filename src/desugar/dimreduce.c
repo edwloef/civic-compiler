@@ -57,9 +57,9 @@ node_st *DDRvarref(node_st *node) {
          right = EXPRS_NEXT(right), i--) {
         vartable_ref dr = e->ty.buf[i];
         dr.n += r.n;
-        char *name = vartable_get(DATA_DDR_GET()->vartable, dr)->name;
+        vartable_entry *e = vartable_get(DATA_DDR_GET()->vartable, dr);
 
-        node_st *dim = ASTvarref(ASTid(STRcpy(name)), NULL);
+        node_st *dim = ASTvarref(ASTid(STRcpy(e->name)), NULL);
         VARREF_N(dim) = dr.n;
         VARREF_L(dim) = dr.l;
         VARREF_RESOLVED_TY(dim) = TY_int;

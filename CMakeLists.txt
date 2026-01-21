@@ -39,8 +39,10 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/checkproploop.c
     src/astopt/constfold.c
     src/astopt/copyprop.c
+    src/astopt/countcalls.c
     src/astopt/countreads.c
     src/astopt/countwrites.c
+    src/astopt/deadfunctions.c
     src/astopt/deadstores.c
     src/astopt/extractcalls.c
     src/astopt/identities.c
@@ -62,6 +64,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/table/funtable.c
     src/table/vartable.c
     src/main.c
+    src/utils.c
 )
 
 target_compile_options(civicc PRIVATE

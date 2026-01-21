@@ -1,21 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "macros.h"
-
-static node_st *AODSinlinestmts(node_st *node, node_st *stmts) {
-    TAKE(STMTS_NEXT(node));
-
-    if (stmts) {
-        node_st *tmp = stmts;
-        while (STMTS_NEXT(tmp)) {
-            tmp = STMTS_NEXT(tmp);
-        }
-        STMTS_NEXT(tmp) = node;
-        return stmts;
-    } else {
-        return node;
-    }
-}
+#include "utils.h"
 
 void AODSinit(void) {}
 void AODSfini(void) {}
@@ -73,7 +58,7 @@ node_st *AODSstmts(node_st *node) {
             TRAVpush(TRAV_EC);
 
             TRAVexpr(stmt);
-            node = AODSinlinestmts(node, DATA_EC_GET()->stmts);
+            node = inline_stmts(node, DATA_EC_GET()->stmts);
 
             TRAVpop();
         }
