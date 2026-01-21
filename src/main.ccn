@@ -290,7 +290,7 @@ enum BinOpKind {
 
 root node Program {
     children {
-        Decls decls { constructor, mandatory }
+        Decls decls { constructor }
     },
 
     attributes {

@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "macros.h"
+#include "palm/str.h"
 
 void AODFinit(void) {}
 void AODFfini(void) {}
@@ -18,7 +19,8 @@ node_st *AODFdecls(node_st *node) {
     node_st *decl = DECLS_DECL(node);
     funtable_ref r = {0, FUNDECL_L(decl)};
     funtable_entry *e = funtable_get(DATA_AODF_GET()->funtable, r);
-    if (e->call_count == 0) {
+    if (e->call_count == 0 ||
+        (STReq(e->name, "__init") && !FUNBODY_STMTS(FUNDECL_BODY(decl)))) {
         TRAVstart(decl, TRAV_F);
         TAKE(DECLS_NEXT(node));
     }
