@@ -56,7 +56,7 @@ node_st *CDfor(node_st *node) {
 node_st *CDcall(node_st *node) {
     TRAVchildren(node);
 
-    if (CALL_N(node) >= VARREF_N(DATA_CD_GET()->ref)) {
+    if (CALL_N(node) <= VARREF_N(DATA_CD_GET()->ref)) {
         DATA_CD_GET()->assign_is_dead = false;
     }
 

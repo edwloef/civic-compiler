@@ -102,7 +102,7 @@ node_st *VPreturn(node_st *node) {
 node_st *VPcall(node_st *node) {
     TRAVchildren(node);
 
-    if (DATA_VP_GET()->write_count > 1 && CALL_N(node) >= DATA_VP_GET()->n) {
+    if (DATA_VP_GET()->write_count > 1 && CALL_N(node) <= DATA_VP_GET()->n) {
         DATA_VP_GET()->expr = NULL;
     }
 
