@@ -165,9 +165,9 @@ cycle AstOpt {
     }
 };
 
-traversal PropagateValue {
+traversal PropValue {
     uid = PV,
-    nodes = Stmt | { VarRef },
+    nodes = Stmt | { Stmts, VarRef },
     travdata {
         Expr expr,
         int write_count,
@@ -176,11 +176,21 @@ traversal PropagateValue {
     }
 };
 
-traversal ValuePropagatable {
-    uid = VP,
+traversal PropIntoLoop {
+    uid = PIL,
+    nodes = { VarRef },
+    travdata {
+        Expr expr,
+        int n,
+        int l
+    }
+};
+
+traversal CheckProp {
+    uid = CP,
     nodes = { Call, VarRef },
     travdata {
-        bool propagatable,
+        bool can_prop,
         int write_count,
         int n,
         int l

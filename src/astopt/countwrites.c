@@ -16,7 +16,7 @@ node_st *CWfundecl(node_st *node) {
         vartable_entry *e = &FUNDECL_VARTABLE(node)->buf[i];
         if (e->external || e->exported) {
             e->write_count = 2;
-        } else if (e->param) {
+        } else if (e->param || e->loopvar) {
             e->write_count = 1;
         }
     }

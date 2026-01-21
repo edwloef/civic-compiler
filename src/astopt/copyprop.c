@@ -38,12 +38,10 @@ node_st *AOCPstmts(node_st *node) {
 
         DATA_PV_GET()->expr = ASSIGN_EXPR(stmt);
 
-        if (NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF) {
-            vartable_ref r = {VARREF_N(ASSIGN_EXPR(stmt)),
-                              VARREF_L(ASSIGN_EXPR(stmt))};
-            vartable_entry *e = vartable_get(vartable, r);
-            DATA_PV_GET()->write_count = e->write_count;
-        }
+        vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
+                          VARREF_L(ASSIGN_REF(stmt))};
+        vartable_entry *e = vartable_get(vartable, r);
+        DATA_PV_GET()->write_count = e->write_count;
 
         DATA_PV_GET()->n = VARREF_N(ASSIGN_REF(stmt));
         DATA_PV_GET()->l = VARREF_L(ASSIGN_REF(stmt));
