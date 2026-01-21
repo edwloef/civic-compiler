@@ -2,23 +2,53 @@
 #include "ccngen/trav.h"
 
 void CDinit(void) {
-    DATA_CD_GET()->is_dead = true;
+    DATA_CD_GET()->assign_is_dead = true;
 }
 void CDfini(void) {}
 
 node_st *CDstmts(node_st *node) {
     TRAVstmt(node);
 
-    node_st *stmt = STMTS_STMT(node);
-    if (NODE_TYPE(stmt) == NT_ASSIGN &&
-        VARREF_N(ASSIGN_REF(stmt)) == DATA_CD_GET()->n &&
-        VARREF_L(ASSIGN_REF(stmt)) == DATA_CD_GET()->l) {
+    if (DATA_CD_GET()->ref_is_dead) {
         return node;
     }
 
-    if (DATA_CD_GET()->is_dead) {
-        TRAVnext(node);
+    if (DATA_CD_GET()->assign_is_dead) {
+        if (STMTS_NEXT(node)) {
+            TRAVnext(node);
+        } else {
+            node_st *parent = DATA_CD_GET()->parent;
+            if (parent) {
+                DATA_CD_GET()->parent = SCOPE_PARENT(parent);
+                TRAVstmts(parent);
+            }
+        }
     }
+
+    return node;
+}
+
+node_st *CDifelse(node_st *node) {
+    TRAVexpr(node);
+
+    bool prev = DATA_CD_GET()->ref_is_dead;
+
+    TRAVif_block(node);
+
+    bool ref_is_dead = DATA_CD_GET()->ref_is_dead;
+    DATA_CD_GET()->ref_is_dead = prev;
+
+    TRAVelse_block(node);
+
+    DATA_CD_GET()->ref_is_dead &= ref_is_dead;
+
+    return node;
+}
+
+node_st *CDfor(node_st *node) {
+    TRAVchildren(node);
+
+    DATA_CD_GET()->ref_is_dead = false;
 
     return node;
 }
@@ -26,7 +56,9 @@ node_st *CDstmts(node_st *node) {
 node_st *CDcall(node_st *node) {
     TRAVchildren(node);
 
-    DATA_CD_GET()->is_dead = false;
+    if (CALL_N(node) >= VARREF_N(DATA_CD_GET()->ref)) {
+        DATA_CD_GET()->assign_is_dead = false;
+    }
 
     return node;
 }
@@ -34,9 +66,17 @@ node_st *CDcall(node_st *node) {
 node_st *CDvarref(node_st *node) {
     TRAVchildren(node);
 
-    if (DATA_CD_GET()->n == VARREF_N(node) &&
-        DATA_CD_GET()->l == VARREF_L(node) && !VARREF_WRITE(node)) {
-        DATA_CD_GET()->is_dead = false;
+    if (node == DATA_CD_GET()->ref) {
+        DATA_CD_GET()->seen = true;
+    } else if (VARREF_N(DATA_CD_GET()->ref) == VARREF_N(node) &&
+               VARREF_L(DATA_CD_GET()->ref) == VARREF_L(node)) {
+        if (VARREF_WRITE(node)) {
+            if (DATA_CD_GET()->seen) {
+                DATA_CD_GET()->ref_is_dead = true;
+            }
+        } else {
+            DATA_CD_GET()->assign_is_dead = false;
+        }
     }
 
     return node;

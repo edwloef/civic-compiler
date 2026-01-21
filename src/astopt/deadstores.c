@@ -39,22 +39,37 @@ node_st *AODSfundecl(node_st *node) {
 }
 
 node_st *AODSstmts(node_st *node) {
-    TRAVchildren(node);
+    TRAVnext(node);
 
     node_st *stmt = STMTS_STMT(node);
-    if (NODE_TYPE(stmt) == NT_ASSIGN && !VARREF_EXPRS(ASSIGN_REF(stmt))) {
-        TRAVpush(TRAV_CD);
+    if (NODE_TYPE(stmt) == NT_ASSIGN && !VARREF_EXPRS(ASSIGN_REF(stmt)) &&
+        NODE_TYPE(ASSIGN_EXPR(stmt)) != NT_MALLOC) {
+        vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
+                          VARREF_L(ASSIGN_REF(stmt))};
+        vartable_entry *e = vartable_get(DATA_AODS_GET()->vartable, r);
 
-        DATA_CD_GET()->n = VARREF_N(ASSIGN_REF(stmt));
-        DATA_CD_GET()->l = VARREF_L(ASSIGN_REF(stmt));
+        bool assign_is_dead = e->read_count == 0;
 
-        TRAVnext(node);
+        if (!assign_is_dead) {
+            node_st *parent = DATA_AODS_GET()->parent;
+            node_st *trav = DATA_AODS_GET()->outer_loop;
+            if (!trav) {
+                trav = node;
+            }
 
-        bool is_dead = DATA_CD_GET()->is_dead;
+            TRAVpush(TRAV_CD);
 
-        TRAVpop();
+            DATA_CD_GET()->parent = parent;
+            DATA_CD_GET()->ref = ASSIGN_REF(stmt);
 
-        if (is_dead) {
+            TRAVopt(trav);
+
+            assign_is_dead = DATA_CD_GET()->assign_is_dead;
+
+            TRAVpop();
+        }
+
+        if (assign_is_dead) {
             TRAVpush(TRAV_EC);
 
             TRAVexpr(stmt);
@@ -62,31 +77,30 @@ node_st *AODSstmts(node_st *node) {
 
             TRAVpop();
         }
+    } else if (NODE_TYPE(stmt) == NT_DOWHILE || NODE_TYPE(stmt) == NT_FOR) {
+        bool outer = DATA_AODS_GET()->outer_loop == NULL;
+        if (outer) {
+            DATA_AODS_GET()->outer_loop = node;
+        }
+
+        TRAVstmt(node);
+
+        if (outer) {
+            DATA_AODS_GET()->outer_loop = NULL;
+        }
+    } else if (NODE_TYPE(stmt) == NT_IFELSE && !DATA_AODS_GET()->outer_loop) {
+        node_st *parent = ASTscope(STMTS_NEXT(node), DATA_AODS_GET()->parent);
+        DATA_AODS_GET()->parent = parent;
+
+        TRAVstmt(node);
+
+        DATA_AODS_GET()->parent = SCOPE_PARENT(parent);
+        SCOPE_STMTS(parent) = NULL;
+        SCOPE_PARENT(parent) = NULL;
+        CCNfree(parent);
+    } else {
+        TRAVstmt(node);
     }
-
-    return node;
-}
-
-node_st *AODSifelse(node_st *node) {
-    TRAVexpr(node);
-
-    // TODO
-
-    return node;
-}
-
-node_st *AODSdowhile(node_st *node) {
-    // TODO
-
-    return node;
-}
-
-node_st *AODSfor(node_st *node) {
-    TRAVloop_start(node);
-    TRAVloop_end(node);
-    TRAVloop_step(node);
-
-    // TODO
 
     return node;
 }

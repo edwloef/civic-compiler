@@ -78,6 +78,12 @@ char *fmt_BinOpKind(enum BinOpKind bo) {
 void PRTinit(void) {}
 void PRTfini(void) {}
 
+node_st *PRTscope(node_st *node) {
+    DBUG_ASSERT(false, "Unreachable.");
+
+    return node;
+}
+
 node_st *PRTprogram(node_st *node) {
     TRAVchildren(node);
 

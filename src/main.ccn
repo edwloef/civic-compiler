@@ -143,10 +143,20 @@ cycle AstOpt {
             }
         };
 
+        traversal CountReads {
+            uid = AOCR,
+            nodes = { Program, FunDecl, VarRef },
+            travdata {
+                user vartable_ptr vartable
+            }
+        };
+
         traversal DeadStores {
             uid = AODS,
-            nodes = { Program, FunDecl, IfElse, Stmts, DoWhile, For },
+            nodes = { Program, FunDecl, Stmts },
             travdata {
+                Scope parent,
+                Stmts outer_loop,
                 user vartable_ptr vartable
             }
         };
@@ -215,11 +225,24 @@ traversal ExtractCalls {
 
 traversal CheckDead {
     uid = CD,
-    nodes = { Stmts, Call, VarRef },
+    nodes = { Stmts, IfElse, For, Call, VarRef },
     travdata {
-        bool is_dead,
-        int n,
-        int l
+        Scope parent,
+        bool seen,
+        bool assign_is_dead,
+        bool ref_is_dead,
+        VarRef ref
+    }
+};
+
+node Scope {
+    children {
+        Stmts stmts { constructor },
+        Scope parent { constructor }
+    },
+
+    lifetime {
+        disallowed
     }
 };
 

@@ -39,6 +39,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/checkproploop.c
     src/astopt/constfold.c
     src/astopt/copyprop.c
+    src/astopt/countreads.c
     src/astopt/countwrites.c
     src/astopt/deadstores.c
     src/astopt/extractcalls.c
