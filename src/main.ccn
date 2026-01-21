@@ -128,7 +128,7 @@ phase Desugar {
 cycle AstOpt {
     actions {
         traversal CountWrites {
-            uid = CW,
+            uid = AOCW,
             nodes = { Program, FunDecl, VarRef },
             travdata {
                 user vartable_ptr vartable
@@ -138,6 +138,14 @@ cycle AstOpt {
         traversal CopyProp {
             uid = AOCP,
             nodes = { Program, FunDecl, Stmts },
+            travdata {
+                user vartable_ptr vartable
+            }
+        };
+
+        traversal DeadStores {
+            uid = AODS,
+            nodes = { Program, FunDecl, IfElse, Stmts, DoWhile, For },
             travdata {
                 user vartable_ptr vartable
             }
@@ -165,8 +173,8 @@ cycle AstOpt {
     }
 };
 
-traversal PropValue {
-    uid = PV,
+traversal ValueProp {
+    uid = VP,
     nodes = Stmt | { Stmts, VarRef },
     travdata {
         Expr expr,
@@ -176,8 +184,8 @@ traversal PropValue {
     }
 };
 
-traversal PropIntoLoop {
-    uid = PIL,
+traversal ValuePropLoop {
+    uid = VPL,
     nodes = { VarRef },
     travdata {
         Expr expr,
@@ -186,12 +194,30 @@ traversal PropIntoLoop {
     }
 };
 
-traversal CheckProp {
-    uid = CP,
-    nodes = { Call, VarRef },
+traversal CheckPropLoop {
+    uid = CPL,
+    nodes = { Stmts, Call, VarRef },
     travdata {
         bool can_prop,
         int write_count,
+        int n,
+        int l
+    }
+};
+
+traversal ExtractCalls {
+    uid = EC,
+    nodes = { Call },
+    travdata {
+        Stmts stmts
+    }
+};
+
+traversal CheckDead {
+    uid = CD,
+    nodes = { Stmts, Call, VarRef },
+    travdata {
+        bool is_dead,
         int n,
         int l
     }

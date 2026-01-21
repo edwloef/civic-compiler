@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "ccngen/trav.h"
 #include "macros.h"
 
 static void AOTCFdiverges(node_st *node) {
@@ -52,6 +53,14 @@ node_st *AOTCFstmts(node_st *node) {
             IFELSE_ELSE_BLOCK(stmt) = tmp;
 
             CCNcycleNotify();
+        } else if (!IFELSE_IF_BLOCK(stmt) && !IFELSE_ELSE_BLOCK(stmt)) {
+            TRAVpush(TRAV_EC);
+
+            TRAVexpr(stmt);
+
+            node = AOTCFinlinestmts(node, DATA_EC_GET()->stmts);
+
+            TRAVpop();
         }
         break;
     case NT_DOWHILE:
@@ -63,6 +72,19 @@ node_st *AOTCFstmts(node_st *node) {
                 DOWHILE_STMTS(stmt) = NULL;
                 node = AOTCFinlinestmts(node, stmts);
             }
+        }
+        break;
+    case NT_FOR:
+        if (!FOR_STMTS(stmt)) {
+            TRAVpush(TRAV_EC);
+
+            TRAVloop_start(stmt);
+            TRAVloop_end(stmt);
+            TRAVloop_step(stmt);
+
+            node = AOTCFinlinestmts(node, DATA_EC_GET()->stmts);
+
+            TRAVpop();
         }
         break;
     case NT_RETURN:

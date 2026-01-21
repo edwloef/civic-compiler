@@ -35,15 +35,18 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/analysis/globals.c
     src/analysis/resolve.c
     src/analysis/typecheck.c
-    src/astopt/checkprop.c
+    src/astopt/checkdead.c
+    src/astopt/checkproploop.c
     src/astopt/constfold.c
     src/astopt/copyprop.c
     src/astopt/countwrites.c
+    src/astopt/deadstores.c
+    src/astopt/extractcalls.c
     src/astopt/identities.c
-    src/astopt/propintoloop.c
-    src/astopt/propvalue.c
     src/astopt/reassoc.c
     src/astopt/trivialcontrolflow.c
+    src/astopt/valueprop.c
+    src/astopt/valueproploop.c
     src/desugar/arrayassign.c
     src/desugar/boolcasts.c
     src/desugar/delwhile.c
