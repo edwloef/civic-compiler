@@ -23,7 +23,7 @@ node_st *AOCPfundecl(node_st *node) {
 }
 
 node_st *AOCPstmts(node_st *node) {
-    TRAVchildren(node);
+    TRAVnext(node);
 
     node_st *stmt = STMTS_STMT(node);
     if (NODE_TYPE(stmt) == NT_ASSIGN && !VARREF_EXPRS(ASSIGN_REF(stmt)) &&
@@ -32,23 +32,43 @@ node_st *AOCPstmts(node_st *node) {
          NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_BOOL ||
          (NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF &&
           !VARREF_EXPRS(ASSIGN_EXPR(stmt))))) {
-        vartable *vartable = DATA_AOCP_GET()->vartable;
+        node_st *parent = DATA_AOCP_GET()->parent;
+        vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
+                          VARREF_L(ASSIGN_REF(stmt))};
+        vartable_entry *e = vartable_get(DATA_AOCP_GET()->vartable, r);
 
         TRAVpush(TRAV_VP);
 
         DATA_VP_GET()->expr = ASSIGN_EXPR(stmt);
-
-        vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
-                          VARREF_L(ASSIGN_REF(stmt))};
-        vartable_entry *e = vartable_get(vartable, r);
         DATA_VP_GET()->write_count = e->write_count;
-
-        DATA_VP_GET()->n = VARREF_N(ASSIGN_REF(stmt));
-        DATA_VP_GET()->l = VARREF_L(ASSIGN_REF(stmt));
+        DATA_VP_GET()->n = r.n;
+        DATA_VP_GET()->l = r.l;
 
         TRAVnext(node);
+        TRAVopt(parent);
 
         TRAVpop();
+    } else if (NODE_TYPE(stmt) == NT_DOWHILE) {
+        node_st *parent = ASTscope(DOWHILE_EXPR(stmt), STMTS_NEXT(node),
+                                   DATA_AOCP_GET()->parent);
+        DATA_AOCP_GET()->parent = parent;
+
+        TRAVstmt(node);
+
+        DATA_AOCP_GET()->parent = SCOPE_PARENT(parent);
+        SCOPE_EXPR(parent) = NULL;
+        SCOPE_STMTS(parent) = NULL;
+        SCOPE_PARENT(parent) = NULL;
+        CCNfree(parent);
+    } else if (NODE_TYPE(stmt) == NT_IFELSE || NODE_TYPE(stmt) == NT_FOR) {
+        node_st *parent = DATA_AOCP_GET()->parent;
+        DATA_AOCP_GET()->parent = NULL;
+
+        TRAVstmt(node);
+
+        DATA_AOCP_GET()->parent = parent;
+    } else {
+        TRAVstmt(node);
     }
 
     return node;

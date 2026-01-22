@@ -155,6 +155,7 @@ cycle AstOpt {
             uid = AOCP,
             nodes = { Program, FunDecl, Stmts },
             travdata {
+                Scope parent,
                 user vartable_ptr vartable
             }
         };
@@ -172,7 +173,7 @@ cycle AstOpt {
             nodes = { Program, FunDecl, Stmts },
             travdata {
                 Scope parent,
-                Stmts outer_loop,
+                Scope outer_loop,
                 user vartable_ptr vartable
             }
         };
@@ -243,7 +244,6 @@ traversal CheckDead {
     uid = CD,
     nodes = { Stmts, IfElse, For, Call, VarRef },
     travdata {
-        Scope parent,
         bool seen,
         bool assign_is_dead,
         bool ref_is_dead,
@@ -253,6 +253,7 @@ traversal CheckDead {
 
 node Scope {
     children {
+        Expr expr { constructor },
         Stmts stmts { constructor },
         Scope parent { constructor }
     },

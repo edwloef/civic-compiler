@@ -38,16 +38,14 @@ node_st *AODSstmts(node_st *node) {
         if (!assign_is_dead && VARREF_N(ASSIGN_REF(stmt)) == 0) {
             node_st *parent = DATA_AODS_GET()->parent;
             node_st *trav = DATA_AODS_GET()->outer_loop;
-            if (!trav) {
-                trav = node;
-            }
+            trav = trav ? trav : node;
 
             TRAVpush(TRAV_CD);
 
-            DATA_CD_GET()->parent = parent;
             DATA_CD_GET()->ref = ASSIGN_REF(stmt);
 
             TRAVopt(trav);
+            TRAVopt(parent);
 
             assign_is_dead = DATA_CD_GET()->assign_is_dead;
 
@@ -62,19 +60,35 @@ node_st *AODSstmts(node_st *node) {
 
             TRAVpop();
         }
-    } else if (NODE_TYPE(stmt) == NT_DOWHILE || NODE_TYPE(stmt) == NT_FOR) {
+    } else if (NODE_TYPE(stmt) == NT_DOWHILE) {
         bool outer = DATA_AODS_GET()->outer_loop == NULL;
         if (outer) {
-            DATA_AODS_GET()->outer_loop = node;
+            DATA_AODS_GET()->outer_loop =
+                ASTscope(DOWHILE_EXPR(stmt), DOWHILE_STMTS(stmt), NULL);
         }
 
         TRAVstmt(node);
 
         if (outer) {
-            DATA_AODS_GET()->outer_loop = NULL;
+            SCOPE_EXPR(DATA_AODS_GET()->outer_loop) = NULL;
+            SCOPE_STMTS(DATA_AODS_GET()->outer_loop) = NULL;
+            DATA_AODS_GET()->outer_loop = CCNfree(DATA_AODS_GET()->outer_loop);
+        }
+    } else if (NODE_TYPE(stmt) == NT_FOR) {
+        bool outer = DATA_AODS_GET()->outer_loop == NULL;
+        if (outer) {
+            DATA_AODS_GET()->outer_loop = ASTscope(NULL, FOR_STMTS(stmt), NULL);
+        }
+
+        TRAVstmt(node);
+
+        if (outer) {
+            SCOPE_STMTS(DATA_AODS_GET()->outer_loop) = NULL;
+            DATA_AODS_GET()->outer_loop = CCNfree(DATA_AODS_GET()->outer_loop);
         }
     } else if (NODE_TYPE(stmt) == NT_IFELSE && !DATA_AODS_GET()->outer_loop) {
-        node_st *parent = ASTscope(STMTS_NEXT(node), DATA_AODS_GET()->parent);
+        node_st *parent =
+            ASTscope(NULL, STMTS_NEXT(node), DATA_AODS_GET()->parent);
         DATA_AODS_GET()->parent = parent;
 
         TRAVstmt(node);

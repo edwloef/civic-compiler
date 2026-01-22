@@ -14,15 +14,7 @@ node_st *CDstmts(node_st *node) {
     }
 
     if (DATA_CD_GET()->assign_is_dead) {
-        if (STMTS_NEXT(node)) {
-            TRAVnext(node);
-        } else {
-            node_st *parent = DATA_CD_GET()->parent;
-            if (parent) {
-                DATA_CD_GET()->parent = SCOPE_PARENT(parent);
-                TRAVstmts(parent);
-            }
-        }
+        TRAVnext(node);
     }
 
     return node;
