@@ -63,12 +63,12 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
         VARREF_EXPRS(ref) = ASTexprs(loopvar, VARREF_EXPRS(ref));
 
         node_st *id = CCNcopy(VARREF_ID(loopvar));
+        vartable_ref dr = dims[0];
+        dr.n += VARREF_N(ref);
 
         node_st *stmt =
             DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1);
 
-        vartable_ref dr = dims[0];
-        dr.n += VARREF_N(ref);
         vartable_entry *e = vartable_get(DATA_DAA_GET()->vartable, dr);
         node_st *ref = ASTvarref(ASTid(STRcpy(e->name)), NULL);
         VARREF_N(ref) = dr.n;
