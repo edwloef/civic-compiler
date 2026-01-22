@@ -46,6 +46,10 @@ node_st *CDfor(node_st *node) {
 }
 
 node_st *CDcall(node_st *node) {
+    if (DATA_CD_GET()->ref_is_dead) {
+        return node;
+    }
+
     TRAVchildren(node);
 
     if (CALL_N(node) == 0) {
@@ -56,6 +60,10 @@ node_st *CDcall(node_st *node) {
 }
 
 node_st *CDvarref(node_st *node) {
+    if (DATA_CD_GET()->ref_is_dead) {
+        return node;
+    }
+
     TRAVchildren(node);
 
     if (node == DATA_CD_GET()->ref) {

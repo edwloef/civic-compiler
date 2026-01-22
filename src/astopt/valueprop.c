@@ -112,14 +112,22 @@ node_st *VPcall(node_st *node) {
 node_st *VPvarref(node_st *node) {
     TRAVchildren(node);
 
-    if (VARREF_N(node) == DATA_VP_GET()->n &&
-        VARREF_L(node) == DATA_VP_GET()->l && DATA_VP_GET()->expr) {
-        if (VARREF_WRITE(node)) {
-            DATA_VP_GET()->expr = NULL;
-        } else {
-            CCNfree(node);
-            node = CCNcopy(DATA_VP_GET()->expr);
-            CCNcycleNotify();
+    if (DATA_VP_GET()->expr) {
+        if (NODE_TYPE(DATA_VP_GET()->expr) == NT_VARREF &&
+            VARREF_N(node) == VARREF_N(DATA_VP_GET()->expr) &&
+            VARREF_L(node) == VARREF_L(DATA_VP_GET()->expr)) {
+            if (VARREF_WRITE(node)) {
+                DATA_VP_GET()->expr = NULL;
+            }
+        } else if (VARREF_N(node) == DATA_VP_GET()->n &&
+                   VARREF_L(node) == DATA_VP_GET()->l) {
+            if (VARREF_WRITE(node)) {
+                DATA_VP_GET()->expr = NULL;
+            } else {
+                CCNfree(node);
+                node = CCNcopy(DATA_VP_GET()->expr);
+                CCNcycleNotify();
+            }
         }
     }
 
