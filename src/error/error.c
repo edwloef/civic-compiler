@@ -71,6 +71,140 @@ void emit_message(level level, char *format, ...) {
     va_end(ap);
 }
 
+static void single_line_annotation(span span, level level, char *format,
+                                   FILE *file, va_list ap) {
+    int lineno_width = log10(span.el + 1) + 1;
+
+    fprintf(stderr,
+            ANSI_BRIGHT_BLUE "%*s-->" ANSI_RESET " %s:%d:%d\n" ANSI_BRIGHT_BLUE
+                             "%*s|\n" ANSI_RESET,
+            lineno_width, "", span.file, span.bl + 1, span.bc + 1,
+            lineno_width + 1, "");
+
+    bool prev_nl = true;
+    int lineno = 0;
+    char line[256];
+
+    while (lineno <= span.el && fgets(line, sizeof(line), file)) {
+        int len = STRlen(line);
+        bool new_nl = line[len - 1] == '\n';
+
+        if (lineno == span.bl) {
+            if (prev_nl) {
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |" ANSI_RESET " ",
+                        lineno_width, lineno + 1);
+            }
+            fputs(line, stderr);
+            if (new_nl) {
+                break;
+            }
+        }
+
+        prev_nl = new_nl;
+        lineno += prev_nl;
+    }
+
+    if (!prev_nl) {
+        fputc('\n', stderr);
+    }
+
+    char *color = color_of_level(level);
+    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s|%*s%s", lineno_width + 1, "",
+            span.bc + 1, "", color);
+    for (int i = 0; i <= span.ec - span.bc; i++) {
+        fputc('^', stderr);
+    }
+
+    fputc(' ', stderr);
+
+    vfprintf(stderr, format, ap);
+
+    fprintf(stderr, ANSI_BRIGHT_BLUE "\n%*s\n" ANSI_RESET, lineno_width + 2,
+            "|");
+}
+
+static void multi_line_annotation(span span, level level, char *format,
+                                  FILE *file, va_list ap) {
+    int lineno_width = log10(span.el + 1) + 2;
+    lineno_width = lineno_width < 3 ? 3 : lineno_width;
+
+    fprintf(stderr,
+            ANSI_BRIGHT_BLUE "%*s-->" ANSI_RESET " %s:%d:%d\n" ANSI_BRIGHT_BLUE
+                             "%*s|\n",
+            lineno_width, "", span.file, span.bl + 1, span.bc + 1,
+            lineno_width + 1, "");
+
+    bool prev_nl = true;
+    int lineno = 0;
+    char line[256];
+
+    int bl_end = -1;
+
+    char *color = color_of_level(level);
+    while (lineno <= span.el && fgets(line, sizeof(line), file)) {
+        int len = STRlen(line);
+        bool new_nl = line[len - 1] == '\n';
+
+        if (lineno == span.bl) {
+            if (prev_nl) {
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |" ANSI_RESET " ",
+                        lineno_width, lineno + 1);
+            }
+            fputs(line, stderr);
+            bl_end += len;
+            if (new_nl) {
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*s|%s┌", lineno_width + 1,
+                        "", color);
+                for (int i = 0; i < span.bc; i++) {
+                    fputc('-', stderr);
+                }
+                for (int i = span.bc; i < bl_end; i++) {
+                    fputc('^', stderr);
+                }
+                fputc('\n', stderr);
+                if (span.el - span.bl >= 3) {
+                    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s |%s|" ANSI_RESET "\n",
+                            lineno_width, "...", color);
+                }
+            }
+        } else if (lineno == span.el) {
+            if (prev_nl) {
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |%s|" ANSI_RESET " ",
+                        lineno_width, lineno + 1, color);
+            }
+            fputs(line, stderr);
+            if (new_nl) {
+                break;
+            }
+        } else if (lineno > span.bl && lineno < span.el &&
+                   span.el - span.bl < 3) {
+            if (prev_nl) {
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |%s|" ANSI_RESET " ",
+                        lineno_width, lineno + 1, color);
+            }
+            fputs(line, stderr);
+        }
+
+        prev_nl = new_nl;
+        lineno += prev_nl;
+    }
+
+    if (!prev_nl) {
+        fputc('\n', stderr);
+    }
+
+    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s |%s└", lineno_width, "", color);
+    for (int i = 0; i <= span.ec + 1; i++) {
+        fputc('^', stderr);
+    }
+    fputc(' ', stderr);
+
+    vfprintf(stderr, format, ap);
+
+    fprintf(stderr, ANSI_BRIGHT_BLUE "\n%*s\n" ANSI_RESET, lineno_width + 2,
+            "|");
+}
+
 void emit_message_with_span(span span, level level, char *format, ...) {
     if (level != L_ERROR && !STReq(globals.input_file, span.file)) {
         return;
@@ -96,52 +230,13 @@ void emit_message_with_span(span span, level level, char *format, ...) {
         return;
     }
 
-    int lineno_width = log10(span.el + 1) + 1;
-
-    fprintf(stderr,
-            ANSI_BRIGHT_BLUE "%*s-->" ANSI_RESET " %s:%d:%d\n" ANSI_BRIGHT_BLUE
-                             "%*s|\n",
-            lineno_width, "", span.file, span.bl + 1, span.bc + 1,
-            lineno_width + 1, "");
-
-    bool nl = true;
-    int lineno = 0;
-    char line[256];
-
-    while (lineno <= span.el && fgets(line, sizeof(line), file)) {
-        if (lineno >= span.bl) {
-            fprintf(stderr, "%*d |" ANSI_RESET " %s" ANSI_BRIGHT_BLUE,
-                    lineno_width, lineno + 1, line);
-        }
-
-        nl = line[STRlen(line) - 1] == '\n';
-        lineno += nl;
-    }
-
-    if (!nl) {
-        fputc('\n', stderr);
-    }
-
-    fclose(file);
-
-    fprintf(stderr, "%*s|", lineno_width + 1, "");
-
-    char *color = color_of_level(level);
-    if (span.bl == span.el) {
-        fprintf(stderr, "%*s%s", span.bc + 1, "", color);
-        for (int i = 0; i <= span.ec - span.bc; i++) {
-            fputc('^', stderr);
-        }
-    } else {
-        fprintf(stderr, "\n%*s|", lineno_width + 1, "");
-    }
-
-    fprintf(stderr, " %s", color);
-
     va_start(ap, format);
-    vfprintf(stderr, format, ap);
+    if (span.bl == span.el) {
+        single_line_annotation(span, level, format, file, ap);
+    } else {
+        multi_line_annotation(span, level, format, file, ap);
+    }
     va_end(ap);
 
-    fprintf(stderr, ANSI_BRIGHT_BLUE "\n%*s\n" ANSI_RESET, lineno_width + 2,
-            "|");
+    fclose(file);
 }
