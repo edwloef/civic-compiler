@@ -80,6 +80,26 @@ node_st *AORbinop(node_st *node) {
             }
         }
         break;
+    case BO_lt:
+    case BO_le:
+        if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT) {
+            // (x < 7) => (7 > x)
+            // (x <= 7) => (7 >= x)
+            BINOP_LEFT(node) = right;
+            BINOP_RIGHT(node) = left;
+            BINOP_OP(node) = BINOP_OP(node) == BO_lt ? BO_gt : BO_ge;
+        }
+        break;
+    case BO_gt:
+    case BO_ge:
+        if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT) {
+            // (x > 7) => (7 < x)
+            // (x >= 7) => (7 <= x)
+            BINOP_LEFT(node) = right;
+            BINOP_RIGHT(node) = left;
+            BINOP_OP(node) = BINOP_OP(node) == BO_gt ? BO_lt : BO_le;
+        }
+        break;
     case BO_eq:
     case BO_ne:
         if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT ||
