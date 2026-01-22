@@ -206,7 +206,8 @@ static void multi_line_annotation(span span, level level, char *format,
 }
 
 void emit_message_with_span(span span, level level, char *format, ...) {
-    if (level != L_ERROR && !STReq(globals.input_file, span.file)) {
+    if (!(level == L_ERROR || STReq(globals.input_file, span.file)) ||
+        (globals.quiet && level == L_INFO)) {
         return;
     }
 
