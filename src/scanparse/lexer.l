@@ -30,7 +30,6 @@ void token_action(void);
 %option noyywrap
 %option noyy_top_state
 
-%x comment
 %x saveline
 
 %%
@@ -113,23 +112,7 @@ void token_action(void);
 
 " "                                                      { globals.col += 1; }
 \t                                                       { globals.col += 4; }
-
 "//".*                                                   { globals.col += yyleng; }
-"/*"                                                     {
-                                                           globals.col += yyleng;
-                                                           BEGIN(comment);
-                                                         }
-<comment>{
-  ([^*\n]*)|("*"+[^*/\n]*)                               { globals.col += yyleng; }
-  "*/"                                                   {
-                                                           globals.col += yyleng;
-                                                           BEGIN(INITIAL);
-                                                         }
-  \n                                                     {
-                                                           globals.line += 1;
-                                                           yy_push_state(saveline);
-                                                         }
-}
 
 <saveline>{
   "# "[0-9]+" \"".*"\"".*\n                              {
