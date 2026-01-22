@@ -112,8 +112,8 @@ node_st *VPcall(node_st *node) {
 node_st *VPvarref(node_st *node) {
     TRAVchildren(node);
 
-    if (DATA_VP_GET()->expr && DATA_VP_GET()->n == VARREF_N(node) &&
-        DATA_VP_GET()->l == VARREF_L(node)) {
+    if (VARREF_N(node) == DATA_VP_GET()->n &&
+        VARREF_L(node) == DATA_VP_GET()->l && DATA_VP_GET()->expr) {
         if (VARREF_WRITE(node)) {
             DATA_VP_GET()->expr = NULL;
         } else {

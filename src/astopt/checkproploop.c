@@ -19,7 +19,7 @@ node_st *CPLstmts(node_st *node) {
 node_st *CPLcall(node_st *node) {
     TRAVchildren(node);
 
-    if (DATA_CPL_GET()->write_count > 1) {
+    if (DATA_CPL_GET()->write_count > 1 && CALL_N(node) <= DATA_VP_GET()->n) {
         DATA_CPL_GET()->can_prop = false;
     }
 
@@ -29,8 +29,8 @@ node_st *CPLcall(node_st *node) {
 node_st *CPLvarref(node_st *node) {
     TRAVchildren(node);
 
-    if (DATA_CPL_GET()->n == VARREF_N(node) &&
-        DATA_CPL_GET()->l == VARREF_L(node) && VARREF_WRITE(node)) {
+    if (VARREF_N(node) == DATA_CPL_GET()->n &&
+        VARREF_L(node) == DATA_CPL_GET()->l && VARREF_WRITE(node)) {
         DATA_CPL_GET()->can_prop = false;
     }
 

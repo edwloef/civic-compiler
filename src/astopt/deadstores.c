@@ -35,7 +35,7 @@ node_st *AODSstmts(node_st *node) {
 
         bool assign_is_dead = e->read_count == 0;
 
-        if (!assign_is_dead) {
+        if (!assign_is_dead && VARREF_N(ASSIGN_REF(stmt)) == 0) {
             node_st *parent = DATA_AODS_GET()->parent;
             node_st *trav = DATA_AODS_GET()->outer_loop;
             if (!trav) {
