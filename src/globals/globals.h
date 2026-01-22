@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#include "palm/hash_table.h"
+
 struct globals {
     int line;
     int col;
@@ -9,6 +11,8 @@ struct globals {
 
     char *input_file;
     char *output_file;
+
+    htable_st *linemap; // file => (lineno => line)
 
     bool quiet;
 

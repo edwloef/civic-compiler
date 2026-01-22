@@ -12,41 +12,28 @@
 #include "parser.h"
 
 void yyerror(char const *err);
-void token_action();
+void token_action(void);
 
 #define FILTER(token) \
     globals.col += yyleng; \
-    return(token);
+    return token;
 
+#define YY_USER_INIT yy_push_state(saveline);
 #define YY_USER_ACTION token_action();
 
 %}
 
-%option noyywrap
-%option nounput
+%option stack
+
 %option noinput
+%option nounput
+%option noyywrap
+%option noyy_top_state
 
 %x comment
+%x saveline
 
 %%
-
-"# "[0-9]+" \"".*"\"".*\n                                {
-                                                           yytext += 2;
-                                                           int len = 0;
-                                                           while (isdigit(yytext[len]))
-                                                               len++;
-                                                           yytext[len] = 0;
-                                                           globals.line = atoi(yytext);
-                                                           globals.line = globals.line == 0 ? 0 : globals.line - 1;
-                                                           globals.col = 0;
-                                                           yytext += len + 2;
-                                                           len = 0;
-                                                           while (yytext[len] != '"')
-                                                               len++;
-                                                           yytext[len] = 0;
-                                                           MEMfree(globals.file);
-                                                           globals.file = STRcpy(yytext);
-                                                         }
 
 "("                                                      { FILTER(PAREN_L);   }
 ")"                                                      { FILTER(PAREN_R);   }
@@ -121,7 +108,7 @@ void token_action();
 
 \n                                                       {
                                                            globals.line += 1;
-                                                           globals.col = 0;
+                                                           yy_push_state(saveline);
                                                          }
 
 " "                                                      { globals.col += 1; }
@@ -140,13 +127,51 @@ void token_action();
                                                          }
   \n                                                     {
                                                            globals.line += 1;
-                                                           globals.col = 0;
+                                                           yy_push_state(saveline);
                                                          }
+}
+
+<saveline>{
+  "# "[0-9]+" \"".*"\"".*\n                              {
+                                                           yytext += 2;
+                                                           int len = 0;
+                                                           while (isdigit(yytext[len]))
+                                                               len++;
+                                                           yytext[len] = 0;
+                                                           globals.line = atoi(yytext);
+                                                           globals.line = globals.line == 0 ? 0 : globals.line - 1;
+                                                           globals.col = 0;
+                                                           yytext += len + 2;
+                                                           len = 0;
+                                                           while (yytext[len] != '"')
+                                                               len++;
+                                                           yytext[len] = 0;
+                                                           MEMfree(globals.file);
+                                                           globals.file = STRcpy(yytext);
+                                                         }
+  .*                                                     {
+                                                           if (!globals.quiet) {
+                                                               if (!globals.linemap)
+                                                                   globals.linemap = HTnew_String(256);
+                                                               htable_st *inner = HTlookup(globals.linemap, globals.file);
+                                                               if (!inner) {
+                                                                   inner = HTnew_Int(256);
+                                                                   HTinsert(globals.linemap, STRcpy(globals.file), inner);
+                                                               }
+                                                               int *lineno = malloc(sizeof(int));
+                                                               *lineno = globals.line;
+                                                               HTinsert(inner, lineno, STRcpy(yytext));
+                                                           }
+                                                           yyless(0);
+                                                           globals.col = 0;
+                                                           yy_pop_state();
+                                                         }
+  \n                                                     { globals.line += 1; }
 }
 
 %%
 
-void token_action() {
+void token_action(void) {
     yylloc.first_line = yylloc.last_line = globals.line;
     yylloc.first_column = globals.col;
     yylloc.last_column = globals.col + yyleng - 1;
