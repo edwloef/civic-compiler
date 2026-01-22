@@ -51,6 +51,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/valueprop.c
     src/astopt/valueproploop.c
     src/desugar/arrayassign.c
+    src/desugar/arrayparams.c
     src/desugar/boolcasts.c
     src/desugar/delwhile.c
     src/desugar/dimreduce.c

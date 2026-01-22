@@ -125,13 +125,13 @@ decl: "extern" funheader ";"
       }
     | "extern" basictype id ";"
       {
-        $$ = ASTvardecl(ASTtype(NULL, $2), $3, NULL);
+        $$ = ASTvardecl(ASTtype(NULL, $2, false), $3, NULL);
         VARDECL_EXTERNAL($$) = true;
         VARDECL_GLOBAL($$) = true;
       }
     | "extern" basictype "[" ids "]" id ";"
       {
-        $$ = ASTvardecl(ASTtype($4, $2), $6, NULL);
+        $$ = ASTvardecl(ASTtype($4, $2, true), $6, NULL);
         VARDECL_EXTERNAL($$) = true;
         VARDECL_GLOBAL($$) = true;
       }
@@ -400,21 +400,21 @@ vardecls: vardecls vardecl
 
 vardecl: basictype id ";"
          {
-           $$ = ASTvardecl(ASTtype(NULL, $1), $2, NULL);
+           $$ = ASTvardecl(ASTtype(NULL, $1, false), $2, NULL);
          }
        | basictype "[" exprs "]" id ";"
          {
-           $$ = ASTvardecl(ASTtype($3, $1), $5, NULL);
+           $$ = ASTvardecl(ASTtype($3, $1, true), $5, NULL);
          }
        | basictype id "=" expr ";"
          {
-           $$ = ASTvardecl(ASTtype(NULL, $1), $2, $4);
+           $$ = ASTvardecl(ASTtype(NULL, $1, false), $2, $4);
            @$ = span_locs(@1, @4);
            add_loc_to_node($$, @$);
          }
        | basictype "[" exprs "]" id "=" expr ";"
          {
-           $$ = ASTvardecl(ASTtype($3, $1), $5, $7);
+           $$ = ASTvardecl(ASTtype($3, $1, true), $5, $7);
            @$ = span_locs(@1, @7);
            add_loc_to_node($$, @$);
          }
@@ -546,19 +546,19 @@ id: "identifier"
 
 params: basictype id "," params
         {
-          $$ = ASTparams(ASTparam(ASTtype(NULL, $1), $2), $4);
+          $$ = ASTparams(ASTparam(ASTtype(NULL, $1, false), $2), $4);
         }
       | basictype "[" ids "]" id "," params
         {
-          $$ = ASTparams(ASTparam(ASTtype($3, $1), $5), $7);
+          $$ = ASTparams(ASTparam(ASTtype($3, $1, true), $5), $7);
         }
       | basictype id
         {
-          $$ = ASTparams(ASTparam(ASTtype(NULL, $1), $2), NULL);
+          $$ = ASTparams(ASTparam(ASTtype(NULL, $1, false), $2), NULL);
         }
       | basictype "[" ids "]" id
         {
-          $$ = ASTparams(ASTparam(ASTtype($3, $1), $5), NULL);
+          $$ = ASTparams(ASTparam(ASTtype($3, $1, true), $5), NULL);
         }
       ;
 

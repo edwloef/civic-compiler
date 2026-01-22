@@ -106,6 +106,15 @@ phase Desugar {
             }
         };
 
+        traversal ArrayParams {
+            uid = DAP,
+            nodes = { Program, FunDecl, Params, Exprs },
+            travdata {
+                user vartable_ptr vartable,
+                Stmts stmts
+            }
+        };
+
         traversal ArrayAssign {
             uid = DAA,
             nodes = { Program, FunDecl, Stmts, Assign, ArrExprs },
@@ -543,7 +552,8 @@ node Type {
     },
 
     attributes {
-        BasicType ty { constructor }
+        BasicType ty { constructor },
+        bool array { constructor }
     }
 };
 

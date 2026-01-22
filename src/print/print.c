@@ -348,7 +348,7 @@ node_st *PRTid(node_st *node) {
 node_st *PRTtype(node_st *node) {
     printf("%s", fmt_BasicType(TYPE_TY(node)));
 
-    if (TYPE_EXPRS(node)) {
+    if (TYPE_ARRAY(node)) {
         printf("[");
         TRAVexprs(node);
         printf("]");
