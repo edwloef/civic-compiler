@@ -95,13 +95,14 @@ static void single_line_annotation(span span, level level, char *format,
                         lineno_width, lineno + 1);
             }
             fputs(line, stderr);
-            if (new_nl) {
-                break;
-            }
         }
 
         prev_nl = new_nl;
         lineno += prev_nl;
+
+        if (prev_nl && lineno == span.bl) {
+            break;
+        }
     }
 
     if (!prev_nl) {
@@ -173,9 +174,6 @@ static void multi_line_annotation(span span, level level, char *format,
                         lineno_width, lineno + 1, color);
             }
             fputs(line, stderr);
-            if (new_nl) {
-                break;
-            }
         } else if (lineno > span.bl && lineno < span.el &&
                    span.el - span.bl < 3) {
             if (prev_nl) {
@@ -187,6 +185,10 @@ static void multi_line_annotation(span span, level level, char *format,
 
         prev_nl = new_nl;
         lineno += prev_nl;
+
+        if (lineno == span.el && prev_nl) {
+            break;
+        }
     }
 
     if (!prev_nl) {
