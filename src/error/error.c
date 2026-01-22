@@ -86,23 +86,23 @@ static void single_line_annotation(span span, level level, char *format,
     char line[256];
 
     while (lineno <= span.el && fgets(line, sizeof(line), file)) {
-        int len = STRlen(line);
-        bool new_nl = line[len - 1] == '\n';
+        bool new_nl = line[STRlen(line) - 1] == '\n';
 
         if (lineno == span.bl) {
             if (prev_nl) {
-                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |" ANSI_RESET " ",
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d | " ANSI_RESET,
                         lineno_width, lineno + 1);
             }
             fputs(line, stderr);
         }
 
         prev_nl = new_nl;
-        lineno += prev_nl;
 
-        if (prev_nl && lineno == span.bl) {
+        if (lineno == span.el && prev_nl) {
             break;
         }
+
+        lineno += prev_nl;
     }
 
     if (!prev_nl) {
@@ -115,7 +115,6 @@ static void single_line_annotation(span span, level level, char *format,
     for (int i = 0; i <= span.ec - span.bc; i++) {
         fputc('^', stderr);
     }
-
     fputc(' ', stderr);
 
     vfprintf(stderr, format, ap);
@@ -126,8 +125,7 @@ static void single_line_annotation(span span, level level, char *format,
 
 static void multi_line_annotation(span span, level level, char *format,
                                   FILE *file, va_list ap) {
-    int lineno_width = log10(span.el + 1) + 2;
-    lineno_width = lineno_width < 3 ? 3 : lineno_width;
+    int lineno_width = log10(span.el + 1) + 1;
 
     fprintf(stderr,
             ANSI_BRIGHT_BLUE "%*s-->" ANSI_RESET " %s:%d:%d\n" ANSI_BRIGHT_BLUE
@@ -139,67 +137,61 @@ static void multi_line_annotation(span span, level level, char *format,
     int lineno = 0;
     char line[256];
 
-    int bl_end = -1;
-
     char *color = color_of_level(level);
     while (lineno <= span.el && fgets(line, sizeof(line), file)) {
-        int len = STRlen(line);
-        bool new_nl = line[len - 1] == '\n';
+        bool new_nl = line[STRlen(line) - 1] == '\n';
 
         if (lineno == span.bl) {
             if (prev_nl) {
-                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |" ANSI_RESET " ",
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |   " ANSI_RESET,
                         lineno_width, lineno + 1);
             }
             fputs(line, stderr);
-            bl_end += len;
             if (new_nl) {
-                fprintf(stderr, ANSI_BRIGHT_BLUE "%*s|%s┌", lineno_width + 1,
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*s|  %s", lineno_width + 1,
                         "", color);
-                for (int i = 0; i < span.bc; i++) {
-                    fputc('-', stderr);
+                for (int i = 0; i <= span.bc; i++) {
+                    fputc('_', stderr);
                 }
-                for (int i = span.bc; i < bl_end; i++) {
-                    fputc('^', stderr);
-                }
-                fputc('\n', stderr);
+                fputs("^\n", stderr);
                 if (span.el - span.bl >= 3) {
-                    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s |%s|" ANSI_RESET "\n",
-                            lineno_width, "...", color);
+                    fprintf(stderr, ANSI_BRIGHT_BLUE "...%*s%s|\n",
+                            lineno_width, "", color);
                 }
             }
         } else if (lineno == span.el) {
             if (prev_nl) {
-                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |%s|" ANSI_RESET " ",
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d | %s| " ANSI_RESET,
                         lineno_width, lineno + 1, color);
             }
             fputs(line, stderr);
         } else if (lineno > span.bl && lineno < span.el &&
                    span.el - span.bl < 3) {
             if (prev_nl) {
-                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d |%s|" ANSI_RESET " ",
+                fprintf(stderr, ANSI_BRIGHT_BLUE "%*d | %s| " ANSI_RESET,
                         lineno_width, lineno + 1, color);
             }
             fputs(line, stderr);
         }
 
         prev_nl = new_nl;
-        lineno += prev_nl;
 
         if (lineno == span.el && prev_nl) {
             break;
         }
+
+        lineno += prev_nl;
     }
 
     if (!prev_nl) {
         fputc('\n', stderr);
     }
 
-    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s |%s└", lineno_width, "", color);
-    for (int i = 0; i <= span.ec + 1; i++) {
-        fputc('^', stderr);
+    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s | %s|", lineno_width, "", color);
+    for (int i = 0; i <= span.ec; i++) {
+        fputc('_', stderr);
     }
-    fputc(' ', stderr);
+    fputs("^ ", stderr);
 
     vfprintf(stderr, format, ap);
 
