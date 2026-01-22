@@ -279,7 +279,7 @@ node_st *PRTdowhile(node_st *node) {
 
 node_st *PRTfor(node_st *node) {
     printf("for (int ");
-    TRAVid(node);
+    TRAVref(node);
     printf(" = ");
     TRAVloop_start(node);
     printf(", ");

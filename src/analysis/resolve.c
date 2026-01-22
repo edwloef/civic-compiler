@@ -157,9 +157,9 @@ node_st *ARfor(node_st *node) {
     TRAVloop_end(node);
     TRAVloop_step(node);
 
-    vartable_entry e = {ID_VAL(FOR_ID(node)),
+    vartable_entry e = {ID_VAL(VARREF_ID(FOR_REF(node))),
                         vartype_new(TY_int),
-                        SPAN(FOR_ID(node)),
+                        SPAN(FOR_REF(node)),
                         0,
                         0,
                         false,
@@ -167,6 +167,7 @@ node_st *ARfor(node_st *node) {
                         false,
                         false};
     vartable_ref r = vartable_push(DATA_AR_GET()->vartable, e);
+    VARREF_L(FOR_REF(node)) = r.l;
 
     TRAVstmts(node);
 

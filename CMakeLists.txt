@@ -53,9 +53,10 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/desugar/arrayassign.c
     src/desugar/arrayparams.c
     src/desugar/boolcasts.c
-    src/desugar/delwhile.c
     src/desugar/dimreduce.c
+    src/desugar/forloops.c
     src/desugar/vardecls.c
+    src/desugar/whileloops.c
     src/error/error.c
     src/free/free.c
     src/globals/globals.c

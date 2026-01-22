@@ -120,7 +120,6 @@ static void multi_line_annotation(span span, level level, char *format,
 
     htable_st *inner = HTlookup(globals.linemap, span.file);
     char *line = HTlookup(inner, &span.bl);
-
     fprintf(stderr,
             ANSI_BRIGHT_BLUE "%*d |   " ANSI_RESET "%s\n" ANSI_BRIGHT_BLUE
                              "%*s|  %s",

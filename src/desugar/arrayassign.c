@@ -60,19 +60,17 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
         }
     } else {
         node_st *loopvar = vartable_temp_var(DATA_DAA_GET()->vartable, TY_int);
-        VARREF_EXPRS(ref) = ASTexprs(loopvar, VARREF_EXPRS(ref));
+        VARREF_EXPRS(ref) = ASTexprs(CCNcopy(loopvar), VARREF_EXPRS(ref));
 
-        node_st *id = CCNcopy(VARREF_ID(loopvar));
         vartable_ref dr = dims[0];
         dr.n += VARREF_N(ref);
-
-        node_st *stmt =
-            DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1);
-
         vartable_entry *e = vartable_get(DATA_DAA_GET()->vartable, dr);
 
+        node_st *dim = vartable_entry_ref(e, dr);
+
         return ASTstmts(
-            ASTfor(id, ASTint(0), vartable_entry_ref(e, dr), ASTint(1), stmt),
+            ASTfor(loopvar, ASTint(0), dim, ASTint(1),
+                   DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1)),
             NULL);
     }
 }

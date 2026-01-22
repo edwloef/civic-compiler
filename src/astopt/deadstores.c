@@ -67,7 +67,6 @@ node_st *AODSstmts(node_st *node) {
         }
         break;
     case NT_DOWHILE:
-    case NT_FOR:
         if (outer) {
             if (NODE_TYPE(stmt) == NT_DOWHILE) {
                 DATA_AODS_GET()->outer_loop =

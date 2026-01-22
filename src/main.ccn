@@ -92,11 +92,6 @@ phase Desugar {
             nodes = { Cast }
         };
 
-        traversal DelWhile {
-            uid = DDW,
-            nodes = { While }
-        };
-
         traversal VarDecls {
             uid = DVD,
             nodes = { Program, FunDecl, FunBody, Decls, VarRef, Call },
@@ -130,6 +125,19 @@ phase Desugar {
             travdata {
                 user vartable_ptr vartable
             }
+        };
+
+        traversal ForLoops {
+            uid = DFL,
+            nodes = { Program, FunDecl, Stmts },
+            travdata {
+                user vartable_ptr vartable
+            }
+        };
+
+        traversal WhileLoops {
+            uid = DWL,
+            nodes = { While }
         };
     }
 };
@@ -457,7 +465,7 @@ node While {
     },
 
     lifetime {
-        allowed ( -> Desugar.DelWhile]
+        allowed ( -> Desugar.WhileLoops]
     }
 };
 
@@ -470,11 +478,15 @@ node DoWhile {
 
 node For {
     children {
-        Id id { constructor, mandatory },
+        VarRef ref { constructor, mandatory },
         Expr loop_start { constructor, mandatory },
         Expr loop_end { constructor, mandatory },
         Expr loop_step { constructor, mandatory },
         Stmts stmts { constructor }
+    },
+
+    lifetime {
+        allowed ( -> Desugar.ForLoops]
     }
 };
 

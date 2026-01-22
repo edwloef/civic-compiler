@@ -59,19 +59,6 @@ node_st *AOTCFstmts(node_st *node) {
             }
         }
         break;
-    case NT_FOR:
-        if (!FOR_STMTS(stmt)) {
-            TRAVpush(TRAV_EC);
-
-            TRAVloop_start(stmt);
-            TRAVloop_end(stmt);
-            TRAVloop_step(stmt);
-
-            node = inline_stmts(node, DATA_EC_GET()->stmts);
-
-            TRAVpop();
-        }
-        break;
     case NT_RETURN:
         AOTCFdiverges(node);
         break;

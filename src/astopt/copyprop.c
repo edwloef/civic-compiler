@@ -66,7 +66,6 @@ node_st *AOCPstmts(node_st *node) {
         CCNfree(parent);
         break;
     }
-    case NT_FOR:
     case NT_IFELSE: {
         node_st *parent = DATA_AOCP_GET()->parent;
         DATA_AOCP_GET()->parent = NULL;
