@@ -94,11 +94,7 @@ node_st *DVDdecls(node_st *node) {
         r.n = DATA_DVD_GET()->vartable->parent == NULL;
 
         if (VARDECL_EXPR(decl)) {
-            node_st *ref = ASTvarref(CCNcopy(VARDECL_ID(decl)), NULL);
-            VARREF_N(ref) = r.n;
-            VARREF_L(ref) = r.l;
-            VARREF_RESOLVED_TY(ref) = e->ty.ty;
-            VARREF_RESOLVED_DIMS(ref) = e->ty.len;
+            node_st *ref = vartable_entry_ref(e, r);
             VARREF_WRITE(ref) = true;
 
             node_st *assign = ASTassign(ref, VARDECL_EXPR(decl));
@@ -108,11 +104,7 @@ node_st *DVDdecls(node_st *node) {
         }
 
         if (TYPE_EXPRS(VARDECL_TY(decl))) {
-            node_st *ref = ASTvarref(CCNcopy(VARDECL_ID(decl)), NULL);
-            VARREF_N(ref) = r.n;
-            VARREF_L(ref) = r.l;
-            VARREF_RESOLVED_TY(ref) = e->ty.ty;
-            VARREF_RESOLVED_DIMS(ref) = e->ty.len;
+            node_st *ref = vartable_entry_ref(e, r);
             VARREF_WRITE(ref) = true;
 
             node_st *malloc = ASTmalloc(TYPE_EXPRS(VARDECL_TY(decl)));

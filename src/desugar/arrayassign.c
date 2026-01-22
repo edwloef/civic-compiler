@@ -70,12 +70,10 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
             DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1);
 
         vartable_entry *e = vartable_get(DATA_DAA_GET()->vartable, dr);
-        node_st *ref = ASTvarref(ASTid(STRcpy(e->name)), NULL);
-        VARREF_N(ref) = dr.n;
-        VARREF_L(ref) = dr.l;
-        VARREF_RESOLVED_TY(ref) = TY_int;
 
-        return ASTstmts(ASTfor(id, ASTint(0), ref, ASTint(1), stmt), NULL);
+        return ASTstmts(
+            ASTfor(id, ASTint(0), vartable_entry_ref(e, dr), ASTint(1), stmt),
+            NULL);
     }
 }
 

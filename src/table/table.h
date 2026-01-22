@@ -4,6 +4,8 @@
 #include "table/funtable.h"
 #include "table/vartable.h"
 
+node_st *vartable_entry_ref(vartable_entry *e, vartable_ref r);
+
 vartable_ref vartable_insert(vartable *self, vartable_entry e, node_st *id);
 
 vartable_ref vartable_resolve(vartable *self, node_st *id);

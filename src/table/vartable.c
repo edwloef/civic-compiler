@@ -21,6 +21,15 @@ void vartype_free(vartype self) {
     MEMfree(self.buf);
 }
 
+node_st *vartable_entry_ref(vartable_entry *e, vartable_ref r) {
+    node_st *ref = ASTvarref(ASTid(STRcpy(e->name)), NULL);
+    VARREF_N(ref) = r.n;
+    VARREF_L(ref) = r.l;
+    VARREF_RESOLVED_TY(ref) = e->ty.ty;
+    VARREF_RESOLVED_DIMS(ref) = e->ty.len;
+    return ref;
+}
+
 vartable *vartable_new(vartable *parent) {
     vartable *n = MEMmalloc(sizeof(vartable));
     *n = (vartable){0, 0, NULL, parent};
