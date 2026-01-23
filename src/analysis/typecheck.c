@@ -661,7 +661,7 @@ node_st *ATCvarref(node_st *node) {
                               fmt_BasicType(resolved_ty.ty));
                     }
                 } else {
-                    ERROR(EXPRS_EXPR(node),
+                    ERROR(EXPRS_EXPR(expr),
                           "can't index into %d-dimensional array of type '%s' "
                           "with %d-dimensional array of type '%s'",
                           ty.len, fmt_BasicType(ty.ty), resolved_ty.dims,
