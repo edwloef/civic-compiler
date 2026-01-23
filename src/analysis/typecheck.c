@@ -235,7 +235,7 @@ node_st *ATCifelse(node_st *node) {
     TRAVchildren(node);
 
     thin_vartype resolved_ty = RESOLVED_TY(IFELSE_EXPR(node));
-    if (resolved_ty.ty != TY_bool) {
+    if (resolved_ty.ty != TY_error && resolved_ty.ty != TY_bool) {
         if (resolved_ty.dims == 0) {
             ERROR(
                 IFELSE_EXPR(node),
