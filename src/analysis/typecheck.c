@@ -184,25 +184,27 @@ node_st *ATCvardecl(node_st *node) {
     vartable_ref r = {0, VARDECL_L(node)};
     vartype ty = vartable_get(DATA_ATC_GET()->vartable, r)->ty;
 
-    for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
-         expr = EXPRS_NEXT(expr)) {
-        thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
-        if (resolved_ty.ty != TY_error) {
-            if (resolved_ty.dims == 0) {
-                if (resolved_ty.ty != TY_int) {
+    if (ty.ty != TY_error) {
+        for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
+             expr = EXPRS_NEXT(expr)) {
+            thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
+            if (resolved_ty.ty != TY_error) {
+                if (resolved_ty.dims == 0) {
+                    if (resolved_ty.ty != TY_int) {
+                        ERROR(EXPRS_EXPR(expr),
+                              "can't declare %d-dimensional array of type '%s' "
+                              "with length of value of type '%s'",
+                              ty.len, fmt_BasicType(ty.ty),
+                              fmt_BasicType(resolved_ty.ty));
+                    }
+                } else {
                     ERROR(
                         EXPRS_EXPR(expr),
                         "can't declare %d-dimensional array of type '%s' with "
-                        "length of value of type '%s'",
-                        ty.len, fmt_BasicType(ty.ty),
+                        "length of %d-dimensional array of type '%s'",
+                        ty.len, fmt_BasicType(ty.ty), resolved_ty.dims,
                         fmt_BasicType(resolved_ty.ty));
                 }
-            } else {
-                ERROR(EXPRS_EXPR(expr),
-                      "can't declare %d-dimensional array of type '%s' with "
-                      "length of %d-dimensional array of type '%s'",
-                      ty.len, fmt_BasicType(ty.ty), resolved_ty.dims,
-                      fmt_BasicType(resolved_ty.ty));
             }
         }
     }
@@ -235,18 +237,19 @@ node_st *ATCifelse(node_st *node) {
     TRAVchildren(node);
 
     thin_vartype resolved_ty = RESOLVED_TY(IFELSE_EXPR(node));
-    if (resolved_ty.ty != TY_error && resolved_ty.ty != TY_bool) {
-        if (resolved_ty.dims == 0) {
-            ERROR(
-                IFELSE_EXPR(node),
-                "expected value of type 'bool' as if-condition, found value of "
-                "type '%s'",
-                fmt_BasicType(resolved_ty.ty));
-        } else {
-            ERROR(IFELSE_EXPR(node),
-                  "expected value of type 'bool' as if-condition, found "
-                  "%d-dimensional array of type '%s'",
-                  resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+    if (resolved_ty.ty != TY_error) {
+        if (resolved_ty.ty != TY_bool) {
+            if (resolved_ty.dims == 0) {
+                ERROR(IFELSE_EXPR(node),
+                      "expected value of type 'bool' as if-condition, found "
+                      "value of type '%s'",
+                      fmt_BasicType(resolved_ty.ty));
+            } else {
+                ERROR(IFELSE_EXPR(node),
+                      "expected value of type 'bool' as if-condition, found "
+                      "%d-dimensional array of type '%s'",
+                      resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
+            }
         }
     }
 
