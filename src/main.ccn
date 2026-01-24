@@ -15,30 +15,6 @@ traversal Print {
     }
 };
 
-phase Stats {
-    actions {
-        traversal CountOps {
-            uid = SCO,
-            nodes = { BinOp },
-            travdata {
-                int add,
-                int sub,
-                int mul,
-                int div,
-                int mod
-            }
-        };
-
-        traversal CountIdents {
-            uid = SCI,
-            nodes = { Id },
-            travdata {
-                user htable_st_ptr count
-            }
-        };
-    }
-};
-
 phase Analysis {
     actions {
         traversal Functions {
