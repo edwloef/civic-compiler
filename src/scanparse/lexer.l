@@ -18,19 +18,16 @@ void token_action(void);
     globals.col += yyleng; \
     return token;
 
-#define YY_USER_INIT yy_push_state(saveline);
+#define YY_USER_INIT BEGIN(SAVELINE);
 #define YY_USER_ACTION token_action();
 
 %}
 
-%option stack
-
 %option noinput
 %option nounput
 %option noyywrap
-%option noyy_top_state
 
-%x saveline
+%x SAVELINE
 
 %%
 
@@ -107,14 +104,14 @@ void token_action(void);
 
 \n                                                       {
                                                            globals.line += 1;
-                                                           yy_push_state(saveline);
+                                                           BEGIN(SAVELINE);
                                                          }
 
 " "                                                      { globals.col += 1; }
 \t                                                       { globals.col += 4; }
 "//".*                                                   { globals.col += yyleng; }
 
-<saveline>{
+<SAVELINE>{
   "# "[0-9]+" \"".*"\"".*\n                              {
                                                            yytext += 2;
                                                            int len = 0;
@@ -147,7 +144,7 @@ void token_action(void);
                                                            }
                                                            yyless(0);
                                                            globals.col = 0;
-                                                           yy_pop_state();
+                                                           BEGIN(INITIAL);
                                                          }
   \n                                                     { globals.line += 1; }
 }
