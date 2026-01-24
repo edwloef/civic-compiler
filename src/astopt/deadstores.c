@@ -6,6 +6,7 @@ void AODSinit(void) {}
 void AODSfini(void) {}
 
 node_st *AODSprogram(node_st *node) {
+    DATA_AODS_GET()->funtable = PROGRAM_FUNTABLE(node);
     DATA_AODS_GET()->vartable = PROGRAM_VARTABLE(node);
 
     TRAVchildren(node);
@@ -23,6 +24,16 @@ node_st *AODSfundecl(node_st *node) {
     return node;
 }
 
+node_st *AODSfunbody(node_st *node) {
+    DATA_AODS_GET()->funtable = FUNBODY_FUNTABLE(node);
+
+    TRAVchildren(node);
+
+    DATA_AODS_GET()->funtable = DATA_AODS_GET()->funtable->parent;
+
+    return node;
+}
+
 node_st *AODSstmts(node_st *node) {
     TRAVnext(node);
 
@@ -35,7 +46,6 @@ node_st *AODSstmts(node_st *node) {
             !EXPR_RESOLVED_DIMS(ASSIGN_REF(stmt))) {
             vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
                               VARREF_L(ASSIGN_REF(stmt))};
-            vartable *vartable = DATA_AODS_GET()->vartable;
             vartable_entry *e = vartable_get(DATA_AODS_GET()->vartable, r);
             bool assign_is_dead = e->read_count == 0;
 
@@ -46,6 +56,9 @@ node_st *AODSstmts(node_st *node) {
             }
 
             if (!assign_is_dead && VARREF_N(ASSIGN_REF(stmt)) == 0) {
+                funtable *funtable = DATA_AODS_GET()->funtable;
+                vartable *vartable = DATA_AODS_GET()->vartable;
+
                 node_st *parent = DATA_AODS_GET()->parent;
                 node_st *trav = DATA_AODS_GET()->outer_loop;
                 trav = trav ? trav : node;
@@ -53,6 +66,7 @@ node_st *AODSstmts(node_st *node) {
                 TRAVpush(TRAV_CD);
 
                 DATA_CD_GET()->ref = ASSIGN_REF(stmt);
+                DATA_CD_GET()->funtable = funtable;
                 DATA_CD_GET()->vartable = vartable;
 
                 TRAVopt(trav);

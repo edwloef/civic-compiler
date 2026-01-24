@@ -77,7 +77,11 @@ node_st *CDcall(node_st *node) {
 
     TRAVchildren(node);
 
-    if (CALL_N(node) <= VARREF_N(DATA_CD_GET()->ref)) {
+    funtable_ref r = {CALL_N(node), CALL_L(node)};
+    funtable_entry *e = funtable_get(DATA_CD_GET()->funtable, r);
+
+    if (CALL_N(node) <= VARREF_N(DATA_CD_GET()->ref) &&
+        CALL_N(node) + e->scalar_write_capture > VARREF_N(DATA_CD_GET()->ref)) {
         vartable_ref r = {VARREF_N(DATA_CD_GET()->ref),
                           VARREF_L(DATA_CD_GET()->ref)};
         vartable_entry *e = vartable_get(DATA_CD_GET()->vartable, r);

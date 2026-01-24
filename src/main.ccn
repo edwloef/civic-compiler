@@ -130,15 +130,50 @@ cycle AstOpt {
             }
         };
 
-        Escapes;
+        traversal Escapes {
+            uid = AOE,
+            nodes = { Program, FunDecl, VarRef },
+            travdata {
+                user vartable_ptr vartable
+            }
+        };
+
+        traversal DirectCaptures {
+            uid = AODC,
+            nodes = { Program, FunDecl, FunBody, VarRef },
+            travdata {
+                user funtable_ptr funtable,
+                int read_capture,
+                int write_capture,
+                int scalar_read_capture,
+                int scalar_write_capture
+            }
+        };
+
+        cycle IndirectCaptures {
+            actions {
+                traversal IndirectCalls {
+                    uid = AOIC,
+                    nodes = { Program, FunDecl, FunBody, Call },
+                    travdata {
+                        user funtable_ptr funtable,
+                        int read_capture,
+                        int write_capture,
+                        int scalar_read_capture,
+                        int scalar_write_capture
+                    }
+                };
+            }
+        };
 
         CountWrites;
 
         traversal CopyProp {
             uid = AOCP,
-            nodes = { Program, FunDecl, Stmts },
+            nodes = { Program, FunDecl, FunBody, Stmts },
             travdata {
                 Scope parent,
+                user funtable_ptr funtable,
                 user vartable_ptr vartable
             }
         };
@@ -147,10 +182,11 @@ cycle AstOpt {
 
         traversal DeadStores {
             uid = AODS,
-            nodes = { Program, FunDecl, Stmts },
+            nodes = { Program, FunDecl, FunBody, Stmts },
             travdata {
                 Scope parent,
                 Scope outer_loop,
+                user funtable_ptr funtable,
                 user vartable_ptr vartable
             }
         };
@@ -201,20 +237,13 @@ traversal CountWrites {
     }
 };
 
-traversal Escapes {
-    uid = E,
-    nodes = { Program, FunDecl, VarRef },
-    travdata {
-        user vartable_ptr vartable
-    }
-};
-
 traversal ValueProp {
     uid = VP,
     nodes = Stmt | { Stmts, VarRef },
     travdata {
         VarRef ref,
         Expr expr,
+        user funtable_ptr funtable,
         user vartable_ptr vartable
     }
 };
@@ -235,6 +264,7 @@ traversal CheckPropLoop {
         bool can_prop,
         VarRef ref,
         Expr expr,
+        user funtable_ptr funtable,
         user vartable_ptr vartable
     }
 };
@@ -255,6 +285,7 @@ traversal CheckDead {
         bool assign_is_dead,
         bool ref_is_dead,
         VarRef ref,
+        user funtable_ptr funtable,
         user vartable_ptr vartable
     }
 };

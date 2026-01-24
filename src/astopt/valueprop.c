@@ -55,12 +55,14 @@ node_st *VPdowhile(node_st *node) {
     if (DATA_VP_GET()->expr && e->write_count > 1) {
         node_st *ref = DATA_VP_GET()->ref;
         node_st *expr = DATA_VP_GET()->expr;
+        funtable *funtable = DATA_VP_GET()->funtable;
         vartable *vartable = DATA_VP_GET()->vartable;
 
         TRAVpush(TRAV_CPL);
 
         DATA_CPL_GET()->ref = ref;
         DATA_CPL_GET()->expr = expr;
+        DATA_CPL_GET()->funtable = funtable;
         DATA_CPL_GET()->vartable = vartable;
 
         node = TRAVopt(node);
@@ -106,7 +108,11 @@ node_st *VPreturn(node_st *node) {
 node_st *VPcall(node_st *node) {
     TRAVchildren(node);
 
-    if (CALL_N(node) <= VARREF_N(DATA_VP_GET()->ref)) {
+    funtable_ref r = {CALL_N(node), CALL_L(node)};
+    funtable_entry *e = funtable_get(DATA_VP_GET()->funtable, r);
+
+    if (CALL_N(node) <= VARREF_N(DATA_VP_GET()->ref) &&
+        CALL_N(node) + e->scalar_write_capture > VARREF_N(DATA_VP_GET()->ref)) {
         vartable_ref r = {VARREF_N(DATA_VP_GET()->ref),
                           VARREF_L(DATA_VP_GET()->ref)};
         vartable_entry *e = vartable_get(DATA_VP_GET()->vartable, r);
@@ -116,7 +122,9 @@ node_st *VPcall(node_st *node) {
     }
 
     if (DATA_VP_GET()->expr && NODE_TYPE(DATA_VP_GET()->expr) == NT_VARREF &&
-        CALL_N(node) <= VARREF_N(DATA_VP_GET()->expr)) {
+        CALL_N(node) <= VARREF_N(DATA_VP_GET()->expr) &&
+        CALL_N(node) + e->scalar_write_capture >
+            VARREF_N(DATA_VP_GET()->expr)) {
         vartable_ref r = {VARREF_N(DATA_VP_GET()->expr),
                           VARREF_L(DATA_VP_GET()->expr)};
         vartable_entry *e = vartable_get(DATA_VP_GET()->vartable, r);

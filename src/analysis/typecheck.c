@@ -68,7 +68,6 @@ static void ATCcheckassign(node_st *from_node, vartype to, node_st *node) {
 }
 
 void ATCinit(void) {}
-
 void ATCfini(void) {}
 
 node_st *ATCprogram(node_st *node) {

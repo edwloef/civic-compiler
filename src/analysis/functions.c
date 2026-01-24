@@ -33,6 +33,9 @@ node_st *AFfundecl(node_st *node) {
                         SPAN(FUNDECL_ID(node)),
                         0,
                         0,
+                        0,
+                        0,
+                        0,
                         FUNDECL_EXTERNAL(node),
                         FUNDECL_EXPORTED(node)};
     FUNDECL_L(node) =

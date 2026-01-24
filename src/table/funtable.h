@@ -32,7 +32,8 @@ typedef struct {
     char *name;
     funtype ty;
     span span;
-    int call_count, min_level;
+    int call_count, read_capture, write_capture, scalar_read_capture,
+        scalar_write_capture;
     bool external, exported;
 } funtable_entry;
 

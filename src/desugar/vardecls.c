@@ -20,8 +20,16 @@ node_st *DVDprogram(node_st *node) {
     FUNDECL_VARTABLE(decl) = vartable_new(PROGRAM_VARTABLE(node));
     FUNBODY_FUNTABLE(body) = funtable_new(PROGRAM_FUNTABLE(node));
 
-    funtable_entry e = {
-        "__init", funtype_new(TY_void), {0, 0, 0, 0, NULL}, 1, 0, false, true};
+    funtable_entry e = {"__init",
+                        funtype_new(TY_void),
+                        {0, 0, 0, 0, NULL},
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        false,
+                        true};
     FUNDECL_L(decl) = funtable_push(PROGRAM_FUNTABLE(node), e).l;
 
     PROGRAM_DECLS(node) = ASTdecls(decl, PROGRAM_DECLS(node));

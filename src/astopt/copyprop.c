@@ -5,6 +5,7 @@ void AOCPinit(void) {}
 void AOCPfini(void) {}
 
 node_st *AOCPprogram(node_st *node) {
+    DATA_AOCP_GET()->funtable = PROGRAM_FUNTABLE(node);
     DATA_AOCP_GET()->vartable = PROGRAM_VARTABLE(node);
 
     TRAVchildren(node);
@@ -22,6 +23,16 @@ node_st *AOCPfundecl(node_st *node) {
     return node;
 }
 
+node_st *AOCPfunbody(node_st *node) {
+    DATA_AOCP_GET()->funtable = FUNBODY_FUNTABLE(node);
+
+    TRAVchildren(node);
+
+    DATA_AOCP_GET()->funtable = DATA_AOCP_GET()->funtable->parent;
+
+    return node;
+}
+
 node_st *AOCPstmts(node_st *node) {
     TRAVnext(node);
 
@@ -34,6 +45,7 @@ node_st *AOCPstmts(node_st *node) {
              NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_BOOL ||
              (NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF &&
               !VARREF_EXPRS(ASSIGN_EXPR(stmt))))) {
+            funtable *funtable = DATA_AOCP_GET()->funtable;
             vartable *vartable = DATA_AOCP_GET()->vartable;
             node_st *parent = DATA_AOCP_GET()->parent;
 
@@ -41,6 +53,7 @@ node_st *AOCPstmts(node_st *node) {
 
             DATA_VP_GET()->ref = ASSIGN_REF(stmt);
             DATA_VP_GET()->expr = ASSIGN_EXPR(stmt);
+            DATA_VP_GET()->funtable = funtable;
             DATA_VP_GET()->vartable = vartable;
 
             TRAVnext(node);
