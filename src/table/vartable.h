@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "ccngen/enum.h"
-#include "error/span.h"
+#include "error/error.h"
 
 typedef struct ccn_node node_st;
 

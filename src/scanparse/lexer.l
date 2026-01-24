@@ -5,7 +5,6 @@
 
 #include "ccn/ccn.h"
 #include "error/error.h"
-#include "error/span.h"
 #include "globals/globals.h"
 #include "palm/memory.h"
 #include "palm/str.h"

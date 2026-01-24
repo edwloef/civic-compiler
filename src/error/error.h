@@ -1,9 +1,10 @@
 #pragma once
 
-#include <stdbool.h>
-
-#include "ccngen/ast.h"
-#include "error/span.h"
+#define SPAN(node)                                                             \
+    (span) {                                                                   \
+        NODE_BLINE(node), NODE_BCOL(node), NODE_ELINE(node), NODE_ECOL(node),  \
+            NODE_FILENAME(node)                                                \
+    }
 
 #define ERROR(node, format, ...) MESSAGE(L_ERROR, node, format, ##__VA_ARGS__)
 
@@ -16,6 +17,11 @@
     emit_message_with_span(SPAN(node), level, format, ##__VA_ARGS__)
 
 typedef enum { L_ERROR, L_WARNING, L_INFO } level;
+
+typedef struct {
+    int bl, bc, el, ec;
+    char *file;
+} span;
 
 void abort_on_error(void);
 
