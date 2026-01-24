@@ -1,6 +1,5 @@
 #include "ccn/ccn.h"
-#include "palm/str.h"
-#include "table/table.h"
+#include "table/vartable.h"
 
 void DDRinit(void) {}
 void DDRfini(void) {}
@@ -58,10 +57,10 @@ node_st *DDRvarref(node_st *node) {
          right = EXPRS_NEXT(right), i--) {
         vartable_ref dr = e->ty.buf[i];
         dr.n += r.n;
-        vartable_entry *e = vartable_get(DATA_DDR_GET()->vartable, dr);
 
         EXPRS_EXPR(exprs) = ASTbinop(
-            ASTbinop(EXPRS_EXPR(exprs), vartable_entry_ref(e, dr), BO_mul),
+            ASTbinop(EXPRS_EXPR(exprs),
+                     vartable_get_ref(DATA_DDR_GET()->vartable, dr), BO_mul),
             EXPRS_EXPR(right), BO_add);
         EXPRS_EXPR(right) = NULL;
     }

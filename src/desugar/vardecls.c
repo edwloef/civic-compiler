@@ -1,7 +1,7 @@
 #include "ccn/ccn.h"
 #include "macros.h"
 #include "palm/str.h"
-#include "table/table.h"
+#include "table/funtable.h"
 
 void DVDinit(void) {}
 void DVDfini(void) {}
@@ -20,16 +20,9 @@ node_st *DVDprogram(node_st *node) {
     FUNDECL_VARTABLE(decl) = vartable_new(PROGRAM_VARTABLE(node));
     FUNBODY_FUNTABLE(body) = funtable_new(PROGRAM_FUNTABLE(node));
 
-    funtable_ref r = funtable_push(PROGRAM_FUNTABLE(node),
-                                   (funtable_entry){"__init",
-                                                    funtype_new(TY_void),
-                                                    {0, 0, 0, 0, NULL},
-                                                    1,
-                                                    0,
-                                                    false,
-                                                    true});
-
-    FUNDECL_L(decl) = r.l;
+    funtable_entry e = {
+        "__init", funtype_new(TY_void), {0, 0, 0, 0, NULL}, 1, 0, false, true};
+    FUNDECL_L(decl) = funtable_push(PROGRAM_FUNTABLE(node), e).l;
 
     PROGRAM_DECLS(node) = ASTdecls(decl, PROGRAM_DECLS(node));
 
@@ -90,23 +83,18 @@ node_st *DVDdecls(node_st *node) {
             }
         }
 
-        vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
-        r.n = DATA_DVD_GET()->vartable->parent == NULL;
+        node_st *ref = vartable_get_ref(DATA_DVD_GET()->vartable, r);
+        VARREF_N(ref) = DATA_DVD_GET()->vartable->parent == NULL;
+        VARREF_WRITE(ref) = true;
 
         if (VARDECL_EXPR(decl)) {
-            node_st *ref = vartable_entry_ref(e, r);
-            VARREF_WRITE(ref) = true;
-
-            node_st *assign = ASTassign(ref, VARDECL_EXPR(decl));
+            node_st *assign = ASTassign(CCNcopy(ref), VARDECL_EXPR(decl));
             VARDECL_EXPR(decl) = NULL;
 
             DATA_DVD_GET()->stmts = ASTstmts(assign, DATA_DVD_GET()->stmts);
         }
 
         if (TYPE_EXPRS(VARDECL_TY(decl))) {
-            node_st *ref = vartable_entry_ref(e, r);
-            VARREF_WRITE(ref) = true;
-
             node_st *malloc = ASTmalloc(TYPE_EXPRS(VARDECL_TY(decl)));
             EXPR_RESOLVED_TY(malloc) = TYPE_TY(VARDECL_TY(decl));
             TYPE_EXPRS(VARDECL_TY(decl)) = NULL;
@@ -114,6 +102,8 @@ node_st *DVDdecls(node_st *node) {
             node_st *assign = ASTassign(ref, malloc);
 
             DATA_DVD_GET()->stmts = ASTstmts(assign, DATA_DVD_GET()->stmts);
+        } else {
+            CCNfree(ref);
         }
 
         if (stmts) {

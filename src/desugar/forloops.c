@@ -1,6 +1,6 @@
 #include "ccn/ccn.h"
 #include "macros.h"
-#include "table/table.h"
+#include "table/vartable.h"
 
 void DFLinit(void) {}
 void DFLfini(void) {}

@@ -1,7 +1,7 @@
 #include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
-#include "table/table.h"
+#include "table/vartable.h"
 
 vartype vartype_new(enum BasicType ty) {
     vartype n = {0, 0, NULL, ty};
@@ -19,15 +19,6 @@ void vartype_push(vartype *self, vartable_ref e) {
 
 void vartype_free(vartype self) {
     MEMfree(self.buf);
-}
-
-node_st *vartable_entry_ref(vartable_entry *e, vartable_ref r) {
-    node_st *ref = ASTvarref(ASTid(STRcpy(e->name)), NULL);
-    VARREF_N(ref) = r.n;
-    VARREF_L(ref) = r.l;
-    VARREF_RESOLVED_TY(ref) = e->ty.ty;
-    VARREF_RESOLVED_DIMS(ref) = e->ty.len;
-    return ref;
 }
 
 vartable *vartable_new(vartable *parent) {
@@ -81,17 +72,6 @@ vartable_ref vartable_resolve(vartable *self, node_st *id) {
     return (vartable_ref){0, -1};
 }
 
-node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
-    static int temp_var_index = 0;
-    char *name = STRfmt("_%d", temp_var_index++);
-    vartable_entry e = {
-        name, vartype_new(ty), {0, 0, 0, 0, NULL}, 0, 0, false, false, false,
-        false};
-    node_st *ref = ASTvarref(ASTid(name), NULL);
-    VARREF_L(ref) = vartable_push(self, e).l;
-    return ref;
-}
-
 static vartable_entry error = {.name = "error", .ty = {.ty = TY_error}};
 vartable_entry *vartable_get(vartable *self, vartable_ref r) {
     if (r.l == -1) {
@@ -103,6 +83,31 @@ vartable_entry *vartable_get(vartable *self, vartable_ref r) {
     }
 
     return &self->buf[r.l];
+}
+
+node_st *vartable_get_ref(vartable *self, vartable_ref r) {
+    vartable_entry *e = vartable_get(self, r);
+    if (e->ty.ty == TY_error) {
+        return NULL;
+    }
+
+    node_st *ref = ASTvarref(ASTid(STRcpy(e->name)), NULL);
+    VARREF_N(ref) = r.n;
+    VARREF_L(ref) = r.l;
+    VARREF_RESOLVED_TY(ref) = e->ty.ty;
+    VARREF_RESOLVED_DIMS(ref) = e->ty.len;
+    return ref;
+}
+
+node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
+    static int temp_var_index = 0;
+    char *name = STRfmt("_%d", temp_var_index++);
+    vartable_entry e = {
+        name, vartype_new(ty), {0, 0, 0, 0, NULL}, 0, 0, false, false, false,
+        false};
+    node_st *ref = ASTvarref(ASTid(name), NULL);
+    VARREF_L(ref) = vartable_push(self, e).l;
+    return ref;
 }
 
 void vartable_free(vartable *self) {

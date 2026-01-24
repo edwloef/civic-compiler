@@ -1,5 +1,5 @@
 #include "ccn/ccn.h"
-#include "table/table.h"
+#include "table/funtable.h"
 
 void AFinit(void) {}
 void AFfini(void) {}

@@ -1,7 +1,7 @@
 #include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
-#include "table/table.h"
+#include "table/funtable.h"
 
 funtype funtype_new(enum BasicType ty) {
     return (funtype){0, 0, NULL, ty};

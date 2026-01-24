@@ -2,7 +2,7 @@
 #include "ccngen/trav.h"
 #include "error/error.h"
 #include "error/span.h"
-#include "table/table.h"
+#include "table/vartable.h"
 
 static void ARlint_vartable_usage(vartable *vartable) {
     for (int i = 0; i < vartable->len; i++) {

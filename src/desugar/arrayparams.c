@@ -1,6 +1,5 @@
 #include "ccn/ccn.h"
-#include "palm/str.h"
-#include "table/table.h"
+#include "table/vartable.h"
 
 void DAPinit(void) {}
 void DAPfini(void) {}
@@ -71,8 +70,8 @@ node_st *DAPexprs(node_st *node) {
     for (int i = 0; i < e->ty.len; i++) {
         vartable_ref dr = e->ty.buf[i];
         dr.n += r.n;
-        vartable_entry *e = vartable_get(DATA_DAP_GET()->vartable, dr);
-        node_st *param = ASTexprs(vartable_entry_ref(e, dr), NULL);
+        node_st *param =
+            ASTexprs(vartable_get_ref(DATA_DAP_GET()->vartable, dr), NULL);
 
         if (params) {
             EXPRS_NEXT(params) = param;

@@ -1,8 +1,7 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "macros.h"
-#include "palm/str.h"
-#include "table/table.h"
+#include "table/vartable.h"
 
 static node_st *DAArev_exprs(node_st *root) {
     node_st *curr = root;
@@ -64,12 +63,10 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
 
         vartable_ref dr = dims[0];
         dr.n += VARREF_N(ref);
-        vartable_entry *e = vartable_get(DATA_DAA_GET()->vartable, dr);
-
-        node_st *dim = vartable_entry_ref(e, dr);
 
         return ASTstmts(
-            ASTfor(loopvar, ASTint(0), dim, ASTint(1),
+            ASTfor(loopvar, ASTint(0),
+                   vartable_get_ref(DATA_DAA_GET()->vartable, dr), ASTint(1),
                    DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1)),
             NULL);
     }

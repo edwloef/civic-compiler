@@ -1,6 +1,14 @@
 #pragma once
 
-#include "table/vartable.h"
+#include "ccngen/enum.h"
+#include "error/span.h"
+
+typedef struct ccn_node node_st;
+
+typedef struct {
+    enum BasicType ty;
+    int dims;
+} thin_vartype;
 
 typedef struct {
     int n, l;
@@ -35,7 +43,11 @@ struct funtable {
 
 funtable *funtable_new(funtable *parent);
 
+funtable_ref funtable_insert(funtable *self, funtable_entry e, node_st *id);
+
 funtable_ref funtable_push(funtable *self, funtable_entry e);
+
+funtable_ref funtable_resolve(funtable *self, node_st *call);
 
 funtable_entry *funtable_get(funtable *self, funtable_ref r);
 

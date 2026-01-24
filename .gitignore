@@ -3,3 +3,6 @@ build-release
 .cache
 civas
 civvm
+test/fuzzer-generated
+civic.dict
+fuzz-outputs
