@@ -5,8 +5,7 @@
 #include "table/vartable.h"
 
 vartype vartype_new(enum BasicType ty) {
-    vartype n = {0, 0, NULL, ty};
-    return n;
+    return (vartype){0, 0, NULL, ty};
 }
 
 void vartype_push(vartype *self, vartable_ref e) {
@@ -38,6 +37,19 @@ vartable_ref vartable_insert(vartable *self, vartable_entry e, node_st *id) {
                                    e.name);
             vartype_free(e.ty);
             return (vartable_ref){0, -1};
+        }
+    }
+
+    return vartable_push(self, e);
+}
+
+vartable_ref vartable_push_loopvar(vartable *self, vartable_entry e) {
+    for (int l = 0; l < self->len; l++) {
+        vartable_entry entry = self->buf[l];
+        if (entry.loopvar) {
+            vartype_free(e.ty);
+            self->buf[l] = e;
+            return (vartable_ref){0, l};
         }
     }
 

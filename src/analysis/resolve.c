@@ -169,7 +169,7 @@ node_st *ARfor(node_st *node) {
                         false,
                         false,
                         false};
-    vartable_ref r = vartable_push(DATA_AR_GET()->vartable, e);
+    vartable_ref r = vartable_push_loopvar(DATA_AR_GET()->vartable, e);
     VARREF_L(FOR_REF(node)) = r.l;
 
     TRAVstmts(node);

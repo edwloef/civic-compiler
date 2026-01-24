@@ -42,6 +42,8 @@ vartable *vartable_new(vartable *parent);
 
 vartable_ref vartable_insert(vartable *self, vartable_entry e, node_st *id);
 
+vartable_ref vartable_push_loopvar(vartable *self, vartable_entry e);
+
 vartable_ref vartable_push(vartable *self, vartable_entry e);
 
 vartable_ref vartable_resolve(vartable *self, node_st *id);
