@@ -34,18 +34,14 @@ node_st *AOCPstmts(node_st *node) {
              NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_BOOL ||
              (NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF &&
               !VARREF_EXPRS(ASSIGN_EXPR(stmt))))) {
+            vartable *vartable = DATA_AOCP_GET()->vartable;
             node_st *parent = DATA_AOCP_GET()->parent;
-            vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
-                              VARREF_L(ASSIGN_REF(stmt))};
-            vartable_entry *e = vartable_get(DATA_AOCP_GET()->vartable, r);
 
             TRAVpush(TRAV_VP);
 
+            DATA_VP_GET()->ref = ASSIGN_REF(stmt);
             DATA_VP_GET()->expr = ASSIGN_EXPR(stmt);
-            DATA_VP_GET()->write_count = e->write_count;
-            DATA_VP_GET()->escapes = e->escapes;
-            DATA_VP_GET()->n = r.n;
-            DATA_VP_GET()->l = r.l;
+            DATA_VP_GET()->vartable = vartable;
 
             TRAVnext(node);
             TRAVopt(parent);

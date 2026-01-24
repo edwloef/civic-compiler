@@ -35,6 +35,7 @@ node_st *AODSstmts(node_st *node) {
             !EXPR_RESOLVED_DIMS(ASSIGN_REF(stmt))) {
             vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
                               VARREF_L(ASSIGN_REF(stmt))};
+            vartable *vartable = DATA_AODS_GET()->vartable;
             vartable_entry *e = vartable_get(DATA_AODS_GET()->vartable, r);
             bool assign_is_dead = e->read_count == 0;
 
@@ -52,6 +53,7 @@ node_st *AODSstmts(node_st *node) {
                 TRAVpush(TRAV_CD);
 
                 DATA_CD_GET()->ref = ASSIGN_REF(stmt);
+                DATA_CD_GET()->vartable = vartable;
 
                 TRAVopt(trav);
                 TRAVopt(parent);

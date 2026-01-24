@@ -1,6 +1,7 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "palm/dbug.h"
+#include "table/vartable.h"
 
 void CDinit(void) {
     DATA_CD_GET()->assign_is_dead = true;
@@ -76,8 +77,13 @@ node_st *CDcall(node_st *node) {
 
     TRAVchildren(node);
 
-    if (CALL_N(node) == 0) {
-        DATA_CD_GET()->assign_is_dead = false;
+    if (CALL_N(node) <= VARREF_N(DATA_CD_GET()->ref)) {
+        vartable_ref r = {VARREF_N(DATA_CD_GET()->ref),
+                          VARREF_L(DATA_CD_GET()->ref)};
+        vartable_entry *e = vartable_get(DATA_CD_GET()->vartable, r);
+        if (e->escapes) {
+            DATA_CD_GET()->assign_is_dead = false;
+        }
     }
 
     return node;
@@ -92,13 +98,13 @@ node_st *CDvarref(node_st *node) {
 
     if (node == DATA_CD_GET()->ref) {
         DATA_CD_GET()->seen = true;
-    } else if (VARREF_N(node) == 0 &&
+    } else if (VARREF_N(node) == VARREF_N(DATA_CD_GET()->ref) &&
                VARREF_L(node) == VARREF_L(DATA_CD_GET()->ref)) {
         if (VARREF_WRITE(node)) {
             if (DATA_CD_GET()->seen) {
                 DATA_CD_GET()->ref_is_dead = true;
             }
-        } else {
+        } else if (!DATA_CD_GET()->ref_is_dead) {
             DATA_CD_GET()->assign_is_dead = false;
         }
     }

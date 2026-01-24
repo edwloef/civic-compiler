@@ -19,8 +19,23 @@ node_st *CPLstmts(node_st *node) {
 node_st *CPLcall(node_st *node) {
     TRAVchildren(node);
 
-    if (DATA_CPL_GET()->write_count > 1 && CALL_N(node) <= DATA_VP_GET()->n) {
-        DATA_CPL_GET()->can_prop = false;
+    if (CALL_N(node) <= VARREF_N(DATA_CPL_GET()->ref)) {
+        vartable_ref r = {VARREF_N(DATA_CPL_GET()->ref),
+                          VARREF_L(DATA_CPL_GET()->ref)};
+        vartable_entry *e = vartable_get(DATA_CPL_GET()->vartable, r);
+        if (e->escapes && e->write_count > 1) {
+            DATA_CPL_GET()->can_prop = false;
+        }
+    }
+
+    if (NODE_TYPE(DATA_CPL_GET()->expr) == NT_VARREF &&
+        CALL_N(node) <= VARREF_N(DATA_CPL_GET()->expr)) {
+        vartable_ref r = {VARREF_N(DATA_CPL_GET()->expr),
+                          VARREF_L(DATA_CPL_GET()->expr)};
+        vartable_entry *e = vartable_get(DATA_CPL_GET()->vartable, r);
+        if (e->escapes) {
+            DATA_CPL_GET()->can_prop = false;
+        }
     }
 
     return node;
@@ -29,9 +44,17 @@ node_st *CPLcall(node_st *node) {
 node_st *CPLvarref(node_st *node) {
     TRAVchildren(node);
 
-    if (VARREF_N(node) == DATA_CPL_GET()->n &&
-        VARREF_L(node) == DATA_CPL_GET()->l && VARREF_WRITE(node)) {
-        DATA_CPL_GET()->can_prop = false;
+    if (VARREF_WRITE(node)) {
+        if (VARREF_N(node) == VARREF_N(DATA_CPL_GET()->ref) &&
+            VARREF_L(node) == VARREF_L(DATA_CPL_GET()->ref)) {
+            DATA_CPL_GET()->can_prop = false;
+        }
+
+        if (NODE_TYPE(DATA_CPL_GET()->expr) == NT_VARREF &&
+            VARREF_N(node) == VARREF_N(DATA_CPL_GET()->expr) &&
+            VARREF_L(node) == VARREF_L(DATA_CPL_GET()->expr)) {
+            DATA_CPL_GET()->can_prop = false;
+        }
     }
 
     return node;

@@ -130,6 +130,8 @@ cycle AstOpt {
             }
         };
 
+        Escapes;
+
         CountWrites;
 
         traversal CopyProp {
@@ -142,8 +144,6 @@ cycle AstOpt {
         };
 
         CountReads;
-
-        Escapes;
 
         traversal DeadStores {
             uid = AODS,
@@ -213,11 +213,9 @@ traversal ValueProp {
     uid = VP,
     nodes = Stmt | { Stmts, VarRef },
     travdata {
+        VarRef ref,
         Expr expr,
-        int write_count,
-        bool escapes,
-        int n,
-        int l
+        user vartable_ptr vartable
     }
 };
 
@@ -225,9 +223,8 @@ traversal ValuePropLoop {
     uid = VPL,
     nodes = { VarRef },
     travdata {
-        Expr expr,
-        int n,
-        int l
+        VarRef ref,
+        Expr expr
     }
 };
 
@@ -236,9 +233,9 @@ traversal CheckPropLoop {
     nodes = { Stmts, Call, VarRef },
     travdata {
         bool can_prop,
-        int write_count,
-        int n,
-        int l
+        VarRef ref,
+        Expr expr,
+        user vartable_ptr vartable
     }
 };
 
@@ -257,7 +254,8 @@ traversal CheckDead {
         bool seen,
         bool assign_is_dead,
         bool ref_is_dead,
-        VarRef ref
+        VarRef ref,
+        user vartable_ptr vartable
     }
 };
 
