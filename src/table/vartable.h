@@ -28,7 +28,7 @@ typedef struct {
     vartype ty;
     span span;
     int read_count, write_count;
-    bool external, exported, param, loopvar;
+    bool external, exported, param, loopvar, escapes;
 } vartable_entry;
 
 typedef struct vartable vartable;

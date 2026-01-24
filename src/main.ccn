@@ -144,13 +144,7 @@ phase Desugar {
 
 cycle AstOpt {
     actions {
-        traversal CountCalls {
-            uid = AOCC,
-            nodes = { Program, FunBody, Call },
-            travdata {
-                user funtable_ptr funtable
-            }
-        };
+        CountCalls;
 
         traversal DeadFunctions {
             uid = AODF,
@@ -160,13 +154,7 @@ cycle AstOpt {
             }
         };
 
-        traversal CountWrites {
-            uid = AOCW,
-            nodes = { Program, FunDecl, VarRef },
-            travdata {
-                user vartable_ptr vartable
-            }
-        };
+        CountWrites;
 
         traversal CopyProp {
             uid = AOCP,
@@ -177,13 +165,9 @@ cycle AstOpt {
             }
         };
 
-        traversal CountReads {
-            uid = AOCR,
-            nodes = { Program, FunDecl, VarRef },
-            travdata {
-                user vartable_ptr vartable
-            }
-        };
+        CountReads;
+
+        Escapes;
 
         traversal DeadStores {
             uid = AODS,
@@ -217,12 +201,45 @@ cycle AstOpt {
     }
 };
 
+traversal CountCalls {
+    uid = CC,
+    nodes = { Program, FunBody, Call },
+    travdata {
+        user funtable_ptr funtable
+    }
+};
+
+traversal CountReads {
+    uid = CR,
+    nodes = { Program, FunDecl, VarRef },
+    travdata {
+        user vartable_ptr vartable
+    }
+};
+
+traversal CountWrites {
+    uid = CW,
+    nodes = { Program, FunDecl, VarRef },
+    travdata {
+        user vartable_ptr vartable
+    }
+};
+
+traversal Escapes {
+    uid = E,
+    nodes = { Program, FunDecl, VarRef },
+    travdata {
+        user vartable_ptr vartable
+    }
+};
+
 traversal ValueProp {
     uid = VP,
     nodes = Stmt | { Stmts, VarRef },
     travdata {
         Expr expr,
         int write_count,
+        bool escapes,
         int n,
         int l
     }

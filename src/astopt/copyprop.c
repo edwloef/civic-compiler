@@ -43,6 +43,7 @@ node_st *AOCPstmts(node_st *node) {
 
             DATA_VP_GET()->expr = ASSIGN_EXPR(stmt);
             DATA_VP_GET()->write_count = e->write_count;
+            DATA_VP_GET()->escapes = e->escapes;
             DATA_VP_GET()->n = r.n;
             DATA_VP_GET()->l = r.l;
 

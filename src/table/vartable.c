@@ -103,9 +103,16 @@ node_st *vartable_get_ref(vartable *self, vartable_ref r) {
 node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
     static int temp_var_index = 0;
     char *name = STRfmt("_%d", temp_var_index++);
-    vartable_entry e = {
-        name, vartype_new(ty), {0, 0, 0, 0, NULL}, 0, 0, false, false, false,
-        false};
+    vartable_entry e = {name,
+                        vartype_new(ty),
+                        {0, 0, 0, 0, NULL},
+                        0,
+                        0,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false};
     node_st *ref = ASTvarref(ASTid(name), NULL);
     VARREF_L(ref) = vartable_push(self, e).l;
     return ref;

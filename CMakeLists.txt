@@ -44,6 +44,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/countwrites.c
     src/astopt/deadfunctions.c
     src/astopt/deadstores.c
+    src/astopt/escapes.c
     src/astopt/extractcalls.c
     src/astopt/identities.c
     src/astopt/reassoc.c
