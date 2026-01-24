@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
+#include "palm/dbug.h"
 
 void CDinit(void) {
     DATA_CD_GET()->assign_is_dead = true;
@@ -16,6 +17,13 @@ node_st *CDstmts(node_st *node) {
     if (DATA_CD_GET()->assign_is_dead) {
         TRAVnext(node);
     }
+
+    return node;
+}
+
+node_st *CDassign(node_st *node) {
+    TRAVexpr(node);
+    TRAVref(node);
 
     return node;
 }
@@ -37,10 +45,26 @@ node_st *CDifelse(node_st *node) {
     return node;
 }
 
-node_st *CDfor(node_st *node) {
+node_st *CDwhile(node_st *node) {
+    DBUG_ASSERT(false, "Unreachable.");
+
+    return node;
+}
+
+node_st *CDdowhile(node_st *node) {
     TRAVchildren(node);
 
-    DATA_CD_GET()->ref_is_dead = false;
+    return node;
+}
+
+node_st *CDfor(node_st *node) {
+    DBUG_ASSERT(false, "Unreachable.");
+
+    return node;
+}
+
+node_st *CDreturn(node_st *node) {
+    TRAVchildren(node);
 
     return node;
 }

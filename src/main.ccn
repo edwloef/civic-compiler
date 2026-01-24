@@ -252,7 +252,7 @@ traversal ExtractCalls {
 
 traversal CheckDead {
     uid = CD,
-    nodes = { Stmts, IfElse, For, Call, VarRef },
+    nodes = Stmt | { Stmts, VarRef },
     travdata {
         bool seen,
         bool assign_is_dead,

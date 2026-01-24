@@ -2,36 +2,6 @@
 #include "ccngen/trav.h"
 #include "palm/dbug.h"
 
-#define PROP_INTO_LOOP(e)                                                      \
-    {                                                                          \
-        if (DATA_VP_GET()->expr && DATA_VP_GET()->write_count > 1) {           \
-            int write_count = DATA_VP_GET()->write_count;                      \
-            int n = DATA_VP_GET()->n;                                          \
-            int l = DATA_VP_GET()->l;                                          \
-            TRAVpush(TRAV_CPL);                                                \
-            DATA_CPL_GET()->write_count = write_count;                         \
-            DATA_CPL_GET()->n = n;                                             \
-            DATA_CPL_GET()->l = l;                                             \
-            e = TRAVopt(e);                                                    \
-            bool can_prop = DATA_CPL_GET()->can_prop;                          \
-            TRAVpop();                                                         \
-            if (!can_prop) {                                                   \
-                DATA_VP_GET()->expr = NULL;                                    \
-            }                                                                  \
-        }                                                                      \
-        if (DATA_VP_GET()->expr) {                                             \
-            node_st *expr = DATA_VP_GET()->expr;                               \
-            int n = DATA_VP_GET()->n;                                          \
-            int l = DATA_VP_GET()->l;                                          \
-            TRAVpush(TRAV_VPL);                                                \
-            DATA_VPL_GET()->expr = expr;                                       \
-            DATA_VPL_GET()->n = n;                                             \
-            DATA_VPL_GET()->l = l;                                             \
-            e = TRAVopt(e);                                                    \
-            TRAVpop();                                                         \
-        }                                                                      \
-    }
-
 void VPinit(void) {}
 void VPfini(void) {}
 
@@ -78,17 +48,49 @@ node_st *VPwhile(node_st *node) {
 }
 
 node_st *VPdowhile(node_st *node) {
-    PROP_INTO_LOOP(node);
+    if (DATA_VP_GET()->expr && DATA_VP_GET()->write_count > 1) {
+        int write_count = DATA_VP_GET()->write_count;
+        int n = DATA_VP_GET()->n;
+        int l = DATA_VP_GET()->l;
+
+        TRAVpush(TRAV_CPL);
+
+        DATA_CPL_GET()->write_count = write_count;
+        DATA_CPL_GET()->n = n;
+        DATA_CPL_GET()->l = l;
+
+        node = TRAVopt(node);
+
+        bool can_prop = DATA_CPL_GET()->can_prop;
+
+        TRAVpop();
+
+        if (!can_prop) {
+            DATA_VP_GET()->expr = NULL;
+        }
+    }
+
+    if (DATA_VP_GET()->expr) {
+        node_st *expr = DATA_VP_GET()->expr;
+        int n = DATA_VP_GET()->n;
+        int l = DATA_VP_GET()->l;
+
+        TRAVpush(TRAV_VPL);
+
+        DATA_VPL_GET()->expr = expr;
+        DATA_VPL_GET()->n = n;
+        DATA_VPL_GET()->l = l;
+
+        node = TRAVopt(node);
+
+        TRAVpop();
+    }
 
     return node;
 }
 
 node_st *VPfor(node_st *node) {
-    TRAVloop_start(node);
-    TRAVloop_end(node);
-    TRAVloop_step(node);
-
-    PROP_INTO_LOOP(FOR_STMTS(node));
+    DBUG_ASSERT(false, "Unreachable.");
 
     return node;
 }

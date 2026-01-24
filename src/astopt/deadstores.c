@@ -36,8 +36,13 @@ node_st *AODSstmts(node_st *node) {
             vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
                               VARREF_L(ASSIGN_REF(stmt))};
             vartable_entry *e = vartable_get(DATA_AODS_GET()->vartable, r);
-
             bool assign_is_dead = e->read_count == 0;
+
+            if (!assign_is_dead && NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF) {
+                vartable_ref er = {VARREF_N(ASSIGN_EXPR(stmt)),
+                                   VARREF_L(ASSIGN_EXPR(stmt))};
+                assign_is_dead = r.n == er.n && r.l == er.l;
+            }
 
             if (!assign_is_dead && VARREF_N(ASSIGN_REF(stmt)) == 0) {
                 node_st *parent = DATA_AODS_GET()->parent;
