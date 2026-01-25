@@ -29,7 +29,8 @@ node_st *DVDprogram(node_st *node) {
                         0,
                         0,
                         false,
-                        true};
+                        true,
+                        false};
     FUNDECL_L(decl) = funtable_push(PROGRAM_FUNTABLE(node), e).l;
 
     PROGRAM_DECLS(node) = ASTdecls(decl, PROGRAM_DECLS(node));

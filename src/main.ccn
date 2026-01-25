@@ -201,9 +201,20 @@ cycle AstOpt {
             nodes = { Monop, Binop, Cast }
         };
 
+        traversal SideEffects {
+            uid = AOSF,
+            nodes = { Program, FunDecl, FunBody },
+            travdata {
+                user funtable_ptr funtable
+            }
+        };
+
         traversal TrivialControlFlow {
             uid = AOTCF,
-            nodes = { Stmts }
+            nodes = { Program, FunBody, Stmts },
+            travdata {
+                user funtable_ptr funtable
+            }
         };
 
         traversal Identities {

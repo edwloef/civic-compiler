@@ -34,7 +34,7 @@ typedef struct {
     span span;
     int call_count, read_capture, write_capture, scalar_read_capture,
         scalar_write_capture;
-    bool external, exported;
+    bool external, exported, side_effects;
 } funtable_entry;
 
 typedef struct funtable funtable;

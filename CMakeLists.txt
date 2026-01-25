@@ -50,6 +50,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/identities.c
     src/astopt/indirectcalls.c
     src/astopt/reassoc.c
+    src/astopt/sideeffects.c
     src/astopt/trivialcontrolflow.c
     src/astopt/valueprop.c
     src/astopt/valueproploop.c

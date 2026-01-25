@@ -9,6 +9,27 @@ static void AOTCFdiverges(node_st *node) {
     }
 }
 
+void AOTCFinit(void) {}
+void AOTCFfini(void) {}
+
+node_st *AOTCFprogram(node_st *node) {
+    DATA_AOTCF_GET()->funtable = PROGRAM_FUNTABLE(node);
+
+    TRAVchildren(node);
+
+    return node;
+}
+
+node_st *AOTCFfunbody(node_st *node) {
+    DATA_AOTCF_GET()->funtable = FUNBODY_FUNTABLE(node);
+
+    TRAVchildren(node);
+
+    DATA_AOTCF_GET()->funtable = DATA_AOTCF_GET()->funtable->parent;
+
+    return node;
+}
+
 node_st *AOTCFstmts(node_st *node) {
     TRAVchildren(node);
 
@@ -62,6 +83,20 @@ node_st *AOTCFstmts(node_st *node) {
     case NT_RETURN:
         AOTCFdiverges(node);
         break;
+    case NT_CALL: {
+        funtable_ref r = {CALL_N(stmt), CALL_L(stmt)};
+        funtable_entry *e = funtable_get(DATA_AOTCF_GET()->funtable, r);
+        if (!e->side_effects) {
+            TRAVpush(TRAV_EC);
+
+            TRAVexprs(stmt);
+
+            node = inline_stmts(node, DATA_EC_GET()->stmts);
+
+            TRAVpop();
+        }
+        break;
+    }
     default:
         break;
     }

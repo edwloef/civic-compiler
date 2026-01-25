@@ -31,11 +31,40 @@ void nested_side_effects() {
     nested();
 }
 
-void foo() {
+export void foo() {
     maybe_side_effects();
     no_side_effects();
     side_effects();
     also_side_effects();
     nested_no_side_effects();
     nested_side_effects();
+}
+
+export void bar() {
+    int a;
+    int[1] b;
+    void no_side_effects() {
+        int a = 0;
+    }
+    void side_effects() {
+        a = a + 1;
+    }
+    void no_side_effects_array_param(int[n] b) {
+        int a = b[0];
+    }
+    void side_effects_array_param(int[n] b) {
+        b[0] = 5;
+    }
+    a = 0;
+    no_side_effects();
+    printInt(a);
+    a = 0;
+    side_effects();
+    printInt(a);
+    b = 0;
+    no_side_effects_array_param(b);
+    printInt(b[0]);
+    b = 0;
+    side_effects_array_param(b);
+    printInt(b[0]);
 }

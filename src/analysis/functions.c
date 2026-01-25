@@ -37,7 +37,8 @@ node_st *AFfundecl(node_st *node) {
                         0,
                         0,
                         FUNDECL_EXTERNAL(node),
-                        FUNDECL_EXPORTED(node)};
+                        FUNDECL_EXPORTED(node),
+                        false};
     FUNDECL_L(node) =
         funtable_insert(DATA_AF_GET()->funtable, e, FUNDECL_ID(node)).l;
 

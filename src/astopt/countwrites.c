@@ -19,7 +19,7 @@ node_st *CWprogram(node_st *node) {
 node_st *CWfundecl(node_st *node) {
     for (int i = 0; i < FUNDECL_VARTABLE(node)->len; i++) {
         vartable_entry *e = &FUNDECL_VARTABLE(node)->buf[i];
-        e->write_count = (e->param || e->loopvar);
+        e->write_count = e->param;
     }
 
     DATA_CW_GET()->vartable = FUNDECL_VARTABLE(node);
