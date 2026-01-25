@@ -121,7 +121,8 @@ static void multi_line_annotation(span span, level level, char *format,
     }
     fputs("^\n", stderr);
 
-    if (span.el - span.bl < 3) {
+    if (span.el - span.bl == 1) {
+    } else if (span.el - span.bl == 2) {
         int lineno = span.bl + 1;
         line = HTlookup(file, &lineno);
 
