@@ -60,11 +60,11 @@ node_st *AOTCFstmts(node_st *node) {
 
             CCNcycleNotify();
         } else if (!IFELSE_IF_BLOCK(stmt) && !IFELSE_ELSE_BLOCK(stmt)) {
-            TRAVpush(TRAV_EC);
+            TRAVpush(TRAV_ES);
 
             TRAVexpr(stmt);
 
-            node = inline_stmts(node, DATA_EC_GET()->stmts);
+            node = inline_stmts(node, DATA_ES_GET()->stmts);
 
             TRAVpop();
         }
@@ -87,11 +87,11 @@ node_st *AOTCFstmts(node_st *node) {
         funtable_ref r = {CALL_N(stmt), CALL_L(stmt)};
         funtable_entry *e = funtable_get(DATA_AOTCF_GET()->funtable, r);
         if (!e->side_effects) {
-            TRAVpush(TRAV_EC);
+            TRAVpush(TRAV_ES);
 
             TRAVexprs(stmt);
 
-            node = inline_stmts(node, DATA_EC_GET()->stmts);
+            node = inline_stmts(node, DATA_ES_GET()->stmts);
 
             TRAVpop();
         }

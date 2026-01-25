@@ -78,10 +78,10 @@ node_st *AODSstmts(node_st *node) {
             }
 
             if (assign_is_dead) {
-                TRAVpush(TRAV_EC);
+                TRAVpush(TRAV_ES);
 
                 TRAVexpr(stmt);
-                node = inline_stmts(node, DATA_EC_GET()->stmts);
+                node = inline_stmts(node, DATA_ES_GET()->stmts);
 
                 TRAVpop();
             }

@@ -280,9 +280,9 @@ traversal CheckPropLoop {
     }
 };
 
-traversal ExtractCalls {
-    uid = EC,
-    nodes = { Call },
+traversal ExtractStmts {
+    uid = ES,
+    nodes = { BinOp, Call },
     travdata {
         Stmts stmts
     }
