@@ -1,26 +1,37 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "error/error.h"
 #include "globals/globals.h"
 #include "palm/dbug.h"
 #include "palm/str.h"
 
-#define ANSI_RESET "\033[0m"
-#define ANSI_BRIGHT_RED "\033[30;91m"
-#define ANSI_BRIGHT_YELLOW "\033[30;93m"
-#define ANSI_BRIGHT_BLUE "\033[30;94m"
-#define ANSI_BRIGHT_CYAN "\033[30;96m"
+static bool color_supported(void) {
+    static bool init = false;
+    static bool support;
+    if (!init) {
+        init = true;
+        support = !getenv("NO_COLOR") && isatty(fileno(stderr));
+    }
+    return support;
+}
+
+#define RESET (color_supported() ? "\033[0m" : "")
+#define BRIGHT_RED (color_supported() ? "\033[30;91m" : "")
+#define BRIGHT_YELLOW (color_supported() ? "\033[30;93m" : "")
+#define BRIGHT_BLUE (color_supported() ? "\033[30;94m" : "")
+#define BRIGHT_CYAN (color_supported() ? "\033[30;96m" : "")
 
 static char *color_of_level(level level) {
     switch (level) {
     case L_ERROR:
-        return ANSI_BRIGHT_RED;
+        return BRIGHT_RED;
     case L_WARNING:
-        return ANSI_BRIGHT_YELLOW;
+        return BRIGHT_YELLOW;
     case L_INFO:
-        return ANSI_BRIGHT_CYAN;
+        return BRIGHT_CYAN;
     default:
         DBUG_ASSERT(false, "Unknown level");
         return "";
@@ -53,12 +64,9 @@ void abort_on_error(void) {
 }
 
 static void va_emit_message(level level, char *format, va_list ap) {
-    if (level == L_ERROR) {
-        error_count++;
-    }
-
-    fprintf(stderr, "%s%s" ANSI_RESET, color_of_level(level),
-            message_of_level(level));
+    error_count += level == L_ERROR;
+    fprintf(stderr, "%s%s%s", color_of_level(level), message_of_level(level),
+            RESET);
     vfprintf(stderr, format, ap);
     fputc('\n', stderr);
 }
@@ -74,56 +82,40 @@ void emit_message(level level, char *format, ...) {
 static void single_line_annotation(span span, level level, char *format,
                                    va_list ap) {
     int lineno_width = log10(span.el + 1) + 1;
-
-    fprintf(stderr,
-            ANSI_BRIGHT_BLUE "%*s-->" ANSI_RESET " %s:%d:%d\n" ANSI_BRIGHT_BLUE
-                             "%*s|\n" ANSI_RESET,
-            lineno_width, "", span.file, span.bl + 1, span.bc + 1,
-            lineno_width + 1, "");
-
-    if (globals.linemap) {
-        htable_st *inner = HTlookup(globals.linemap, span.file);
-        char *line = HTlookup(inner, &span.bl);
-
-        fprintf(stderr, ANSI_BRIGHT_BLUE "%*d | " ANSI_RESET "%s\n",
-                lineno_width, span.bl + 1, line);
-    }
-
     char *color = color_of_level(level);
-    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s|%*s%s", lineno_width + 1, "",
+
+    htable_st *file = HTlookup(globals.linemap, span.file);
+    char *line = HTlookup(file, &span.bl);
+
+    fprintf(stderr, "%s%*s--> %s%s:%d:%d\n%s%*s|\n%*d | %s%s\n%s%*s|%*s%s",
+            BRIGHT_BLUE, lineno_width, "", RESET, span.file, span.bl + 1,
+            span.bc + 1, BRIGHT_BLUE, lineno_width + 1, "", lineno_width,
+            span.bl + 1, RESET, line, BRIGHT_BLUE, lineno_width + 1, "",
             span.bc + 1, "", color);
 
-    if (globals.linemap) {
-        for (int i = 0; i <= span.ec - span.bc; i++) {
-            fputc('^', stderr);
-        }
-        fputc(' ', stderr);
+    for (int i = 0; i <= span.ec - span.bc; i++) {
+        fputc('^', stderr);
     }
+    fputc(' ', stderr);
 
     vfprintf(stderr, format, ap);
 
-    fprintf(stderr, ANSI_BRIGHT_BLUE "\n%*s\n" ANSI_RESET, lineno_width + 2,
-            "|");
+    fprintf(stderr, "\n%s%*s|%s\n", BRIGHT_BLUE, lineno_width + 1, "", RESET);
 }
 
 static void multi_line_annotation(span span, level level, char *format,
                                   va_list ap) {
     int lineno_width = log10(span.el + 1) + 1;
-
-    fprintf(stderr,
-            ANSI_BRIGHT_BLUE "%*s-->" ANSI_RESET " %s:%d:%d\n" ANSI_BRIGHT_BLUE
-                             "%*s|\n",
-            lineno_width, "", span.file, span.bl + 1, span.bc + 1,
-            lineno_width + 1, "");
-
     char *color = color_of_level(level);
 
-    htable_st *inner = HTlookup(globals.linemap, span.file);
-    char *line = HTlookup(inner, &span.bl);
-    fprintf(stderr,
-            ANSI_BRIGHT_BLUE "%*d |   " ANSI_RESET "%s\n" ANSI_BRIGHT_BLUE
-                             "%*s|  %s",
-            lineno_width, span.bl + 1, line, lineno_width + 1, "", color);
+    htable_st *file = HTlookup(globals.linemap, span.file);
+    char *line = HTlookup(file, &span.bl);
+
+    fprintf(stderr, "%s%*s--> %s%s:%d:%d\n%s%*s|\n%*d |   %s%s\n%s%*s|  %s",
+            BRIGHT_BLUE, lineno_width, "", RESET, span.file, span.bl + 1,
+            span.bc + 1, BRIGHT_BLUE, lineno_width + 1, "", lineno_width,
+            span.bl + 1, RESET, line, BRIGHT_BLUE, lineno_width + 1, "", color);
+
     for (int i = 0; i <= span.bc; i++) {
         fputc('_', stderr);
     }
@@ -131,21 +123,20 @@ static void multi_line_annotation(span span, level level, char *format,
 
     if (span.el - span.bl < 3) {
         int lineno = span.bl + 1;
-        line = HTlookup(inner, &lineno);
+        line = HTlookup(file, &lineno);
 
-        fprintf(stderr, ANSI_BRIGHT_BLUE "%*d | %s| " ANSI_RESET "%s\n",
-                lineno_width, lineno + 1, color, line);
+        fprintf(stderr, "%s%*d | %s| %s%s\n", BRIGHT_BLUE, lineno_width,
+                lineno + 1, color, RESET, line);
     } else {
-        fprintf(stderr, ANSI_BRIGHT_BLUE "...%*s%s|\n", lineno_width, "",
-                color);
+        fprintf(stderr, "%s...%*s%s|\n", BRIGHT_BLUE, lineno_width, "", color);
     }
 
-    line = HTlookup(inner, &span.el);
+    line = HTlookup(file, &span.el);
 
-    fprintf(stderr, ANSI_BRIGHT_BLUE "%*d | %s| " ANSI_RESET "%s\n",
-            lineno_width, span.el + 1, color, line);
+    fprintf(stderr, "%s%*d | %s| %s%s\n%s%*s | %s|", BRIGHT_BLUE, lineno_width,
+            span.el + 1, color, RESET, line, BRIGHT_BLUE, lineno_width, "",
+            color);
 
-    fprintf(stderr, ANSI_BRIGHT_BLUE "%*s | %s|", lineno_width, "", color);
     for (int i = 0; i <= span.ec; i++) {
         fputc('_', stderr);
     }
@@ -153,8 +144,7 @@ static void multi_line_annotation(span span, level level, char *format,
 
     vfprintf(stderr, format, ap);
 
-    fprintf(stderr, ANSI_BRIGHT_BLUE "\n%*s\n" ANSI_RESET, lineno_width + 2,
-            "|");
+    fprintf(stderr, "\n%s%*s|%s\n", BRIGHT_BLUE, lineno_width + 1, "", RESET);
 }
 
 void emit_message_with_span(span span, level level, char *format, ...) {
@@ -162,11 +152,7 @@ void emit_message_with_span(span span, level level, char *format, ...) {
         return;
     }
 
-    if (globals.quiet) {
-        if (level == L_INFO) {
-            return;
-        }
-
+    if (globals.quiet || !globals.linemap) {
         fprintf(stderr, "%s:%d:%d: ", span.file, span.bl + 1, span.bc + 1);
     }
 
@@ -176,7 +162,7 @@ void emit_message_with_span(span span, level level, char *format, ...) {
     va_emit_message(level, format, ap);
     va_end(ap);
 
-    if (!globals.quiet) {
+    if (!(globals.quiet || !globals.linemap)) {
         va_start(ap, format);
         if (span.bl == span.el) {
             single_line_annotation(span, level, format, ap);
