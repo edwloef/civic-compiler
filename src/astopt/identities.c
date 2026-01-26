@@ -57,12 +57,6 @@ node_st *AOImonop(node_st *node) {
                     BINOP_RIGHT(node) = ASTmonop(BINOP_RIGHT(node), MO_neg);
                 }
                 break;
-            case BO_mod:
-                if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
-                    // (-(7 % x)) => ((-7) % x)
-                    TAKE(MONOP_EXPR(node));
-                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
-                }
             default:
                 break;
             }
@@ -281,13 +275,6 @@ node_st *AOIbinop(node_st *node) {
             node = ASTint(0);
             BOOL_RESOLVED_TY(node) = TY_int;
             CCNcycleNotify();
-        } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_neg) {
-            // ((-x) % y) => (-(x % y))
-            SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
-            WRAP(MO_neg);
-        } else if (NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_neg) {
-            // (x % (-y)) => (x % y)
-            SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
         }
         break;
     case BO_and:
