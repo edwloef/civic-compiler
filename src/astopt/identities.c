@@ -3,6 +3,11 @@
 #include "ccn/ccn.h"
 #include "globals/globals.h"
 #include "macros.h"
+#include "palm/dbug.h"
+
+#define CHECK_FFINITE_MATH_ONLY()                                              \
+    if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
+        return node;
 
 node_st *AOImonop(node_st *node) {
     TRAVchildren(node);
@@ -118,10 +123,51 @@ node_st *AOIbinop(node_st *node) {
     switch (BINOP_OP(node)) {
     case BO_add:
     case BO_sub:
-        if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
-            (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0 &&
-             (!globals.fsigned_zeros || signbit(FLOAT_VAL(left)))) ||
-            (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
+        if (NODE_TYPE(left) == NT_BINOP &&
+            BINOP_OP(left) == (BINOP_OP(node) == BO_add ? BO_sub : BO_add) &&
+            NODE_TYPE(BINOP_RIGHT(left)) == NT_VARREF &&
+            NODE_TYPE(right) == NT_VARREF &&
+            VARREF_N(BINOP_RIGHT(left)) == VARREF_N(right) &&
+            VARREF_L(BINOP_RIGHT(left)) == VARREF_L(right) &&
+            !VARREF_EXPRS(right)) {
+            CHECK_FFINITE_MATH_ONLY();
+            // ((y + x) - x) => y
+            // ((y - x) + x) => y
+            TAKE(BINOP_LEFT(BINOP_LEFT(node)));
+            break;
+        } else if ((BINOP_OP(node) == BO_sub ||
+                    BINOP_RESOLVED_TY(node) == TY_bool) &&
+                   NODE_TYPE(left) == NT_VARREF &&
+                   NODE_TYPE(right) == NT_VARREF &&
+                   VARREF_N(left) == VARREF_N(right) &&
+                   VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+            CHECK_FFINITE_MATH_ONLY();
+            switch (BINOP_RESOLVED_TY(node)) {
+            case TY_int:
+                // x - x => 0
+                CCNfree(node);
+                node = ASTint(0);
+                INT_RESOLVED_TY(node) = TY_int;
+                CCNcycleNotify();
+                break;
+            case TY_float:
+                // x - x => 0.0
+                CCNfree(node);
+                node = ASTfloat(0);
+                FLOAT_RESOLVED_TY(node) = TY_float;
+                CCNcycleNotify();
+                break;
+            case TY_bool:
+                // x + x => x
+                TAKE(BINOP_LEFT(node));
+                break;
+            default:
+                DBUG_ASSERT(false, "Unreachable.");
+            }
+        } else if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
+                   (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0 &&
+                    (!globals.fsigned_zeros || signbit(FLOAT_VAL(left)))) ||
+                   (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
             // ({0, 0.0, false} + x) => x
             // ({0, 0.0} - x) => (-x)
             if (BINOP_OP(node) == BO_sub) {
@@ -149,8 +195,25 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_mul:
-        if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_not &&
-            NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_not) {
+        if (BINOP_RESOLVED_TY(node) == TY_bool && NODE_TYPE(left) == NT_BINOP &&
+            BINOP_OP(left) == BO_mul &&
+            NODE_TYPE(BINOP_RIGHT(left)) == NT_VARREF &&
+            NODE_TYPE(right) == NT_VARREF &&
+            VARREF_N(BINOP_RIGHT(left)) == VARREF_N(right) &&
+            VARREF_L(BINOP_RIGHT(left)) == VARREF_L(right) &&
+            !VARREF_EXPRS(right)) {
+            // ((y * x) * x) => (y * x)
+            TAKE(BINOP_LEFT(node));
+            break;
+        }
+        if (BINOP_RESOLVED_TY(node) == TY_bool &&
+            NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
+            VARREF_N(left) == VARREF_N(right) &&
+            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+            // x * x => x
+            TAKE(BINOP_LEFT(node));
+        } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_not &&
+                   NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_not) {
             // ((!x) * (!y)) => (!(x + y))
             BINOP_OP(node) = BO_add;
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));

@@ -25,14 +25,19 @@ static void Usage(char *program) {
            "compiler.\n");
     printf("  -f[no]associative-math        Allow re-association of "
            "floating-point operations. Requires -fno-signed-zeros.\n");
+    printf("  -f[no]finite-math-only        Allow optimizations for "
+           "floating-point arithmetic that assume arguments are not NaNs or "
+           "+-Infs.\n");
     printf("  -f[no]signed-zeros            Allow optimizations for "
            "floating-point arithmetic that ignore the signedness of zero.\n");
 }
 
 #define FASSOCIATIVE_MATH 256
 #define FNO_ASSOCIATIVE_MATH 257
-#define FSIGNED_ZEROS 258
-#define FNO_SIGNED_ZEROS 259
+#define FFINITE_MATH_ONLY 258
+#define FNO_FINITE_MATH_ONLY 259
+#define FSIGNED_ZEROS 260
+#define FNO_SIGNED_ZEROS 261
 
 static struct option options[] = {
     {"help", no_argument, 0, 'h'},
@@ -42,6 +47,8 @@ static struct option options[] = {
     {"structure", no_argument, 0, 's'},
     {"fassociative-math", no_argument, 0, FASSOCIATIVE_MATH},
     {"fno-associative-math", no_argument, 0, FNO_ASSOCIATIVE_MATH},
+    {"ffinite-math-only", no_argument, 0, FASSOCIATIVE_MATH},
+    {"fno-finite-math-only", no_argument, 0, FNO_ASSOCIATIVE_MATH},
     {"fsigned-zeros", no_argument, 0, FASSOCIATIVE_MATH},
     {"fno-signed-zeros", no_argument, 0, FNO_ASSOCIATIVE_MATH},
     {0, 0, 0, 0}};
@@ -75,6 +82,12 @@ static void ProcessArgs(int argc, char *argv[]) {
             break;
         case FNO_ASSOCIATIVE_MATH:
             globals.fassociative_math = false;
+            break;
+        case FFINITE_MATH_ONLY:
+            globals.ffinite_math_only = true;
+            break;
+        case FNO_FINITE_MATH_ONLY:
+            globals.ffinite_math_only = false;
             break;
         case FSIGNED_ZEROS:
             globals.fsigned_zeros = true;
