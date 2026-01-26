@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
+#include "macros.h"
 #include "utils.h"
 
 static void AOTCFdiverges(node_st *node) {
@@ -47,19 +48,39 @@ node_st *AOTCFstmts(node_st *node) {
             }
 
             node = inline_stmts(node, stmts);
-        } else if (NODE_TYPE(IFELSE_EXPR(stmt)) == NT_MONOP &&
-                   MONOP_OP(IFELSE_EXPR(stmt)) == MO_not) {
-            node_st *tmp = IFELSE_EXPR(stmt);
-            IFELSE_EXPR(stmt) = MONOP_EXPR(tmp);
-            MONOP_EXPR(tmp) = NULL;
-            CCNfree(tmp);
+        } else if (IFELSE_IF_BLOCK(stmt)) {
+            if (IFELSE_ELSE_BLOCK(stmt)) {
+                if (NODE_TYPE(IFELSE_EXPR(stmt)) == NT_MONOP) {
+                    SWAP(IFELSE_EXPR(stmt), MONOP_EXPR(tmp));
 
-            tmp = IFELSE_IF_BLOCK(stmt);
+                    node_st *tmp = IFELSE_IF_BLOCK(stmt);
+                    IFELSE_IF_BLOCK(stmt) = IFELSE_ELSE_BLOCK(stmt);
+                    IFELSE_ELSE_BLOCK(stmt) = tmp;
+                }
+            } else {
+                if (!STMTS_NEXT(IFELSE_IF_BLOCK(stmt)) &&
+                    NODE_TYPE(STMTS_STMT(IFELSE_IF_BLOCK(stmt))) == NT_IFELSE &&
+                    !IFELSE_ELSE_BLOCK(STMTS_STMT(IFELSE_IF_BLOCK(stmt)))) {
+                    IFELSE_EXPR(stmt) = ASTbinop(
+                        IFELSE_EXPR(stmt),
+                        IFELSE_EXPR(STMTS_STMT(IFELSE_IF_BLOCK(stmt))), BO_and);
+                    BINOP_RESOLVED_TY(IFELSE_EXPR(stmt)) = TY_bool;
+                    IFELSE_EXPR(STMTS_STMT(IFELSE_IF_BLOCK(stmt))) = NULL;
+
+                    SWAP(IFELSE_IF_BLOCK(stmt),
+                         IFELSE_IF_BLOCK(STMTS_STMT(tmp)));
+                }
+            }
+        } else if (IFELSE_ELSE_BLOCK(stmt)) {
+            IFELSE_EXPR(stmt) = ASTmonop(IFELSE_EXPR(stmt), MO_not);
+            MONOP_RESOLVED_TY(IFELSE_EXPR(stmt)) = TY_bool;
+
+            node_st *tmp = IFELSE_IF_BLOCK(stmt);
             IFELSE_IF_BLOCK(stmt) = IFELSE_ELSE_BLOCK(stmt);
             IFELSE_ELSE_BLOCK(stmt) = tmp;
 
             CCNcycleNotify();
-        } else if (!IFELSE_IF_BLOCK(stmt) && !IFELSE_ELSE_BLOCK(stmt)) {
+        } else {
             TRAVpush(TRAV_ES);
 
             TRAVexpr(stmt);
