@@ -31,6 +31,7 @@ node_st *AOImonop(node_st *node) {
             case BO_add:
             case BO_sub:
                 if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
+                    // (-(7 + x)) => ((-7) - x)
                     // (-(7 - x)) => ((-7) + x)
                     TAKE(MONOP_EXPR(node));
                     BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
@@ -69,6 +70,7 @@ node_st *AOImonop(node_st *node) {
         break;
     case MO_not:
         if (NODE_TYPE(expr) == NT_MONOP && MONOP_OP(expr) == MO_not) {
+            // !(!(x)) => x
             TAKE(MONOP_EXPR(MONOP_EXPR(node)))
         } else if (NODE_TYPE(expr) == NT_BINOP) {
             switch (BINOP_OP(expr)) {
