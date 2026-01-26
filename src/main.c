@@ -26,8 +26,8 @@ static void Usage(char *program) {
     printf("  -f[no]associative-math        Allow re-association of "
            "floating-point operations. Requires -fno-signed-zeros.\n");
     printf("  -f[no]finite-math-only        Allow optimizations for "
-           "floating-point arithmetic that assume arguments are not NaNs or "
-           "+-Infs.\n");
+           "floating-point arithmetic that assume arguments and results are "
+           "not NaNs or +-Infs.\n");
     printf("  -f[no]signed-zeros            Allow optimizations for "
            "floating-point arithmetic that ignore the signedness of zero.\n");
 }
