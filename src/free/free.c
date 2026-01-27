@@ -3,6 +3,9 @@
 node_st *Fprogram(node_st *node) {
     TRAVchildren(node);
 
+    consttable_free(PROGRAM_CONSTTABLE(node));
+    PROGRAM_CONSTTABLE(node) = NULL;
+
     funtable_free(PROGRAM_FUNTABLE(node));
     PROGRAM_FUNTABLE(node) = NULL;
 

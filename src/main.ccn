@@ -253,9 +253,12 @@ phase CodeGen {
                     }
                 };
 
-                traversal NormalizeFloats {
-                    uid = CGNF,
-                    nodes = { Float }
+                traversal Constants {
+                    uid = CGC,
+                    nodes = { Program, Int, Float },
+                    travdata {
+                        user consttable_ptr consttable
+                    }
                 };
             }
         };
@@ -383,6 +386,7 @@ root node Program {
     },
 
     attributes {
+        user consttable_ptr consttable,
         user funtable_ptr funtable,
         user vartable_ptr vartable
     }
@@ -428,7 +432,7 @@ node Exprs {
 };
 
 nodeset Expr {
-    nodes = { ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool, Malloc },
+    nodes = { ArrExprs, Monop, Binop, Cast, Call, VarRef, Int, Float, Bool, Malloc, ConstRef },
 
     attributes {
         BasicType resolved_ty,
@@ -655,5 +659,15 @@ node Float {
 node Bool {
     attributes {
         bool val { constructor }
+    }
+};
+
+node ConstRef {
+    attributes {
+        int l { constructor }
+    },
+
+    lifetime {
+        allowed (CodeGen.Constants -> )
     }
 };

@@ -386,3 +386,10 @@ node_st *PRTbool(node_st *node) {
 
     return node;
 }
+
+node_st *PRTconstref(node_st *node) {
+    printf("%sC%d", CONSTREF_RESOLVED_TY(node) == TY_int ? "I" : "F",
+           CONSTREF_L(node));
+
+    return node;
+}

@@ -718,3 +718,9 @@ node_st *ATCbool(node_st *node) {
 
     return node;
 }
+
+node_st *ATCconstref(node_st *node) {
+    DBUG_ASSERT(false, "Unreachable.");
+
+    return node;
+}
