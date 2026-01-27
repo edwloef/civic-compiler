@@ -424,10 +424,6 @@ node Exprs {
     children {
         Expr expr { constructor, mandatory },
         Exprs next { constructor }
-    },
-
-    attributes {
-        bool transp
     }
 };
 
@@ -436,8 +432,7 @@ nodeset Expr {
 
     attributes {
         BasicType resolved_ty,
-        int resolved_dims,
-        bool transp
+        int resolved_dims
     }
 };
 
