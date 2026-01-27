@@ -26,8 +26,10 @@ node_st *CGCint(node_st *node) {
         consttable_insert_int(DATA_CGC_GET()->consttable, INT_VAL(node));
 
     CCNfree(node);
+    node = ASTconstref(r.l);
+    CONSTREF_RESOLVED_TY(node) = TY_int;
 
-    return ASTconstref(r.l);
+    return node;
 }
 
 node_st *CGCfloat(node_st *node) {
@@ -46,6 +48,8 @@ node_st *CGCfloat(node_st *node) {
         consttable_insert_float(DATA_CGC_GET()->consttable, FLOAT_VAL(node));
 
     CCNfree(node);
+    node = ASTconstref(r.l);
+    CONSTREF_RESOLVED_TY(node) = TY_float;
 
-    return ASTconstref(r.l);
+    return node;
 }
