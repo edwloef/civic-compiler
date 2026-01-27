@@ -252,6 +252,11 @@ phase CodeGen {
                         user vartable_ptr new
                     }
                 };
+
+                traversal NormalizeFloats {
+                    uid = CGNF,
+                    nodes = { Float }
+                };
             }
         };
     }
