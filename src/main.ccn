@@ -4,6 +4,7 @@ start phase RootPhase {
         Analysis;
         Desugar;
         AstOpt;
+        CodeGen;
         Free;
     }
 };
@@ -224,6 +225,38 @@ cycle AstOpt {
     }
 };
 
+phase CodeGen {
+    actions {
+        phase Tables {
+            actions {
+                CountCalls;
+
+                traversal ShrinkFuntables {
+                    uid = CGSF,
+                    nodes = { Program, FunBody, Call },
+                    travdata {
+                        user funtable_ptr funtable,
+                        user funtable_ptr new
+                    }
+                };
+
+                CountReads;
+
+                CountWrites;
+
+                traversal ShrinkVartables {
+                    uid = CGSV,
+                    nodes = { Program, FunDecl, VarRef },
+                    travdata {
+                        user vartable_ptr vartable,
+                        user vartable_ptr new
+                    }
+                };
+            }
+        };
+    }
+};
+
 traversal CountCalls {
     uid = CC,
     nodes = { Program, FunBody, Call },
@@ -301,6 +334,11 @@ traversal CheckDead {
     }
 };
 
+traversal Free {
+    uid = F,
+    nodes = { Program, Fundecl, Funbody }
+};
+
 node Scope {
     children {
         Expr expr { constructor },
@@ -311,11 +349,6 @@ node Scope {
     lifetime {
         disallowed
     }
-};
-
-traversal Free {
-    uid = F,
-    nodes = { Program, Fundecl, Funbody }
 };
 
 enum BasicType {

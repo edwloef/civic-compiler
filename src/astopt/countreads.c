@@ -1,15 +1,19 @@
 #include "ccn/ccn.h"
 
+static void CRreset(void) {
+    for (int i = 0; i < DATA_CR_GET()->vartable->len; i++) {
+        vartable_entry *e = &DATA_CR_GET()->vartable->buf[i];
+        e->read_count = (e->exported || e->external);
+    }
+}
+
 void CRinit(void) {}
 void CRfini(void) {}
 
 node_st *CRprogram(node_st *node) {
-    for (int i = 0; i < PROGRAM_VARTABLE(node)->len; i++) {
-        vartable_entry *e = &PROGRAM_VARTABLE(node)->buf[i];
-        e->read_count = (e->exported || e->external);
-    }
-
     DATA_CR_GET()->vartable = PROGRAM_VARTABLE(node);
+
+    CRreset();
 
     TRAVchildren(node);
 
@@ -17,12 +21,9 @@ node_st *CRprogram(node_st *node) {
 }
 
 node_st *CRfundecl(node_st *node) {
-    for (int i = 0; i < FUNDECL_VARTABLE(node)->len; i++) {
-        vartable_entry *e = &FUNDECL_VARTABLE(node)->buf[i];
-        e->read_count = 0;
-    }
-
     DATA_CR_GET()->vartable = FUNDECL_VARTABLE(node);
+
+    CRreset();
 
     TRAVchildren(node);
 

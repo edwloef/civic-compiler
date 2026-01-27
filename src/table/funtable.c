@@ -17,6 +17,12 @@ void funtype_push(funtype *self, thin_vartype e) {
     self->buf[self->len++] = e;
 }
 
+funtype funtype_copy(funtype *self) {
+    return (funtype){self->len, self->len,
+                     MEMcopy(self->len * sizeof(thin_vartype), self->buf),
+                     self->ty};
+}
+
 void funtype_free(funtype self) {
     MEMfree(self.buf);
 }

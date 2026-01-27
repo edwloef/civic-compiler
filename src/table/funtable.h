@@ -26,13 +26,15 @@ funtype funtype_new(enum BasicType ty);
 
 void funtype_push(funtype *self, thin_vartype e);
 
+funtype funtype_copy(funtype *self);
+
 void funtype_free(funtype self);
 
 typedef struct {
     char *name;
     funtype ty;
     span span;
-    int call_count, read_capture, write_capture, scalar_read_capture,
+    int new_l, call_count, read_capture, write_capture, scalar_read_capture,
         scalar_write_capture;
     bool external, exported, side_effects;
 } funtable_entry;

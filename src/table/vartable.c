@@ -17,6 +17,12 @@ void vartype_push(vartype *self, vartable_ref e) {
     self->buf[self->len++] = e;
 }
 
+vartype vartype_copy(vartype *self) {
+    return (vartype){self->len, self->len,
+                     MEMcopy(self->len * sizeof(vartable_ref), self->buf),
+                     self->ty};
+}
+
 void vartype_free(vartype self) {
     MEMfree(self.buf);
 }
@@ -118,6 +124,7 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
     vartable_entry e = {name,
                         vartype_new(ty),
                         {0, 0, 0, 0, NULL},
+                        0,
                         0,
                         0,
                         false,

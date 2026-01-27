@@ -1,15 +1,19 @@
 #include "ccn/ccn.h"
 
+static void CWreset(void) {
+    for (int i = 0; i < DATA_CW_GET()->vartable->len; i++) {
+        vartable_entry *e = &DATA_CW_GET()->vartable->buf[i];
+        e->write_count = 2 * (e->external || e->exported) + e->param;
+    }
+}
+
 void CWinit(void) {}
 void CWfini(void) {}
 
 node_st *CWprogram(node_st *node) {
-    for (int i = 0; i < PROGRAM_VARTABLE(node)->len; i++) {
-        vartable_entry *e = &PROGRAM_VARTABLE(node)->buf[i];
-        e->write_count = 2 * (e->external || e->exported);
-    }
-
     DATA_CW_GET()->vartable = PROGRAM_VARTABLE(node);
+
+    CWreset();
 
     TRAVchildren(node);
 
@@ -17,12 +21,9 @@ node_st *CWprogram(node_st *node) {
 }
 
 node_st *CWfundecl(node_st *node) {
-    for (int i = 0; i < FUNDECL_VARTABLE(node)->len; i++) {
-        vartable_entry *e = &FUNDECL_VARTABLE(node)->buf[i];
-        e->write_count = e->param;
-    }
-
     DATA_CW_GET()->vartable = FUNDECL_VARTABLE(node);
+
+    CWreset();
 
     TRAVchildren(node);
 

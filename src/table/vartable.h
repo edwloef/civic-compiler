@@ -21,13 +21,15 @@ vartype vartype_new(enum BasicType ty);
 
 void vartype_push(vartype *self, vartable_ref e);
 
+vartype vartype_copy(vartype *self);
+
 void vartype_free(vartype self);
 
 typedef struct {
     char *name;
     vartype ty;
     span span;
-    int read_count, write_count;
+    int new_l, read_count, write_count;
     bool external, exported, param, loopvar, escapes;
 } vartable_entry;
 

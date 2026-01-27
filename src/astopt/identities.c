@@ -65,7 +65,7 @@ node_st *AOImonop(node_st *node) {
     case MO_not:
         if (NODE_TYPE(expr) == NT_MONOP && MONOP_OP(expr) == MO_not) {
             // !(!(x)) => x
-            TAKE(MONOP_EXPR(MONOP_EXPR(node)))
+            TAKE(MONOP_EXPR(MONOP_EXPR(node)));
         } else if (NODE_TYPE(expr) == NT_BINOP) {
             switch (BINOP_OP(expr)) {
             case BO_lt:
