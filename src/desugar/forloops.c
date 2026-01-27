@@ -67,6 +67,11 @@ node_st *DFLstmts(node_st *node) {
                 ASTwhile(ASTbinop(CCNcopy(end_ref), CCNcopy(start_ref), BO_lt),
                          FOR_STMTS(stmt)),
                 NULL));
+        BINOP_RESOLVED_TY(IFELSE_EXPR(dowhile)) = TY_int;
+        BINOP_RESOLVED_TY(WHILE_EXPR(STMTS_STMT(IFELSE_IF_BLOCK(dowhile)))) =
+            TY_int;
+        BINOP_RESOLVED_TY(WHILE_EXPR(STMTS_STMT(IFELSE_ELSE_BLOCK(dowhile)))) =
+            TY_int;
 
         FOR_STMTS(stmt) = NULL;
 

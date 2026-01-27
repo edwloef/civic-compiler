@@ -1,15 +1,12 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "error/error.h"
+#include "macros.h"
 #include "palm/dbug.h"
 #include "print/print.h"
 
-static thin_vartype RESOLVED_TY(node_st *node) {
-    return (thin_vartype){EXPR_RESOLVED_TY(node), EXPR_RESOLVED_DIMS(node)};
-}
-
 static void ATCcheckassign(node_st *from_node, vartype to, node_st *node) {
-    thin_vartype from = RESOLVED_TY(from_node);
+    thin_vartype from = TYPE(from_node);
     if (from.ty == TY_error || to.ty == TY_error) {
         return;
     }
@@ -85,7 +82,7 @@ node_st *ATCarrexprs(node_st *node) {
 
     for (node_st *expr = node; expr; expr = ARREXPRS_NEXT(expr)) {
         TRAVexpr(expr);
-        thin_vartype resolved_ty = RESOLVED_TY(ARREXPRS_EXPR(expr));
+        thin_vartype resolved_ty = TYPE(ARREXPRS_EXPR(expr));
 
         if (resolved_ty.ty == TY_error) {
             error = true;
@@ -186,7 +183,7 @@ node_st *ATCvardecl(node_st *node) {
     if (ty.ty != TY_error) {
         for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
              expr = EXPRS_NEXT(expr)) {
-            thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
+            thin_vartype resolved_ty = TYPE(EXPRS_EXPR(expr));
             if (resolved_ty.ty != TY_error) {
                 if (resolved_ty.dims == 0) {
                     if (resolved_ty.ty != TY_int) {
@@ -235,7 +232,7 @@ node_st *ATCassign(node_st *node) {
 node_st *ATCifelse(node_st *node) {
     TRAVchildren(node);
 
-    thin_vartype resolved_ty = RESOLVED_TY(IFELSE_EXPR(node));
+    thin_vartype resolved_ty = TYPE(IFELSE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
         if (resolved_ty.ty != TY_bool) {
             if (resolved_ty.dims == 0) {
@@ -258,7 +255,7 @@ node_st *ATCifelse(node_st *node) {
 node_st *ATCwhile(node_st *node) {
     TRAVchildren(node);
 
-    thin_vartype resolved_ty = RESOLVED_TY(WHILE_EXPR(node));
+    thin_vartype resolved_ty = TYPE(WHILE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
         if (resolved_ty.ty != TY_bool) {
             if (resolved_ty.dims == 0) {
@@ -282,7 +279,7 @@ node_st *ATCwhile(node_st *node) {
 node_st *ATCdowhile(node_st *node) {
     TRAVchildren(node);
 
-    thin_vartype resolved_ty = RESOLVED_TY(DOWHILE_EXPR(node));
+    thin_vartype resolved_ty = TYPE(DOWHILE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
         if (resolved_ty.ty != TY_bool) {
             if (resolved_ty.dims == 0) {
@@ -305,7 +302,7 @@ node_st *ATCdowhile(node_st *node) {
 node_st *ATCfor(node_st *node) {
     TRAVchildren(node);
 
-    thin_vartype start_ty = RESOLVED_TY(FOR_LOOP_START(node));
+    thin_vartype start_ty = TYPE(FOR_LOOP_START(node));
     if (start_ty.ty != TY_error) {
         if (start_ty.ty != TY_int) {
             if (start_ty.dims == 0) {
@@ -322,7 +319,7 @@ node_st *ATCfor(node_st *node) {
         }
     }
 
-    thin_vartype end_ty = RESOLVED_TY(FOR_LOOP_END(node));
+    thin_vartype end_ty = TYPE(FOR_LOOP_END(node));
     if (end_ty.ty != TY_error) {
         if (end_ty.ty != TY_int) {
             if (end_ty.dims == 0) {
@@ -339,7 +336,7 @@ node_st *ATCfor(node_st *node) {
         }
     }
 
-    thin_vartype step_ty = RESOLVED_TY(FOR_LOOP_STEP(node));
+    thin_vartype step_ty = TYPE(FOR_LOOP_STEP(node));
     if (step_ty.ty != TY_error) {
         if (step_ty.ty != TY_int) {
             if (step_ty.dims == 0) {
@@ -363,7 +360,7 @@ node_st *ATCreturn(node_st *node) {
     TRAVchildren(node);
 
     if (RETURN_EXPR(node)) {
-        thin_vartype resolved_ty = RESOLVED_TY(RETURN_EXPR(node));
+        thin_vartype resolved_ty = TYPE(RETURN_EXPR(node));
         if (DATA_ATC_GET()->ret_ty == TY_void) {
             ERROR(node,
                   "can't return value from function without return value");
@@ -397,7 +394,7 @@ node_st *ATCreturn(node_st *node) {
 node_st *ATCmonop(node_st *node) {
     TRAVchildren(node);
 
-    thin_vartype resolved_ty = RESOLVED_TY(MONOP_EXPR(node));
+    thin_vartype resolved_ty = TYPE(MONOP_EXPR(node));
 
     MONOP_RESOLVED_DIMS(node) = 0;
 
@@ -445,8 +442,8 @@ node_st *ATCmonop(node_st *node) {
 node_st *ATCbinop(node_st *node) {
     TRAVchildren(node);
 
-    thin_vartype left_ty = RESOLVED_TY(BINOP_LEFT(node));
-    thin_vartype right_ty = RESOLVED_TY(BINOP_RIGHT(node));
+    thin_vartype left_ty = TYPE(BINOP_LEFT(node));
+    thin_vartype right_ty = TYPE(BINOP_RIGHT(node));
 
     BINOP_RESOLVED_DIMS(node) = 0;
 
@@ -557,7 +554,7 @@ node_st *ATCbinop(node_st *node) {
 node_st *ATCcast(node_st *node) {
     TRAVchildren(node);
 
-    thin_vartype resolved_ty = RESOLVED_TY(CAST_EXPR(node));
+    thin_vartype resolved_ty = TYPE(CAST_EXPR(node));
 
     if (resolved_ty.ty != TY_error) {
         if (resolved_ty.dims != 0) {
@@ -593,7 +590,7 @@ node_st *ATCcall(node_st *node) {
         }
 
         thin_vartype expected_ty = ty.buf[i];
-        thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(arg));
+        thin_vartype resolved_ty = TYPE(EXPRS_EXPR(arg));
         if (resolved_ty.ty != TY_error) {
             if ((expected_ty.dims != resolved_ty.dims ||
                  expected_ty.ty != resolved_ty.ty)) {
@@ -652,7 +649,7 @@ node_st *ATCvarref(node_st *node) {
 
     for (node_st *expr = VARREF_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
         if (ty.ty != TY_error && ty.len != 0) {
-            thin_vartype resolved_ty = RESOLVED_TY(EXPRS_EXPR(expr));
+            thin_vartype resolved_ty = TYPE(EXPRS_EXPR(expr));
             if (resolved_ty.ty != TY_error) {
                 if (resolved_ty.dims == 0) {
                     if (resolved_ty.ty != TY_int) {

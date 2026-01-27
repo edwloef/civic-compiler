@@ -2,6 +2,11 @@
 
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
+#define TYPE(n)                                                                \
+    (thin_vartype) {                                                           \
+        EXPR_RESOLVED_TY(n), EXPR_RESOLVED_DIMS(n)                             \
+    }
+
 #define TAKE(n)                                                                \
     {                                                                          \
         node_st *tmp = n;                                                      \

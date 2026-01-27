@@ -167,6 +167,8 @@ node_st *AOIbinop(node_st *node) {
             // ({0, 0.0} - x) => (-x)
             if (BINOP_OP(node) == BO_sub) {
                 BINOP_RIGHT(node) = ASTmonop(BINOP_RIGHT(node), MO_neg);
+                MONOP_RESOLVED_TY(BINOP_RIGHT(node)) =
+                    EXPR_RESOLVED_TY(MONOP_EXPR(BINOP_RIGHT(node)));
             }
             TAKE(BINOP_RIGHT(node));
         } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_not &&
