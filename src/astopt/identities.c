@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <math.h>
 
 #include "ccn/ccn.h"
@@ -8,6 +9,11 @@
 #define CHECK_FFINITE_MATH_ONLY()                                              \
     if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
         break;
+
+#define BINOP_IDENTICAL_REFS()                                                 \
+    (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&          \
+     VARREF_N(left) == VARREF_N(right) && VARREF_L(left) == VARREF_L(right) && \
+     !VARREF_EXPRS(right))
 
 node_st *AOImonop(node_st *node) {
     TRAVchildren(node);
@@ -120,9 +126,7 @@ node_st *AOIbinop(node_st *node) {
     case BO_add:
     case BO_sub:
         if ((BINOP_OP(node) == BO_sub || BINOP_RESOLVED_TY(node) == TY_bool) &&
-            NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+            BINOP_IDENTICAL_REFS()) {
             CHECK_FFINITE_MATH_ONLY();
             switch (BINOP_RESOLVED_TY(node)) {
             case TY_int:
@@ -192,10 +196,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_mul:
-        if (BINOP_RESOLVED_TY(node) == TY_bool &&
-            NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+        if (BINOP_RESOLVED_TY(node) == TY_bool && BINOP_IDENTICAL_REFS()) {
             // (x * x) => x
             TAKE(BINOP_LEFT(node));
         } else if (BINOP_RESOLVED_TY(node) == TY_bool &&
@@ -239,9 +240,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_div:
-        if (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+        if (BINOP_IDENTICAL_REFS()) {
             CHECK_FFINITE_MATH_ONLY();
             // (x / x) => {1, 1.0}
             enum BasicType ty = BINOP_RESOLVED_TY(node);
@@ -269,9 +268,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_mod:
-        if (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+        if (BINOP_IDENTICAL_REFS()) {
             // (x % x) => 0
             CCNfree(node);
             node = ASTint(0);
@@ -280,9 +277,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_and:
-        if (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+        if (BINOP_IDENTICAL_REFS()) {
             // (x && x) => x
             TAKE(BINOP_LEFT(node));
         } else if (NODE_TYPE(left) == NT_BOOL) {
@@ -296,9 +291,7 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_or:
-        if (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+        if (BINOP_IDENTICAL_REFS()) {
             // (x || x) => x
             TAKE(BINOP_LEFT(node));
         } else if (NODE_TYPE(left) == NT_BOOL) {
@@ -312,7 +305,14 @@ node_st *AOIbinop(node_st *node) {
         }
         break;
     case BO_eq:
-        if (NODE_TYPE(left) == NT_BOOL) {
+        if (BINOP_IDENTICAL_REFS()) {
+            CHECK_FFINITE_MATH_ONLY();
+            // (x == x) => true
+            CCNfree(node);
+            node = ASTbool(true);
+            BOOL_RESOLVED_TY(node) = TY_bool;
+            CCNcycleNotify();
+        } else if (NODE_TYPE(left) == NT_BOOL) {
             if (BOOL_VAL(left) == true) {
                 // (true == x) => x
                 TAKE(BINOP_RIGHT(node));
@@ -321,21 +321,37 @@ node_st *AOIbinop(node_st *node) {
                 TAKE(BINOP_RIGHT(node));
                 WRAP(MO_not);
             }
-            break;
         }
-        // fallthrough
+        break;
     case BO_le:
-    case BO_ge:
-        if (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+        if (BINOP_IDENTICAL_REFS()) {
             CHECK_FFINITE_MATH_ONLY();
-            // (x == x) => true
             // (x <= x) => true
+            CCNfree(node);
+            node = ASTbool(true);
+            BOOL_RESOLVED_TY(node) = TY_bool;
+            CCNcycleNotify();
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MIN &&
+                   NODE_TYPE(right) == NT_VARREF) {
+            // (INT_MIN <= x) => true
+            CCNfree(node);
+            node = ASTbool(true);
+            CCNcycleNotify();
+        }
+        break;
+    case BO_ge:
+        if (BINOP_IDENTICAL_REFS()) {
+            CHECK_FFINITE_MATH_ONLY();
             // (x >= x) => true
             CCNfree(node);
             node = ASTbool(true);
             BOOL_RESOLVED_TY(node) = TY_bool;
+            CCNcycleNotify();
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MAX &&
+                   NODE_TYPE(right) == NT_VARREF) {
+            // (INT_MAX >= x) => true
+            CCNfree(node);
+            node = ASTbool(true);
             CCNcycleNotify();
         }
         break;
@@ -349,21 +365,42 @@ node_st *AOIbinop(node_st *node) {
                 // (false != x) => x
                 TAKE(BINOP_RIGHT(node));
             }
-            break;
-        }
-        // fallthrough
-    case BO_lt:
-    case BO_gt:
-        if (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&
-            VARREF_N(left) == VARREF_N(right) &&
-            VARREF_L(left) == VARREF_L(right) && !VARREF_EXPRS(right)) {
+        } else if (BINOP_IDENTICAL_REFS()) {
             CHECK_FFINITE_MATH_ONLY();
             // (x != x) => false
+            CCNfree(node);
+            node = ASTbool(false);
+            BOOL_RESOLVED_TY(node) = TY_bool;
+            CCNcycleNotify();
+        }
+        break;
+    case BO_lt:
+        if (BINOP_IDENTICAL_REFS()) {
             // (x < x) => false
+            CCNfree(node);
+            node = ASTbool(false);
+            BOOL_RESOLVED_TY(node) = TY_bool;
+            CCNcycleNotify();
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MAX &&
+                   NODE_TYPE(right) == NT_VARREF) {
+            // (INT_MAX < x) => false
+            CCNfree(node);
+            node = ASTbool(false);
+            CCNcycleNotify();
+        }
+        break;
+    case BO_gt:
+        if (BINOP_IDENTICAL_REFS()) {
             // (x > x) => false
             CCNfree(node);
             node = ASTbool(false);
             BOOL_RESOLVED_TY(node) = TY_bool;
+            CCNcycleNotify();
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MIN &&
+                   NODE_TYPE(right) == NT_VARREF) {
+            // (INT_MIN > x) => false
+            CCNfree(node);
+            node = ASTbool(false);
             CCNcycleNotify();
         }
         break;

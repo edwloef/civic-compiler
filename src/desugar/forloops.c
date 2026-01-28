@@ -1,3 +1,5 @@
+#include <limits.h>
+
 #include "ccn/ccn.h"
 #include "macros.h"
 #include "table/vartable.h"
@@ -34,6 +36,9 @@ node_st *DFLstmts(node_st *node) {
 
         FOR_REF(stmt) = NULL;
 
+        node_st *clamped_end_ref =
+            vartable_temp_var(DATA_DFL_GET()->vartable, TY_int);
+
         node_st *start_assign = ASTassign(start_ref, FOR_LOOP_START(stmt));
         node_st *end_assign = ASTassign(end_ref, FOR_LOOP_END(stmt));
         node_st *step_assign = ASTassign(step_ref, FOR_LOOP_STEP(stmt));
@@ -57,21 +62,61 @@ node_st *DFLstmts(node_st *node) {
             FOR_STMTS(stmt) = ASTstmts(step_inc, NULL);
         }
 
-        node_st *dowhile = ASTifelse(
-            ASTbinop(CCNcopy(step_ref), ASTint(0), BO_gt),
-            ASTstmts(
-                ASTwhile(ASTbinop(CCNcopy(end_ref), CCNcopy(start_ref), BO_gt),
-                         CCNcopy(FOR_STMTS(stmt))),
-                NULL),
-            ASTstmts(
-                ASTwhile(ASTbinop(CCNcopy(end_ref), CCNcopy(start_ref), BO_lt),
-                         FOR_STMTS(stmt)),
-                NULL));
-        BINOP_RESOLVED_TY(IFELSE_EXPR(dowhile)) = TY_int;
-        BINOP_RESOLVED_TY(WHILE_EXPR(STMTS_STMT(IFELSE_IF_BLOCK(dowhile)))) =
-            TY_int;
-        BINOP_RESOLVED_TY(WHILE_EXPR(STMTS_STMT(IFELSE_ELSE_BLOCK(dowhile)))) =
-            TY_int;
+        node_st *positive_step_clamp_assign =
+            ASTassign(CCNcopy(clamped_end_ref),
+                      ASTbinop(ASTint(INT_MIN), CCNcopy(step_ref), BO_sub));
+        VARREF_WRITE(ASSIGN_REF(positive_step_clamp_assign)) = true;
+
+        node_st *positive_step_overflow_while =
+            ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
+                     CCNcopy(FOR_STMTS(stmt)));
+
+        node_st *positive_step_overflow_if =
+            ASTifelse(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
+                      CCNcopy(FOR_STMTS(stmt)), NULL);
+
+        node_st *positive_step_no_overflow_while =
+            ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
+                     CCNcopy(FOR_STMTS(stmt)));
+
+        node_st *positive_step_ifelse = ASTifelse(
+            ASTbinop(CCNcopy(clamped_end_ref), CCNcopy(end_ref), BO_lt),
+            ASTstmts(positive_step_overflow_while,
+                     ASTstmts(positive_step_overflow_if, NULL)),
+            ASTstmts(positive_step_no_overflow_while, NULL));
+
+        node_st *positive_step = ASTstmts(positive_step_clamp_assign,
+                                          ASTstmts(positive_step_ifelse, NULL));
+
+        node_st *negative_step_clamp_assign =
+            ASTassign(CCNcopy(clamped_end_ref),
+                      ASTbinop(ASTint(INT_MAX), CCNcopy(step_ref), BO_sub));
+        VARREF_WRITE(ASSIGN_REF(negative_step_clamp_assign)) = true;
+
+        node_st *negative_step_overflow_while =
+            ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
+                     CCNcopy(FOR_STMTS(stmt)));
+
+        node_st *negative_step_overflow_if =
+            ASTifelse(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
+                      CCNcopy(FOR_STMTS(stmt)), NULL);
+
+        node_st *negative_step_no_overflow_while =
+            ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
+                     FOR_STMTS(stmt));
+
+        node_st *negative_step_ifelse =
+            ASTifelse(ASTbinop(clamped_end_ref, CCNcopy(end_ref), BO_gt),
+                      ASTstmts(negative_step_overflow_while,
+                               ASTstmts(negative_step_overflow_if, NULL)),
+                      ASTstmts(negative_step_no_overflow_while, NULL));
+
+        node_st *negative_step = ASTstmts(negative_step_clamp_assign,
+                                          ASTstmts(negative_step_ifelse, NULL));
+
+        node_st *transformed =
+            ASTifelse(ASTbinop(CCNcopy(step_ref), ASTint(0), BO_gt),
+                      positive_step, negative_step);
 
         FOR_STMTS(stmt) = NULL;
 
@@ -81,10 +126,10 @@ node_st *DFLstmts(node_st *node) {
 
         TAKE(STMTS_NEXT(node));
 
-        node =
-            ASTstmts(start_assign,
-                     ASTstmts(end_assign,
-                              ASTstmts(step_assign, ASTstmts(dowhile, node))));
+        node = ASTstmts(
+            start_assign,
+            ASTstmts(end_assign,
+                     ASTstmts(step_assign, ASTstmts(transformed, node))));
     }
 
     return node;
