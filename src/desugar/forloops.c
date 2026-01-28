@@ -67,9 +67,9 @@ node_st *DFLstmts(node_st *node) {
                       ASTbinop(ASTint(INT_MIN), CCNcopy(step_ref), BO_sub));
         VARREF_WRITE(ASSIGN_REF(positive_step_clamp_assign)) = true;
 
-        node_st *positive_step_overflow_while =
-            ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
-                     CCNcopy(FOR_STMTS(stmt)));
+        node_st *positive_step_overflow_while = ASTwhile(
+            ASTbinop(CCNcopy(start_ref), CCNcopy(clamped_end_ref), BO_lt),
+            CCNcopy(FOR_STMTS(stmt)));
 
         node_st *positive_step_overflow_if =
             ASTifelse(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
@@ -93,9 +93,9 @@ node_st *DFLstmts(node_st *node) {
                       ASTbinop(ASTint(INT_MAX), CCNcopy(step_ref), BO_sub));
         VARREF_WRITE(ASSIGN_REF(negative_step_clamp_assign)) = true;
 
-        node_st *negative_step_overflow_while =
-            ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
-                     CCNcopy(FOR_STMTS(stmt)));
+        node_st *negative_step_overflow_while = ASTwhile(
+            ASTbinop(CCNcopy(start_ref), CCNcopy(clamped_end_ref), BO_gt),
+            CCNcopy(FOR_STMTS(stmt)));
 
         node_st *negative_step_overflow_if =
             ASTifelse(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
