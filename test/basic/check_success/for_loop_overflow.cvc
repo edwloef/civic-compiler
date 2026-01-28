@@ -1,0 +1,7 @@
+extern void printInt(int i);
+
+export void foo() {
+    for (int i = 2147483646, 2147483647, 2) {
+        printInt(i);
+    }
+}
