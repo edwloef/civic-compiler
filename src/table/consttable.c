@@ -24,7 +24,8 @@ consttable_ref consttable_insert_int(consttable *self, int intval) {
         }
     }
 
-    return consttable_push(self, (consttable_entry){TY_int, {intval}});
+    return consttable_push(self,
+                           (consttable_entry){TY_int, {.intval = intval}});
 }
 
 consttable_ref consttable_insert_float(consttable *self, double floatval) {
@@ -35,7 +36,8 @@ consttable_ref consttable_insert_float(consttable *self, double floatval) {
         }
     }
 
-    return consttable_push(self, (consttable_entry){TY_float, {floatval}});
+    return consttable_push(
+        self, (consttable_entry){TY_float, {.floatval = floatval}});
 }
 
 consttable_ref consttable_push(consttable *self, consttable_entry e) {
