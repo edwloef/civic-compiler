@@ -19,7 +19,9 @@ static void Usage(char *program) {
     printf("  -o --output <output>          Output assembly to output file "
            "instead of STDOUT.\n");
     printf(
-        "  -q --quiet                    Make compiler output less verbose.");
+        "  -q --quiet                    Make compiler output less verbose.\n");
+    printf("  -O --optimize                 Run optimizations on generated "
+           "code.\n");
     printf("  -b --breakpoint <breakpoint>  Set a breakpoint.\n");
     printf("  -s --structure                Pretty print the structure of the "
            "compiler.\n");
@@ -43,6 +45,7 @@ static struct option options[] = {
     {"help", no_argument, 0, 'h'},
     {"output", required_argument, 0, 'o'},
     {"quiet", no_argument, 0, 'q'},
+    {"optimize", no_argument, 0, 'O'},
     {"breakpoint", required_argument, 0, 'b'},
     {"structure", no_argument, 0, 's'},
     {"fassociative-math", no_argument, 0, FASSOCIATIVE_MATH},
@@ -56,7 +59,8 @@ static struct option options[] = {
 static void ProcessArgs(int argc, char *argv[]) {
     int c;
 
-    while ((c = getopt_long_only(argc, argv, "ho:b:s", options, NULL)) != -1) {
+    while ((c = getopt_long_only(argc, argv, "ho:qOb:s", options, NULL)) !=
+           -1) {
         switch (c) {
         case 'h':
             Usage(argv[0]);
@@ -66,6 +70,9 @@ static void ProcessArgs(int argc, char *argv[]) {
             break;
         case 'q':
             globals.quiet = true;
+            break;
+        case 'O':
+            globals.optimize = true;
             break;
         case 'b':
             if (isdigit(optarg[0])) {
@@ -122,4 +129,8 @@ int main(int argc, char **argv) {
     ProcessArgs(argc, argv);
     CCNrun(NULL);
     return 0;
+}
+
+bool is_optimize_enabled(void) {
+    return globals.optimize;
 }

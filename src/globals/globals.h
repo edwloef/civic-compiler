@@ -15,6 +15,7 @@ struct globals {
     htable_st *linemap; // file => (lineno => line)
 
     bool quiet;
+    bool optimize;
 
     bool fassociative_math;
     bool ffinite_math_only;

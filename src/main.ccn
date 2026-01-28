@@ -3,7 +3,7 @@ start phase RootPhase {
         pass scanparse;
         Analysis;
         Desugar;
-        AstOpt;
+        MaybeOpt;
         CodeGen;
         Free;
     }
@@ -119,6 +119,10 @@ phase Desugar {
     }
 };
 
+phase MaybeOpt {
+gate = is_optimize_enabled,
+actions {
+
 cycle AstOpt {
     actions {
         CountCalls;
@@ -223,6 +227,9 @@ cycle AstOpt {
             nodes = { Monop, Binop, Cast }
         };
     }
+};
+
+}
 };
 
 phase CodeGen {
