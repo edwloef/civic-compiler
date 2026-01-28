@@ -116,6 +116,11 @@ decls: decl decls
        {
          $$ = ASTdecls($1, NULL);
        }
+     | decl stmt
+       {
+        yylloc = @2;
+        yyerror("unexpected statement, expected declaration");
+       }
      ;
 
 decl: "extern" funheader ";"
@@ -155,11 +160,6 @@ decl: "extern" funheader ";"
         $$ = $1;
         VARDECL_GLOBAL($$) = true;
       }
-    | stmt
-      {
-        yylloc = @1;
-        yyerror("unexpected statement, expected declaration");
-      }
     ;
 
 stmts: stmt stmts
@@ -171,6 +171,16 @@ stmts: stmt stmts
        {
          $$ = ASTstmts($1, NULL);
          add_loc_to_node($$, @$);
+       }
+     | stmt fundef
+       {
+         yylloc = @2;
+         yyerror("unexpected function definition, expected statement");
+       }
+     | stmt vardecl
+       {
+         yylloc = @2;
+         yyerror("unexpected variable declaration, expected statement");
        }
      ;
 
@@ -428,6 +438,11 @@ fundefs: fundef fundefs
          {
            $$ = ASTdecls($1, NULL);
          }
+       | fundef vardecl
+         {
+           yylloc = @2;
+           yyerror("unexpected variable declaration, expected function definition or statement");
+         }
        ;
 
 fundef: funheader ";"
@@ -629,10 +644,15 @@ void yyerror(char const *error) {
 }
 
 void sigchld_handler(int sig, siginfo_t *si, void *context) {
+    (void)sig;
+    (void)context;
+
     cpp_status = si->si_status;
 }
 
 node_st *scanparse(node_st *root) {
+    (void)root;
+
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
 
     yyin = fopen(globals.input_file, "r");

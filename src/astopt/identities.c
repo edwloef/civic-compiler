@@ -7,7 +7,7 @@
 
 #define CHECK_FFINITE_MATH_ONLY()                                              \
     if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
-        return node;
+        break;
 
 node_st *AOImonop(node_st *node) {
     TRAVchildren(node);

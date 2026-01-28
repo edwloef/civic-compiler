@@ -3,11 +3,9 @@
 
 #define CHECK_FASSOCIATIVE_MATH()                                              \
     if (EXPR_RESOLVED_TY(node) == TY_float && !globals.fassociative_math)      \
-        return node;
+        break;
 
 node_st *AORbinop(node_st *node) {
-    TRAVchildren(node);
-
     node_st *left = BINOP_LEFT(node);
     node_st *right = BINOP_RIGHT(node);
 
@@ -122,6 +120,8 @@ node_st *AORbinop(node_st *node) {
     default:
         break;
     }
+
+    TRAVchildren(node);
 
     return node;
 }

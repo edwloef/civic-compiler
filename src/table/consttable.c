@@ -6,8 +6,8 @@ bool double_biteq(double lhs, double rhs) {
         int64_t intval;
         double floatval;
     } bitcast;
-    bitcast l = {lhs};
-    bitcast r = {rhs};
+    bitcast l = {.floatval = lhs};
+    bitcast r = {.floatval = rhs};
     return l.intval == r.intval;
 }
 
