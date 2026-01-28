@@ -133,6 +133,7 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
                         false,
                         false};
     node_st *ref = ASTvarref(ASTid(name), NULL);
+    VARREF_RESOLVED_TY(ref) = ty;
     VARREF_L(ref) = vartable_push(self, e).l;
     return ref;
 }
