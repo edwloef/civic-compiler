@@ -10,11 +10,6 @@
     if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
         break;
 
-#define BINOP_IDENTICAL_REFS()                                                 \
-    (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&          \
-     VARREF_N(left) == VARREF_N(right) && VARREF_L(left) == VARREF_L(right) && \
-     !VARREF_EXPRS(right))
-
 node_st *AOImonop(node_st *node) {
     TRAVchildren(node);
 
@@ -116,6 +111,17 @@ node_st *AOImonop(node_st *node) {
     return node;
 }
 
+#define BINOP_IDENTICAL_REFS()                                                 \
+    (NODE_TYPE(left) == NT_VARREF && NODE_TYPE(right) == NT_VARREF &&          \
+     VARREF_N(left) == VARREF_N(right) && VARREF_L(left) == VARREF_L(right) && \
+     !VARREF_EXPRS(right))
+
+#define BINOP_NAN()                                                            \
+    ((NODE_TYPE(left) == NT_FLOAT && isnan(FLOAT_VAL(left)) &&                 \
+      NODE_TYPE(right) == NT_VARREF) ||                                        \
+     (NODE_TYPE(right) == NT_FLOAT && isnan(FLOAT_VAL(right)) &&               \
+      NODE_TYPE(left) == NT_VARREF))
+
 node_st *AOIbinop(node_st *node) {
     TRAVchildren(node);
 
@@ -150,6 +156,12 @@ node_st *AOIbinop(node_st *node) {
             default:
                 DBUG_ASSERT(false, "Unreachable.");
             }
+        } else if (BINOP_NAN()) {
+            // (NAN + x) => NAN
+            // (NAN - x) => NAN
+            CCNfree(node);
+            node = ASTfloat(NAN);
+            CCNcycleNotify();
         } else if (NODE_TYPE(left) == NT_BINOP &&
                    BINOP_OP(left) ==
                        (BINOP_OP(node) == BO_add ? BO_sub : BO_add) &&
@@ -199,6 +211,11 @@ node_st *AOIbinop(node_st *node) {
         if (BINOP_RESOLVED_TY(node) == TY_bool && BINOP_IDENTICAL_REFS()) {
             // (x * x) => x
             TAKE(BINOP_LEFT(node));
+        } else if (BINOP_NAN()) {
+            // (NAN * x) => NAN
+            CCNfree(node);
+            node = ASTfloat(NAN);
+            CCNcycleNotify();
         } else if (BINOP_RESOLVED_TY(node) == TY_bool &&
                    NODE_TYPE(left) == NT_BINOP && BINOP_OP(left) == BO_mul &&
                    NODE_TYPE(BINOP_RIGHT(left)) == NT_VARREF &&
@@ -247,6 +264,12 @@ node_st *AOIbinop(node_st *node) {
             CCNfree(node);
             node = ty == TY_int ? ASTint(1) : ASTfloat(1.0);
             EXPR_RESOLVED_TY(node) = ty;
+            CCNcycleNotify();
+        } else if (BINOP_NAN()) {
+            // (NAN / x) => NAN
+            // (x / NAN) => NAN
+            CCNfree(node);
+            node = ASTfloat(NAN);
             CCNcycleNotify();
         } else if ((NODE_TYPE(right) == NT_INT && INT_VAL(right) == 1) ||
                    (NODE_TYPE(right) == NT_FLOAT && FLOAT_VAL(right) == 1.0)) {
@@ -312,6 +335,11 @@ node_st *AOIbinop(node_st *node) {
             node = ASTbool(true);
             BOOL_RESOLVED_TY(node) = TY_bool;
             CCNcycleNotify();
+        } else if (BINOP_NAN()) {
+            // (NAN == x) => false
+            CCNfree(node);
+            node = ASTbool(false);
+            CCNcycleNotify();
         } else if (NODE_TYPE(left) == NT_BOOL) {
             if (BOOL_VAL(left) == true) {
                 // (true == x) => x
@@ -337,6 +365,11 @@ node_st *AOIbinop(node_st *node) {
             CCNfree(node);
             node = ASTbool(true);
             CCNcycleNotify();
+        } else if (BINOP_NAN()) {
+            // (NAN <= x) => false
+            CCNfree(node);
+            node = ASTbool(false);
+            CCNcycleNotify();
         }
         break;
     case BO_ge:
@@ -352,6 +385,11 @@ node_st *AOIbinop(node_st *node) {
             // (INT_MAX >= x) => true
             CCNfree(node);
             node = ASTbool(true);
+            CCNcycleNotify();
+        } else if (BINOP_NAN()) {
+            // (NAN >= x) => false
+            CCNfree(node);
+            node = ASTbool(false);
             CCNcycleNotify();
         }
         break;
@@ -372,6 +410,11 @@ node_st *AOIbinop(node_st *node) {
             node = ASTbool(false);
             BOOL_RESOLVED_TY(node) = TY_bool;
             CCNcycleNotify();
+        } else if (BINOP_NAN()) {
+            // (NAN != x) => true
+            CCNfree(node);
+            node = ASTbool(true);
+            CCNcycleNotify();
         }
         break;
     case BO_lt:
@@ -387,6 +430,11 @@ node_st *AOIbinop(node_st *node) {
             CCNfree(node);
             node = ASTbool(false);
             CCNcycleNotify();
+        } else if (BINOP_NAN()) {
+            // (NAN < x) => false
+            CCNfree(node);
+            node = ASTbool(false);
+            CCNcycleNotify();
         }
         break;
     case BO_gt:
@@ -399,6 +447,11 @@ node_st *AOIbinop(node_st *node) {
         } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MIN &&
                    NODE_TYPE(right) == NT_VARREF) {
             // (INT_MIN > x) => false
+            CCNfree(node);
+            node = ASTbool(false);
+            CCNcycleNotify();
+        } else if (BINOP_NAN()) {
+            // (NAN > x) => false
             CCNfree(node);
             node = ASTbool(false);
             CCNcycleNotify();
