@@ -183,19 +183,6 @@ cycle AstOpt {
             }
         };
 
-        CountReads;
-
-        traversal DeadStores {
-            uid = AODS,
-            nodes = { Program, FunDecl, FunBody, Stmts },
-            travdata {
-                Scope parent,
-                Scope outer_loop,
-                user funtable_ptr funtable,
-                user vartable_ptr vartable
-            }
-        };
-
         traversal Reassoc {
             uid = AOR,
             nodes = { Binop }
@@ -225,6 +212,19 @@ cycle AstOpt {
         traversal Identities {
             uid = AOI,
             nodes = { Monop, Binop, Cast }
+        };
+
+        CountReads;
+
+        traversal DeadStores {
+            uid = AODS,
+            nodes = { Program, FunDecl, FunBody, Stmts },
+            travdata {
+                Scope parent,
+                Scope outer_loop,
+                user funtable_ptr funtable,
+                user vartable_ptr vartable
+            }
         };
     }
 };
