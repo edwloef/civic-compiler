@@ -234,18 +234,18 @@ node_st *ATCifelse(node_st *node) {
 
     thin_vartype resolved_ty = TYPE(IFELSE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
-        if (resolved_ty.ty != TY_bool) {
-            if (resolved_ty.dims == 0) {
+        if (resolved_ty.dims == 0) {
+            if (resolved_ty.ty != TY_bool) {
                 ERROR(IFELSE_EXPR(node),
                       "expected value of type 'bool' as if-condition, found "
                       "value of type '%s'",
                       fmt_BasicType(resolved_ty.ty));
-            } else {
-                ERROR(IFELSE_EXPR(node),
-                      "expected value of type 'bool' as if-condition, found "
-                      "%d-dimensional array of type '%s'",
-                      resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
             }
+        } else {
+            ERROR(IFELSE_EXPR(node),
+                  "expected value of type 'bool' as if-condition, found "
+                  "%d-dimensional array of type '%s'",
+                  resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
         }
     }
 
@@ -257,19 +257,19 @@ node_st *ATCwhile(node_st *node) {
 
     thin_vartype resolved_ty = TYPE(WHILE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
-        if (resolved_ty.ty != TY_bool) {
-            if (resolved_ty.dims == 0) {
+        if (resolved_ty.dims == 0) {
+            if (resolved_ty.ty != TY_bool) {
                 ERROR(WHILE_EXPR(node),
                       "expected value of type 'bool' as while-condition, found "
                       "value "
                       "of type '%s'",
                       fmt_BasicType(resolved_ty.ty));
-            } else {
-                ERROR(WHILE_EXPR(node),
-                      "expected value of type 'bool' as while-condition, found "
-                      "%d-dimensional array of type '%s'",
-                      resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
             }
+        } else {
+            ERROR(WHILE_EXPR(node),
+                  "expected value of type 'bool' as while-condition, found "
+                  "%d-dimensional array of type '%s'",
+                  resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
         }
     }
 
@@ -281,18 +281,18 @@ node_st *ATCdowhile(node_st *node) {
 
     thin_vartype resolved_ty = TYPE(DOWHILE_EXPR(node));
     if (resolved_ty.ty != TY_error) {
-        if (resolved_ty.ty != TY_bool) {
-            if (resolved_ty.dims == 0) {
+        if (resolved_ty.dims == 0) {
+            if (resolved_ty.ty != TY_bool) {
                 ERROR(DOWHILE_EXPR(node),
                       "expected value of type 'bool' as do-while-condition, "
                       "found value of type '%s'",
                       fmt_BasicType(resolved_ty.ty));
-            } else {
-                ERROR(DOWHILE_EXPR(node),
-                      "expected value of type 'bool' as do-while-condition, "
-                      "found %d-dimensional array of type '%s'",
-                      resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
             }
+        } else {
+            ERROR(DOWHILE_EXPR(node),
+                  "expected value of type 'bool' as do-while-condition, "
+                  "found %d-dimensional array of type '%s'",
+                  resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
         }
     }
 
@@ -304,52 +304,52 @@ node_st *ATCfor(node_st *node) {
 
     thin_vartype start_ty = TYPE(FOR_LOOP_START(node));
     if (start_ty.ty != TY_error) {
-        if (start_ty.ty != TY_int) {
-            if (start_ty.dims == 0) {
+        if (start_ty.dims == 0) {
+            if (start_ty.ty != TY_int) {
                 ERROR(FOR_LOOP_START(node),
                       "expected value of type 'int' as for-loop start value, "
                       "found value of type '%s'",
                       fmt_BasicType(start_ty.ty));
-            } else {
-                ERROR(FOR_LOOP_START(node),
-                      "expected value of type 'int' as for-loop start value, "
-                      "found %d-dimensional array of type '%s'",
-                      start_ty.dims, fmt_BasicType(start_ty.ty));
             }
+        } else {
+            ERROR(FOR_LOOP_START(node),
+                  "expected value of type 'int' as for-loop start value, "
+                  "found %d-dimensional array of type '%s'",
+                  start_ty.dims, fmt_BasicType(start_ty.ty));
         }
     }
 
     thin_vartype end_ty = TYPE(FOR_LOOP_END(node));
     if (end_ty.ty != TY_error) {
-        if (end_ty.ty != TY_int) {
-            if (end_ty.dims == 0) {
+        if (end_ty.dims == 0) {
+            if (end_ty.ty != TY_int) {
                 ERROR(FOR_LOOP_END(node),
                       "expected value of type 'int' as for-loop end value, "
                       "found value of type '%s'",
                       fmt_BasicType(end_ty.ty));
-            } else {
-                ERROR(FOR_LOOP_END(node),
-                      "expected value of type 'int' as for-loop end value, "
-                      "found %d-dimensional array of type '%s'",
-                      end_ty.dims, fmt_BasicType(end_ty.ty));
             }
+        } else {
+            ERROR(FOR_LOOP_END(node),
+                  "expected value of type 'int' as for-loop end value, "
+                  "found %d-dimensional array of type '%s'",
+                  end_ty.dims, fmt_BasicType(end_ty.ty));
         }
     }
 
     thin_vartype step_ty = TYPE(FOR_LOOP_STEP(node));
     if (step_ty.ty != TY_error) {
-        if (step_ty.ty != TY_int) {
-            if (step_ty.dims == 0) {
+        if (step_ty.dims == 0) {
+            if (step_ty.ty != TY_int) {
                 ERROR(FOR_LOOP_STEP(node),
                       "expected value of type 'int' as for-loop step value, "
                       "found value of type '%s'",
                       fmt_BasicType(step_ty.ty));
-            } else {
-                ERROR(FOR_LOOP_STEP(node),
-                      "expected value of type 'int' as for-loop step value, "
-                      "found %d-dimensional array of type '%s'",
-                      step_ty.dims, fmt_BasicType(step_ty.ty));
             }
+        } else {
+            ERROR(FOR_LOOP_STEP(node),
+                  "expected value of type 'int' as for-loop step value, "
+                  "found %d-dimensional array of type '%s'",
+                  step_ty.dims, fmt_BasicType(step_ty.ty));
         }
     }
 
