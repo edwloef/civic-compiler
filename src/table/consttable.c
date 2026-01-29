@@ -19,25 +19,24 @@ consttable *consttable_new(void) {
 
 consttable_ref consttable_insert_int(consttable *self, int intval) {
     for (int i = 0; i < self->len; i++) {
-        if (self->buf[i].ty == TY_int && self->buf[i].val.intval == intval) {
+        if (self->buf[i].ty == TY_int && self->buf[i].intval == intval) {
             return (consttable_ref){i};
         }
     }
 
-    return consttable_push(self,
-                           (consttable_entry){TY_int, {.intval = intval}});
+    return consttable_push(self, (consttable_entry){TY_int, .intval = intval});
 }
 
 consttable_ref consttable_insert_float(consttable *self, double floatval) {
     for (int i = 0; i < self->len; i++) {
         if (self->buf[i].ty == TY_float &&
-            double_biteq(self->buf[i].val.floatval, floatval)) {
+            double_biteq(self->buf[i].floatval, floatval)) {
             return (consttable_ref){i};
         }
     }
 
-    return consttable_push(
-        self, (consttable_entry){TY_float, {.floatval = floatval}});
+    return consttable_push(self,
+                           (consttable_entry){TY_float, .floatval = floatval});
 }
 
 consttable_ref consttable_push(consttable *self, consttable_entry e) {

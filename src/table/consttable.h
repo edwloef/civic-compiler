@@ -15,7 +15,7 @@ typedef struct {
     union {
         int intval;
         double floatval;
-    } val;
+    };
 } consttable_entry;
 
 typedef struct {
