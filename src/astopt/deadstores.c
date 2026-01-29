@@ -61,8 +61,7 @@ node_st *AODSstmts(node_st *node) {
                 vartable *vartable = DATA_AODS_GET()->vartable;
 
                 node_st *parent = DATA_AODS_GET()->parent;
-                node_st *trav = DATA_AODS_GET()->outer_loop;
-                trav = trav ? trav : node;
+                node_st *outer_loop = DATA_AODS_GET()->outer_loop;
 
                 TRAVpush(TRAV_CD);
 
@@ -70,7 +69,8 @@ node_st *AODSstmts(node_st *node) {
                 DATA_CD_GET()->funtable = funtable;
                 DATA_CD_GET()->vartable = vartable;
 
-                TRAVopt(trav);
+                TRAVopt(node);
+                TRAVopt(outer_loop);
                 TRAVopt(parent);
 
                 assign_is_dead = DATA_CD_GET()->assign_is_dead;

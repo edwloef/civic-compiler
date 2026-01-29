@@ -68,10 +68,6 @@ node_st *CDreturn(node_st *node) {
 }
 
 node_st *CDcall(node_st *node) {
-    if (DATA_CD_GET()->ref_is_dead) {
-        return node;
-    }
-
     TRAVchildren(node);
 
     funtable_ref r = {CALL_N(node), CALL_L(node)};
@@ -82,7 +78,7 @@ node_st *CDcall(node_st *node) {
         vartable_ref r = {VARREF_N(DATA_CD_GET()->ref),
                           VARREF_L(DATA_CD_GET()->ref)};
         vartable_entry *e = vartable_get(DATA_CD_GET()->vartable, r);
-        if (e->escapes) {
+        if (e->escapes && !DATA_CD_GET()->ref_is_dead) {
             DATA_CD_GET()->assign_is_dead = false;
         }
     }
@@ -91,14 +87,14 @@ node_st *CDcall(node_st *node) {
 }
 
 node_st *CDvarref(node_st *node) {
-    if (DATA_CD_GET()->ref_is_dead) {
-        return node;
-    }
-
     TRAVchildren(node);
 
     if (node == DATA_CD_GET()->ref) {
-        DATA_CD_GET()->seen = true;
+        if (DATA_CD_GET()->seen) {
+            DATA_CD_GET()->ref_is_dead = true;
+        } else {
+            DATA_CD_GET()->seen = true;
+        }
     } else if (VARREF_N(node) == VARREF_N(DATA_CD_GET()->ref) &&
                VARREF_L(node) == VARREF_L(DATA_CD_GET()->ref)) {
         if (VARREF_WRITE(node)) {
