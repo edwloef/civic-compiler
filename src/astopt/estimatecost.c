@@ -70,7 +70,7 @@ node_st *ECcast(node_st *node) {
 
 node_st *ECcall(node_st *node) {
     int arg_count = 0;
-    for (node_st *param = CALL_EXPRS(node); param; param = PARAMS_NEXT(param)) {
+    for (node_st *param = CALL_EXPRS(node); param; param = EXPRS_NEXT(param)) {
         arg_count++;
     }
 
