@@ -1,5 +1,4 @@
 #include <limits.h>
-#include <stdio.h>
 
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
