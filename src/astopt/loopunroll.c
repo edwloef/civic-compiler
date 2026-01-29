@@ -2,7 +2,6 @@
 
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "globals/globals.h"
 #include "utils.h"
 
 void AOLUinit(void) {}
