@@ -226,6 +226,15 @@ cycle AstOpt {
                 user vartable_ptr vartable
             }
         };
+
+        traversal LoopUnroll {
+            uid = AOLU,
+            nodes = { Program, FunDecl, FunBody, Stmts },
+            travdata {
+                user funtable_ptr funtable,
+                user vartable_ptr vartable
+            }
+        };
     }
 };
 
@@ -309,7 +318,7 @@ traversal ValueProp {
 
 traversal ValuePropLoop {
     uid = VPL,
-    nodes = { VarRef },
+    nodes = { DoWhile, VarRef },
     travdata {
         VarRef ref,
         Expr expr
@@ -343,6 +352,29 @@ traversal CheckDead {
         bool seen,
         bool assign_is_dead,
         bool ref_is_dead,
+        VarRef ref,
+        user funtable_ptr funtable,
+        user vartable_ptr vartable
+    }
+};
+
+traversal CheckUnroll {
+    uid = CU,
+    nodes = { IfElse, DoWhile, Assign, Call },
+    travdata {
+        bool can_unroll,
+        VarRef ref,
+        int step,
+        user funtable_ptr funtable,
+        user vartable_ptr vartable
+    }
+};
+
+traversal CheckUnrollScope {
+    uid = CUS,
+    nodes = { Assign, call },
+    travdata {
+        bool can_unroll,
         VarRef ref,
         user funtable_ptr funtable,
         user vartable_ptr vartable
@@ -550,6 +582,11 @@ node DoWhile {
     children {
         Stmts stmts { constructor },
         Expr expr { constructor }
+    },
+
+    attributes {
+        bool known_start,
+        int unroll_start
     }
 };
 

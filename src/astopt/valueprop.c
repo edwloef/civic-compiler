@@ -48,6 +48,16 @@ node_st *VPwhile(node_st *node) {
 }
 
 node_st *VPdowhile(node_st *node) {
+    node_st *expr = DOWHILE_EXPR(node);
+    if (DATA_VP_GET()->expr && NODE_TYPE(DATA_VP_GET()->expr) == NT_INT &&
+        NODE_TYPE(expr) == NT_BINOP && NODE_TYPE(BINOP_LEFT(expr)) == NT_INT &&
+        NODE_TYPE(BINOP_RIGHT(expr)) == NT_VARREF &&
+        VARREF_N(BINOP_RIGHT(expr)) == VARREF_N(DATA_VP_GET()->ref) &&
+        VARREF_L(BINOP_RIGHT(expr)) == VARREF_L(DATA_VP_GET()->ref)) {
+        DOWHILE_KNOWN_START(node) = true;
+        DOWHILE_UNROLL_START(node) = INT_VAL(DATA_VP_GET()->expr);
+    }
+
     vartable_ref r = {VARREF_N(DATA_VP_GET()->ref),
                       VARREF_L(DATA_VP_GET()->ref)};
     vartable_entry *e = vartable_get(DATA_VP_GET()->vartable, r);

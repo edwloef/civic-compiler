@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
+#include "macros.h"
 #include "utils.h"
 
 void AODSinit(void) {}
@@ -81,6 +82,8 @@ node_st *AODSstmts(node_st *node) {
                 TRAVpush(TRAV_ES);
 
                 TRAVexpr(stmt);
+
+                TAKE(STMTS_NEXT(node));
                 node = inline_stmts(node, DATA_ES_GET()->stmts);
 
                 TRAVpop();

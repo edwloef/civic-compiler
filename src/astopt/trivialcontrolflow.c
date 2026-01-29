@@ -47,6 +47,7 @@ node_st *AOTCFstmts(node_st *node) {
                 IFELSE_ELSE_BLOCK(stmt) = NULL;
             }
 
+            TAKE(STMTS_NEXT(node));
             node = inline_stmts(node, stmts);
         } else if (IFELSE_IF_BLOCK(stmt)) {
             if (IFELSE_ELSE_BLOCK(stmt)) {
@@ -85,6 +86,7 @@ node_st *AOTCFstmts(node_st *node) {
 
             TRAVexpr(stmt);
 
+            TAKE(STMTS_NEXT(node));
             node = inline_stmts(node, DATA_ES_GET()->stmts);
 
             TRAVpop();
@@ -97,6 +99,7 @@ node_st *AOTCFstmts(node_st *node) {
             } else {
                 node_st *stmts = DOWHILE_STMTS(stmt);
                 DOWHILE_STMTS(stmt) = NULL;
+                TAKE(STMTS_NEXT(node));
                 node = inline_stmts(node, stmts);
             }
         }
@@ -112,6 +115,7 @@ node_st *AOTCFstmts(node_st *node) {
 
             TRAVexprs(stmt);
 
+            TAKE(STMTS_NEXT(node));
             node = inline_stmts(node, DATA_ES_GET()->stmts);
 
             TRAVpop();

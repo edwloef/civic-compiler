@@ -37,6 +37,8 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/analysis/typecheck.c
     src/astopt/checkdead.c
     src/astopt/checkproploop.c
+    src/astopt/checkunroll.c
+    src/astopt/checkunrollscope.c
     src/astopt/constfold.c
     src/astopt/copyprop.c
     src/astopt/countcalls.c
@@ -49,6 +51,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/extractstmts.c
     src/astopt/identities.c
     src/astopt/indirectcalls.c
+    src/astopt/loopunroll.c
     src/astopt/reassoc.c
     src/astopt/sideeffects.c
     src/astopt/trivialcontrolflow.c
