@@ -1,6 +1,12 @@
+#include "palm/dbug.h"
+
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
+
+#define OUT_OF_LIFETIME()                                                      \
+    DBUG_ASSERT(false, "Unreachable.");                                        \
+    return node;
 
 #define TYPE(n)                                                                \
     (thin_vartype) {                                                           \

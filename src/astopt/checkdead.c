@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
+#include "macros.h"
 #include "palm/dbug.h"
 #include "table/vartable.h"
 
@@ -47,9 +48,7 @@ node_st *CDifelse(node_st *node) {
 }
 
 node_st *CDwhile(node_st *node) {
-    DBUG_ASSERT(false, "Unreachable.");
-
-    return node;
+    OUT_OF_LIFETIME();
 }
 
 node_st *CDdowhile(node_st *node) {
@@ -59,9 +58,7 @@ node_st *CDdowhile(node_st *node) {
 }
 
 node_st *CDfor(node_st *node) {
-    DBUG_ASSERT(false, "Unreachable.");
-
-    return node;
+    OUT_OF_LIFETIME();
 }
 
 node_st *CDreturn(node_st *node) {

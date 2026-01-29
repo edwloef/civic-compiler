@@ -25,6 +25,8 @@ static void Usage(char *program) {
     printf("  -b --breakpoint <breakpoint>  Set a breakpoint.\n");
     printf("  -s --structure                Pretty print the structure of the "
            "compiler.\n");
+    printf("     --unroll-limit <limit>     Set the number of operations "
+           "allowed to be unrolled in a loop. Default value: 256");
     printf("  -f[no]associative-math        Allow re-association of "
            "floating-point operations. Requires -fno-signed-zeros.\n");
     printf("  -f[no]finite-math-only        Allow optimizations for "
@@ -34,12 +36,13 @@ static void Usage(char *program) {
            "floating-point arithmetic that ignore the signedness of zero.\n");
 }
 
-#define FASSOCIATIVE_MATH 256
-#define FNO_ASSOCIATIVE_MATH 257
-#define FFINITE_MATH_ONLY 258
-#define FNO_FINITE_MATH_ONLY 259
-#define FSIGNED_ZEROS 260
-#define FNO_SIGNED_ZEROS 261
+#define UNROLL_LIMIT 256
+#define FASSOCIATIVE_MATH 257
+#define FNO_ASSOCIATIVE_MATH 258
+#define FFINITE_MATH_ONLY 259
+#define FNO_FINITE_MATH_ONLY 260
+#define FSIGNED_ZEROS 261
+#define FNO_SIGNED_ZEROS 262
 
 static struct option options[] = {
     {"help", no_argument, 0, 'h'},
@@ -48,6 +51,7 @@ static struct option options[] = {
     {"optimize", no_argument, 0, 'O'},
     {"breakpoint", required_argument, 0, 'b'},
     {"structure", no_argument, 0, 's'},
+    {"unroll-limit", required_argument, 0, UNROLL_LIMIT},
     {"fassociative-math", no_argument, 0, FASSOCIATIVE_MATH},
     {"fno-associative-math", no_argument, 0, FNO_ASSOCIATIVE_MATH},
     {"ffinite-math-only", no_argument, 0, FASSOCIATIVE_MATH},
@@ -84,6 +88,9 @@ static void ProcessArgs(int argc, char *argv[]) {
         case 's':
             CCNshowTree();
             exit(EXIT_SUCCESS);
+        case UNROLL_LIMIT:
+            globals.unroll_limit = atoi(optarg);
+            break;
         case FASSOCIATIVE_MATH:
             globals.fassociative_math = true;
             break;

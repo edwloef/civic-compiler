@@ -17,6 +17,8 @@ struct globals {
     bool quiet;
     bool optimize;
 
+    int unroll_limit;
+
     bool fassociative_math;
     bool ffinite_math_only;
     bool fsigned_zeros;

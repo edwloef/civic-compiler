@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
+#include "macros.h"
 #include "palm/dbug.h"
 
 #define EMIT_INDENT() printf("%*s", DATA_PRT_GET()->indent * 4, "");
@@ -79,9 +80,7 @@ void PRTinit(void) {}
 void PRTfini(void) {}
 
 node_st *PRTscope(node_st *node) {
-    DBUG_ASSERT(false, "Unreachable.");
-
-    return node;
+    OUT_OF_LIFETIME();
 }
 
 node_st *PRTprogram(node_st *node) {

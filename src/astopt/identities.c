@@ -154,7 +154,7 @@ node_st *AOIbinop(node_st *node) {
                 TAKE(BINOP_LEFT(node));
                 break;
             default:
-                DBUG_ASSERT(false, "Unreachable.");
+                DBUG_ASSERT(false, "Unknown basic type detected.");
             }
         } else if (BINOP_NAN()) {
             // (NAN + x) => NAN

@@ -1,7 +1,9 @@
 #include <limits.h>
+#include <stdio.h>
 
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
+#include "globals/globals.h"
 #include "utils.h"
 
 void AOLUinit(void) {}
@@ -79,14 +81,27 @@ node_st *AOLUstmts(node_st *node) {
                 can_unroll = false;
             } else {
                 count = (end - start) / step;
+
                 if (count <= 0) {
                     CCNfree(DOWHILE_EXPR(stmt));
                     DOWHILE_EXPR(stmt) = ASTbool(false);
                     can_unroll = false;
-                } else if (step > 0) {
-                    can_unroll = INT_MIN - step > end;
-                } else if (step < 0) {
-                    can_unroll = INT_MAX - step < end;
+                } else {
+                    TRAVpush(TRAV_EC);
+
+                    TRAVdo(DOWHILE_STMTS(stmt));
+
+                    int cost = DATA_EC_GET()->cost;
+
+                    TRAVpop();
+
+                    if (count * cost > globals.unroll_limit) {
+                        can_unroll = false;
+                    } else if (step > 0) {
+                        can_unroll = INT_MIN - step > end;
+                    } else {
+                        can_unroll = INT_MAX - step < end;
+                    }
                 }
             }
         }

@@ -636,9 +636,7 @@ node_st *ATCcall(node_st *node) {
 }
 
 node_st *ATCmalloc(node_st *node) {
-    DBUG_ASSERT(false, "Unreachable.");
-
-    return node;
+    OUT_OF_LIFETIME();
 }
 
 node_st *ATCvarref(node_st *node) {
@@ -717,7 +715,5 @@ node_st *ATCbool(node_st *node) {
 }
 
 node_st *ATCconstref(node_st *node) {
-    DBUG_ASSERT(false, "Unreachable.");
-
-    return node;
+    OUT_OF_LIFETIME();
 }

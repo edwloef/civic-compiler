@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
+#include "macros.h"
 #include "palm/dbug.h"
 
 void VPinit(void) {}
@@ -42,9 +43,7 @@ node_st *VPifelse(node_st *node) {
 }
 
 node_st *VPwhile(node_st *node) {
-    DBUG_ASSERT(false, "Unreachable.");
-
-    return node;
+    OUT_OF_LIFETIME();
 }
 
 node_st *VPdowhile(node_st *node) {
@@ -104,9 +103,7 @@ node_st *VPdowhile(node_st *node) {
 }
 
 node_st *VPfor(node_st *node) {
-    DBUG_ASSERT(false, "Unreachable.");
-
-    return node;
+    OUT_OF_LIFETIME();
 }
 
 node_st *VPreturn(node_st *node) {

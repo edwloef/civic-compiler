@@ -33,7 +33,7 @@ static char *color_of_level(level level) {
     case L_INFO:
         return BRIGHT_CYAN;
     default:
-        DBUG_ASSERT(false, "Unknown level");
+        DBUG_ASSERT(false, "Unknown level detected");
         return "";
     }
 }
@@ -47,7 +47,7 @@ static char *message_of_level(level level) {
     case L_INFO:
         return "info: ";
     default:
-        DBUG_ASSERT(false, "Unknown level");
+        DBUG_ASSERT(false, "Unknown level detected");
         return "";
     }
 }

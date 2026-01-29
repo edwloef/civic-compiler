@@ -381,6 +381,14 @@ traversal CheckUnrollScope {
     }
 };
 
+traversal EstimateCost {
+    uid = EC,
+    nodes = Stmt | Expr | { Stmts },
+    travdata {
+        int cost
+    }
+};
+
 traversal Free {
     uid = F,
     nodes = { Program, Fundecl, Funbody }
