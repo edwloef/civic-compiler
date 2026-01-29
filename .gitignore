@@ -6,3 +6,4 @@ civvm
 test/fuzzer-generated
 civic.dict
 fuzz-outputs
+profile.json*
