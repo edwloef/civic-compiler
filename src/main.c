@@ -119,6 +119,10 @@ static void ProcessArgs(int argc, char *argv[]) {
         emit_message(L_ERROR, "-fassociative-math requires -fno-signed-zeros");
         abort_on_error();
     }
+
+#ifdef NDEBUG
+    CCNsetTreeCheck(false);
+#endif
 }
 
 void BreakpointHandler(node_st *root) {

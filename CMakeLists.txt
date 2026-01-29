@@ -82,22 +82,22 @@ target_compile_options(civicc PRIVATE
 # Enable address sanitizer
 if(NOT DISABLE_ASAN)
     target_compile_options(civicc PRIVATE
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<CONFIG:Debug>:-fsanitize=address>>
+        $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-fsanitize=address>
     )
 
     target_link_options(civicc PRIVATE
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<CONFIG:Debug>:-fsanitize=address>>
+        $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-fsanitize=address>
     )
 endif()
 
 # Enable undefined behavior sanitizer
 if(NOT DISABLE_UBSAN)
     target_compile_options(civicc PRIVATE
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<CONFIG:Debug>:-fsanitize=undefined>>
+        $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-fsanitize=undefined>
     )
 
     target_link_options(civicc PRIVATE
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<CONFIG:Debug>:-fsanitize=undefined>>
+        $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-fsanitize=undefined>
     )
 endif()
 
