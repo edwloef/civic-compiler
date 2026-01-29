@@ -110,6 +110,8 @@ void token_action(void);
 \t                                                       { globals.col += 4; }
 "//".*                                                   { globals.col += yyleng; }
 
+.                                                        { yyerror("unexpected token found, quit parsing"); }
+
 <SAVELINE>{
   "# "[0-9]+" \"".*"\"".*\n                              {
                                                            yytext += 2;
