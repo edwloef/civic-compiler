@@ -30,7 +30,7 @@ node_st *ADfundecl(node_st *node) {
     TRAVchildren(node);
 
     if (!FUNDECL_EXTERNAL(node) && FUNDECL_TY(node) != TY_void &&
-        (!FUNDECL_BODY(node) || !FUNBODY_STMTS(FUNDECL_BODY(node)) ||
+        (!FUNBODY_STMTS(FUNDECL_BODY(node)) ||
          !STMTS_DIVERGES(FUNBODY_STMTS(FUNDECL_BODY(node))))) {
         ERROR(
             FUNDECL_ID(node),

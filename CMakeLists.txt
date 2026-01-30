@@ -66,6 +66,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/desugar/boolcasts.c
     src/desugar/dimreduce.c
     src/desugar/forloops.c
+    src/desugar/implicitreturns.c
     src/desugar/vardecls.c
     src/desugar/whileloops.c
     src/error/error.c

@@ -64,6 +64,11 @@ phase Analysis {
 
 phase Desugar {
     actions {
+        traversal ImplicitReturns {
+            uid = DIR,
+            nodes = { FunDecl }
+        };
+
         traversal BoolCasts {
             uid = DBC,
             nodes = { Cast }
