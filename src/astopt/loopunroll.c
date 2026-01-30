@@ -47,10 +47,9 @@ node_st *AOLUstmts(node_st *node) {
                           NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BINOP &&
                           NODE_TYPE(BINOP_LEFT(DOWHILE_EXPR(stmt))) == NT_INT;
 
-        long long start = DOWHILE_UNROLL_START(stmt);
-        long long end;
-        long long step;
-        long long count;
+        int start = DOWHILE_UNROLL_START(stmt);
+        int end;
+        int step;
 
         if (can_unroll) {
             end = INT_VAL(BINOP_LEFT(DOWHILE_EXPR(stmt)));
@@ -86,8 +85,14 @@ node_st *AOLUstmts(node_st *node) {
             }
         }
 
+        long long count;
+
         if (can_unroll) {
-            count = (end - start) / step;
+            long long llstart = start;
+            long long llend = end;
+            long long llstep = step;
+
+            count = (llend - llstart) / llstep;
 
             if (count <= 1) {
                 count = 1;
