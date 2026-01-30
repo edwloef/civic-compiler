@@ -109,7 +109,7 @@ node_st *AOLUstmts(node_st *node) {
             node_st *head = STMTS_NEXT(node);
             STMTS_NEXT(node) = NULL;
 
-            for (int i = start; i < count; i++) {
+            for (int i = 0; i < count; i++) {
                 head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(stmt)));
             }
 
