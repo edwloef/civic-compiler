@@ -47,7 +47,7 @@ phase Analysis {
 
         traversal TypeCheck {
             uid = ATC,
-            nodes = Expr | Stmt | { Program, FunDecl, FunBody, VarDecl },
+            nodes = Expr | Stmt | { Program, FunDecl, FunBody, VarDecl, Type },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,

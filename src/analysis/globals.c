@@ -54,6 +54,8 @@ node_st *AGvardecl(node_st *node) {
                             false};
         vartable_ref r = vartable_insert(DATA_AG_GET()->vartable, e,
                                          VARREF_ID(EXPRS_EXPR(expr)));
+        VARREF_L(EXPRS_EXPR(expr)) = r.l;
+
         vartype_push(&ty, r);
     }
 

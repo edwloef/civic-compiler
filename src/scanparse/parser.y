@@ -580,10 +580,12 @@ params: basictype id "," params
 ids: id "," ids
      {
        $$ = ASTexprs(ASTvarref($1, NULL), $3);
+       add_loc_to_node(EXPRS_EXPR($$), @1);
      }
    | id
      {
        $$ = ASTexprs(ASTvarref($1, NULL), NULL);
+       add_loc_to_node(EXPRS_EXPR($$), @1);
      }
    ;
 

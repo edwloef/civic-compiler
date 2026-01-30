@@ -177,35 +177,10 @@ node_st *ATCfunbody(node_st *node) {
 node_st *ATCvardecl(node_st *node) {
     TRAVchildren(node);
 
-    vartable_ref r = {0, VARDECL_L(node)};
-    vartype ty = vartable_get(DATA_ATC_GET()->vartable, r)->ty;
-
-    if (ty.ty != TY_error) {
-        for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
-             expr = EXPRS_NEXT(expr)) {
-            thin_vartype resolved_ty = TYPE(EXPRS_EXPR(expr));
-            if (resolved_ty.ty != TY_error) {
-                if (resolved_ty.dims == 0) {
-                    if (resolved_ty.ty != TY_int) {
-                        ERROR(EXPRS_EXPR(expr),
-                              "can't declare %d-dimensional array of type '%s' "
-                              "with length of value of type '%s'",
-                              ty.len, fmt_BasicType(ty.ty),
-                              fmt_BasicType(resolved_ty.ty));
-                    }
-                } else {
-                    ERROR(
-                        EXPRS_EXPR(expr),
-                        "can't declare %d-dimensional array of type '%s' with "
-                        "length of %d-dimensional array of type '%s'",
-                        ty.len, fmt_BasicType(ty.ty), resolved_ty.dims,
-                        fmt_BasicType(resolved_ty.ty));
-                }
-            }
-        }
-    }
-
     if (VARDECL_EXPR(node)) {
+        vartable_ref r = {0, VARDECL_L(node)};
+        vartype ty = vartable_get(DATA_ATC_GET()->vartable, r)->ty;
+
         ATCcheckassign(VARDECL_EXPR(node), ty, node);
     }
 
@@ -689,6 +664,40 @@ node_st *ATCvarref(node_st *node) {
 
     VARREF_RESOLVED_TY(node) = ty.ty;
     VARREF_RESOLVED_DIMS(node) = ty.len;
+
+    return node;
+}
+
+node_st *ATCtype(node_st *node) {
+    TRAVchildren(node);
+
+    enum BasicType ty = TYPE_TY(node);
+
+    int dims = 0;
+    for (node_st *expr = TYPE_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
+        dims++;
+    }
+
+    for (node_st *expr = TYPE_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
+        thin_vartype resolved_ty = TYPE(EXPRS_EXPR(expr));
+        if (resolved_ty.ty != TY_error) {
+            if (resolved_ty.dims == 0) {
+                if (resolved_ty.ty != TY_int) {
+                    ERROR(EXPRS_EXPR(expr),
+                          "can't declare %d-dimensional array of type '%s' "
+                          "with length of value of type '%s'",
+                          dims, fmt_BasicType(ty),
+                          fmt_BasicType(resolved_ty.ty));
+                }
+            } else {
+                ERROR(EXPRS_EXPR(expr),
+                      "can't declare %d-dimensional array of type '%s' with "
+                      "length of %d-dimensional array of type '%s'",
+                      dims, fmt_BasicType(ty), resolved_ty.dims,
+                      fmt_BasicType(resolved_ty.ty));
+            }
+        }
+    }
 
     return node;
 }
