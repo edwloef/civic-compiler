@@ -71,18 +71,13 @@ node_st *DFLstmts(node_st *node) {
         if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
             INT_VAL(ASSIGN_EXPR(step_assign)) > 0) {
             node_st *positive_step_overflow = NULL;
-            node_st *positive_step_no_overflow = NULL;
 
-            node_st *positive_step_clamp_assign = ASTassign(
-                CCNcopy(clamped_end_ref),
-                ASTbinop(ASTint(INT64_MIN), CCNcopy(step_ref), BO_sub));
-            VARREF_WRITE(ASSIGN_REF(positive_step_clamp_assign)) = true;
-
-            if (!(NODE_TYPE(ASSIGN_EXPR(step_assign)) == NT_INT &&
-                  (INT_VAL(ASSIGN_EXPR(step_assign)) == 1 ||
-                   (NODE_TYPE(ASSIGN_EXPR(end_assign)) == NT_INT &&
-                    INT_VAL(ASSIGN_EXPR(end_assign)) <=
-                        INT64_MIN - INT_VAL(ASSIGN_EXPR(step_assign)))))) {
+            if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
+                INT_VAL(ASSIGN_EXPR(step_assign)) != 1) {
+                node_st *positive_step_clamp_assign = ASTassign(
+                    CCNcopy(clamped_end_ref),
+                    ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_sub));
+                VARREF_WRITE(ASSIGN_REF(positive_step_clamp_assign)) = true;
 
                 node_st *positive_step_overflow_while =
                     ASTwhile(ASTbinop(CCNcopy(start_ref),
@@ -93,47 +88,38 @@ node_st *DFLstmts(node_st *node) {
                     ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
                     CCNcopy(FOR_STMTS(stmt)), NULL);
 
-                positive_step_overflow =
+                positive_step_overflow = ASTstmts(
+                    positive_step_clamp_assign,
                     ASTstmts(positive_step_overflow_while,
-                             ASTstmts(positive_step_overflow_if, NULL));
+                             ASTstmts(positive_step_overflow_if, NULL)));
             }
 
-            if (!(NODE_TYPE(ASSIGN_EXPR(step_assign)) == NT_INT &&
-                  (INT_VAL(ASSIGN_EXPR(step_assign)) != 1 ||
-                   (NODE_TYPE(ASSIGN_EXPR(end_assign)) == NT_INT &&
-                    INT_VAL(ASSIGN_EXPR(end_assign))) >
-                       INT64_MIN - INT_VAL(ASSIGN_EXPR(step_assign))))) {
-                node_st *positive_step_no_overflow_while = ASTwhile(
-                    ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
-                    CCNcopy(FOR_STMTS(stmt)));
+            node_st *positive_step_no_overflow_while =
+                ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
+                         CCNcopy(FOR_STMTS(stmt)));
 
-                positive_step_no_overflow =
-                    ASTstmts(positive_step_no_overflow_while, NULL);
-            }
+            node_st *positive_step_no_overflow =
+                ASTstmts(positive_step_no_overflow_while, NULL);
 
             node_st *positive_step_ifelse = ASTifelse(
-                ASTbinop(CCNcopy(clamped_end_ref), CCNcopy(end_ref), BO_lt),
+                ASTbinop(ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add),
+                         CCNcopy(end_ref), BO_lt),
                 positive_step_overflow, positive_step_no_overflow);
 
-            positive_step = ASTstmts(positive_step_clamp_assign,
-                                     ASTstmts(positive_step_ifelse, NULL));
+            positive_step = ASTstmts(positive_step_ifelse, NULL);
         }
 
         if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
             INT_VAL(ASSIGN_EXPR(step_assign)) < 0) {
             node_st *negative_step_overflow = NULL;
-            node_st *negative_step_no_overflow = NULL;
 
-            node_st *negative_step_clamp_assign = ASTassign(
-                CCNcopy(clamped_end_ref),
-                ASTbinop(ASTint(INT64_MAX), CCNcopy(step_ref), BO_sub));
-            VARREF_WRITE(ASSIGN_REF(negative_step_clamp_assign)) = true;
+            if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
+                INT_VAL(ASSIGN_EXPR(step_assign)) != -1) {
+                node_st *negative_step_clamp_assign = ASTassign(
+                    CCNcopy(clamped_end_ref),
+                    ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_sub));
+                VARREF_WRITE(ASSIGN_REF(negative_step_clamp_assign)) = true;
 
-            if (!(NODE_TYPE(ASSIGN_EXPR(step_assign)) == NT_INT &&
-                  (INT_VAL(ASSIGN_EXPR(step_assign)) == -1 ||
-                   (NODE_TYPE(ASSIGN_EXPR(end_assign)) == NT_INT &&
-                    INT_VAL(ASSIGN_EXPR(end_assign)) <=
-                        INT64_MAX - INT_VAL(ASSIGN_EXPR(step_assign)))))) {
                 node_st *negative_step_overflow_while =
                     ASTwhile(ASTbinop(CCNcopy(start_ref),
                                       CCNcopy(clamped_end_ref), BO_gt),
@@ -143,30 +129,25 @@ node_st *DFLstmts(node_st *node) {
                     ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
                     CCNcopy(FOR_STMTS(stmt)), NULL);
 
-                negative_step_overflow =
+                negative_step_overflow = ASTstmts(
+                    negative_step_clamp_assign,
                     ASTstmts(negative_step_overflow_while,
-                             ASTstmts(negative_step_overflow_if, NULL));
+                             ASTstmts(negative_step_overflow_if, NULL)));
             }
 
-            if (!(NODE_TYPE(ASSIGN_EXPR(step_assign)) == NT_INT &&
-                  (INT_VAL(ASSIGN_EXPR(step_assign)) != -1 ||
-                   (NODE_TYPE(ASSIGN_EXPR(end_assign)) == NT_INT &&
-                    INT_VAL(ASSIGN_EXPR(end_assign)) >
-                        INT64_MAX - INT_VAL(ASSIGN_EXPR(step_assign)))))) {
-                node_st *negative_step_no_overflow_while = ASTwhile(
-                    ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
-                    CCNcopy(FOR_STMTS(stmt)));
+            node_st *negative_step_no_overflow_while =
+                ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
+                         CCNcopy(FOR_STMTS(stmt)));
 
-                negative_step_no_overflow =
-                    ASTstmts(negative_step_no_overflow_while, NULL);
-            }
+            node_st *negative_step_no_overflow =
+                ASTstmts(negative_step_no_overflow_while, NULL);
 
             node_st *negative_step_ifelse = ASTifelse(
-                ASTbinop(CCNcopy(clamped_end_ref), CCNcopy(end_ref), BO_gt),
+                ASTbinop(ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add),
+                         CCNcopy(end_ref), BO_gt),
                 negative_step_overflow, negative_step_no_overflow);
 
-            negative_step = ASTstmts(negative_step_clamp_assign,
-                                     ASTstmts(negative_step_ifelse, NULL));
+            negative_step = ASTstmts(negative_step_ifelse, NULL);
         }
 
         node_st *transformed =

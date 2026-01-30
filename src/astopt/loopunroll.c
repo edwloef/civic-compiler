@@ -47,10 +47,10 @@ node_st *AOLUstmts(node_st *node) {
                           NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BINOP &&
                           NODE_TYPE(BINOP_LEFT(DOWHILE_EXPR(stmt))) == NT_INT;
 
-        int start = DOWHILE_UNROLL_START(stmt);
-        int end;
-        int step;
-        int count;
+        int64_t start = DOWHILE_UNROLL_START(stmt);
+        int64_t end;
+        int64_t step;
+        int64_t count;
 
         if (can_unroll) {
             end = INT_VAL(BINOP_LEFT(DOWHILE_EXPR(stmt)));
@@ -74,34 +74,33 @@ node_st *AOLUstmts(node_st *node) {
         }
 
         if (can_unroll) {
-            if (step == 0) {
+            if (step > 0) {
+                can_unroll = end + step > end;
+            } else if (step < 0) {
+                can_unroll = end + step < end;
+            } else {
                 CCNfree(DOWHILE_EXPR(stmt));
                 DOWHILE_EXPR(stmt) = ASTbool(true);
                 can_unroll = false;
+                CCNcycleNotify();
+            }
+        }
+
+        if (can_unroll) {
+            count = (end - start) / step;
+
+            if (count <= 1) {
+                count = 1;
             } else {
-                count = (end - start) / step;
+                TRAVpush(TRAV_EC);
 
-                if (count <= 0) {
-                    CCNfree(DOWHILE_EXPR(stmt));
-                    DOWHILE_EXPR(stmt) = ASTbool(false);
-                    can_unroll = false;
-                } else {
-                    TRAVpush(TRAV_EC);
+                TRAVdo(DOWHILE_STMTS(stmt));
 
-                    TRAVdo(DOWHILE_STMTS(stmt));
+                int cost = DATA_EC_GET()->cost;
 
-                    int cost = DATA_EC_GET()->cost;
+                TRAVpop();
 
-                    TRAVpop();
-
-                    if (count * cost > globals.unroll_limit) {
-                        can_unroll = false;
-                    } else if (step > 0) {
-                        can_unroll = INT64_MIN - step > end;
-                    } else {
-                        can_unroll = INT64_MAX - step < end;
-                    }
-                }
+                can_unroll = count * cost <= globals.unroll_limit;
             }
         }
 
