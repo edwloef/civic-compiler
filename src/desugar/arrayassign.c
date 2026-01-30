@@ -35,6 +35,7 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
 
                 VARREF_EXPRS(inner_ref) =
                     ASTexprs(ASTint(i), VARREF_EXPRS(inner_ref));
+                INT_RESOLVED_TY(EXPRS_EXPR(VARREF_EXPRS(inner_ref))) = TY_int;
 
                 node_st *stmt = DAAbuild_array_assign(
                     inner_ref, dims + 1, ARREXPRS_EXPR(inner), ref_dims - 1);
