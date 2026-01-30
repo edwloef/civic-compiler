@@ -17,7 +17,7 @@ consttable *consttable_new(void) {
     return n;
 }
 
-consttable_ref consttable_insert_int(consttable *self, int64_t intval) {
+consttable_ref consttable_insert_int(consttable *self, int intval) {
     for (int i = 0; i < self->len; i++) {
         if (self->buf[i].ty == TY_int && self->buf[i].intval == intval) {
             return (consttable_ref){i};

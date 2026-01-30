@@ -374,7 +374,7 @@ traversal CheckUnroll {
     travdata {
         bool can_unroll,
         VarRef ref,
-        int64 step,
+        int step,
         user funtable_ptr funtable,
         user vartable_ptr vartable
     }
@@ -604,7 +604,7 @@ node DoWhile {
 
     attributes {
         bool known_start,
-        int64 unroll_start
+        int unroll_start
     }
 };
 
@@ -703,7 +703,7 @@ node Type {
 
 node Int {
     attributes {
-        int64 val { constructor }
+        int val { constructor }
     }
 };
 
