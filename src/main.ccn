@@ -254,7 +254,7 @@ phase CodeGen {
 
                 traversal ShrinkFuntables {
                     uid = CGSF,
-                    nodes = { Program, FunBody, Call },
+                    nodes = { Program, FunDecl, FunBody, Call },
                     travdata {
                         user funtable_ptr funtable,
                         user funtable_ptr new

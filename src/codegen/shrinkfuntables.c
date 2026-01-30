@@ -30,6 +30,15 @@ node_st *CGSFprogram(node_st *node) {
     return node;
 }
 
+node_st *CGSFfundecl(node_st *node) {
+    TRAVchildren(node);
+
+    funtable_ref r = {0, FUNDECL_L(node)};
+    FUNDECL_L(node) = funtable_get(DATA_CGSF_GET()->funtable, r)->new_l;
+
+    return node;
+}
+
 node_st *CGSFfunbody(node_st *node) {
     DATA_CGSF_GET()->funtable = FUNBODY_FUNTABLE(node);
     funtable *prev = DATA_CGSF_GET()->new;
