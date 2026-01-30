@@ -20,7 +20,8 @@ node_st *AODFdecls(node_st *node) {
     funtable_ref r = {0, FUNDECL_L(decl)};
     funtable_entry *e = funtable_get(DATA_AODF_GET()->funtable, r);
     if (e->call_count == 0 ||
-        (STReq(e->name, "__init") && !FUNBODY_STMTS(FUNDECL_BODY(decl)))) {
+        (STReq(e->name, "__init") && NODE_TYPE(STMTS_STMT(FUNBODY_STMTS(
+                                         FUNDECL_BODY(decl)))) == NT_RETURN)) {
         TRAVstart(decl, TRAV_F);
         TAKE(DECLS_NEXT(node));
     }
