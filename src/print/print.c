@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "macros.h"
@@ -369,7 +371,7 @@ node_st *PRTvarref(node_st *node) {
 }
 
 node_st *PRTint(node_st *node) {
-    printf("%d", INT_VAL(node));
+    printf("%" PRId64, INT_VAL(node));
 
     return node;
 }

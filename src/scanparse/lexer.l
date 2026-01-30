@@ -81,8 +81,8 @@ void token_action(void);
 
 (0[xX])?[0-9]+                                           {
                                                            errno = 0;
-                                                           long val = strtol(yytext, NULL, 0);
-                                                           if (errno == ERANGE || val < INT_MIN || val > INT_MAX)
+                                                           long long val = strtoll(yytext, NULL, 0);
+                                                           if (errno == ERANGE || val < INT32_MIN || val > INT32_MAX)
                                                                yyerror("integer literal out of range");
                                                            yylval.cint = val;
                                                            FILTER(LIT_INT);

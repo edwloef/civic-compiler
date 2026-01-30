@@ -359,9 +359,9 @@ node_st *AOIbinop(node_st *node) {
             node = ASTbool(true);
             BOOL_RESOLVED_TY(node) = TY_bool;
             CCNcycleNotify();
-        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MIN &&
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT64_MIN &&
                    NODE_TYPE(right) == NT_VARREF) {
-            // (INT_MIN <= x) => true
+            // (INT64_MIN <= x) => true
             CCNfree(node);
             node = ASTbool(true);
             CCNcycleNotify();
@@ -380,9 +380,9 @@ node_st *AOIbinop(node_st *node) {
             node = ASTbool(true);
             BOOL_RESOLVED_TY(node) = TY_bool;
             CCNcycleNotify();
-        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MAX &&
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT64_MAX &&
                    NODE_TYPE(right) == NT_VARREF) {
-            // (INT_MAX >= x) => true
+            // (INT64_MAX >= x) => true
             CCNfree(node);
             node = ASTbool(true);
             CCNcycleNotify();
@@ -424,9 +424,9 @@ node_st *AOIbinop(node_st *node) {
             node = ASTbool(false);
             BOOL_RESOLVED_TY(node) = TY_bool;
             CCNcycleNotify();
-        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MAX &&
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT64_MAX &&
                    NODE_TYPE(right) == NT_VARREF) {
-            // (INT_MAX < x) => false
+            // (INT64_MAX < x) => false
             CCNfree(node);
             node = ASTbool(false);
             CCNcycleNotify();
@@ -444,9 +444,9 @@ node_st *AOIbinop(node_st *node) {
             node = ASTbool(false);
             BOOL_RESOLVED_TY(node) = TY_bool;
             CCNcycleNotify();
-        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT_MIN &&
+        } else if (NODE_TYPE(left) == NT_INT && INT_VAL(left) == INT64_MIN &&
                    NODE_TYPE(right) == NT_VARREF) {
-            // (INT_MIN > x) => false
+            // (INT64_MIN > x) => false
             CCNfree(node);
             node = ASTbool(false);
             CCNcycleNotify();

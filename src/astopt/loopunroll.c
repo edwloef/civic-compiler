@@ -97,9 +97,9 @@ node_st *AOLUstmts(node_st *node) {
                     if (count * cost > globals.unroll_limit) {
                         can_unroll = false;
                     } else if (step > 0) {
-                        can_unroll = INT_MIN - step > end;
+                        can_unroll = INT64_MIN - step > end;
                     } else {
-                        can_unroll = INT_MAX - step < end;
+                        can_unroll = INT64_MAX - step < end;
                     }
                 }
             }

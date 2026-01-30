@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "ccngen/enum.h"
 
@@ -13,7 +14,7 @@ typedef struct {
 typedef struct {
     enum BasicType ty;
     union {
-        int intval;
+        int64_t intval;
         double floatval;
     };
 } consttable_entry;
@@ -25,7 +26,7 @@ typedef struct {
 
 consttable *consttable_new(void);
 
-consttable_ref consttable_insert_int(consttable *self, int intval);
+consttable_ref consttable_insert_int(consttable *self, int64_t intval);
 
 consttable_ref consttable_insert_float(consttable *self, double floatval);
 
