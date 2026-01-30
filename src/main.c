@@ -26,7 +26,7 @@ static void Usage(char *program) {
     printf("  -s --structure                Pretty print the structure of the "
            "compiler.\n");
     printf("     --unroll-limit <limit>     Set the number of operations "
-           "allowed to be unrolled in a loop. Default value: 256");
+           "allowed to be unrolled in a loop. Default value: 256\n");
     printf("  -f[no]associative-math        Allow re-association of "
            "floating-point operations. Requires -fno-signed-zeros.\n");
     printf("  -f[no]finite-math-only        Allow optimizations for "
