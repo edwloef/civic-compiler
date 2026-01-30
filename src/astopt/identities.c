@@ -295,7 +295,7 @@ node_st *AOIbinop(node_st *node) {
             // (x % x) => 0
             CCNfree(node);
             node = ASTint(0);
-            BOOL_RESOLVED_TY(node) = TY_int;
+            INT_RESOLVED_TY(node) = TY_int;
             CCNcycleNotify();
         }
         break;
