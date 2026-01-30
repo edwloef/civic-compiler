@@ -250,27 +250,32 @@ phase CodeGen {
     actions {
         phase Tables {
             actions {
-                CountCalls;
+                phase OptTables {
+                    gate = is_optimize_enabled,
+                    actions {
+                        CountCalls;
 
-                traversal ShrinkFuntables {
-                    uid = CGSF,
-                    nodes = { Program, FunDecl, FunBody, Call },
-                    travdata {
-                        user funtable_ptr funtable,
-                        user funtable_ptr new
-                    }
-                };
+                        traversal ShrinkFuntables {
+                            uid = CGSF,
+                            nodes = { Program, FunDecl, FunBody, Call },
+                            travdata {
+                                user funtable_ptr funtable,
+                                user funtable_ptr new
+                            }
+                        };
 
-                CountReads;
+                        CountReads;
 
-                CountWrites;
+                        CountWrites;
 
-                traversal ShrinkVartables {
-                    uid = CGSV,
-                    nodes = { Program, FunDecl, VarRef },
-                    travdata {
-                        user vartable_ptr vartable,
-                        user vartable_ptr new
+                        traversal ShrinkVartables {
+                            uid = CGSV,
+                            nodes = { Program, FunDecl, VarRef },
+                            travdata {
+                                user vartable_ptr vartable,
+                                user vartable_ptr new
+                            }
+                        };
                     }
                 };
 
