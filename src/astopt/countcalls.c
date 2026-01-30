@@ -6,11 +6,7 @@ void CCfini(void) {}
 node_st *CCprogram(node_st *node) {
     for (int i = 0; i < PROGRAM_FUNTABLE(node)->len; i++) {
         funtable_entry *e = &PROGRAM_FUNTABLE(node)->buf[i];
-        if (e->exported) {
-            e->call_count = 1;
-        } else {
-            e->call_count = 0;
-        }
+        e->call_count = e->exported;
     }
 
     DATA_CC_GET()->funtable = PROGRAM_FUNTABLE(node);

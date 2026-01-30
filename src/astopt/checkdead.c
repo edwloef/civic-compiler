@@ -90,19 +90,15 @@ node_st *CDvarref(node_st *node) {
     TRAVchildren(node);
 
     if (node == DATA_CD_GET()->ref) {
-        if (DATA_CD_GET()->seen) {
-            DATA_CD_GET()->ref_is_dead = true;
-        } else {
-            DATA_CD_GET()->seen = true;
-        }
-    } else if (VARREF_N(node) == VARREF_N(DATA_CD_GET()->ref) &&
-               VARREF_L(node) == VARREF_L(DATA_CD_GET()->ref)) {
-        if (VARREF_WRITE(node)) {
-            if (DATA_CD_GET()->seen) {
+        DATA_CD_GET()->seen = true;
+    } else if (DATA_CD_GET()->seen) {
+        if (VARREF_N(node) == VARREF_N(DATA_CD_GET()->ref) &&
+            VARREF_L(node) == VARREF_L(DATA_CD_GET()->ref)) {
+            if (VARREF_WRITE(node)) {
                 DATA_CD_GET()->ref_is_dead = true;
+            } else if (!DATA_CD_GET()->ref_is_dead) {
+                DATA_CD_GET()->assign_is_dead = false;
             }
-        } else if (!DATA_CD_GET()->ref_is_dead) {
-            DATA_CD_GET()->assign_is_dead = false;
         }
     }
 
