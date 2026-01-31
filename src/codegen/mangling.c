@@ -13,10 +13,6 @@ node_st *CGMprogram(node_st *node) {
 }
 
 node_st *CGMfundecl(node_st *node) {
-    if (FUNDECL_EXTERNAL(node)) {
-        return node;
-    }
-
     funtable *parent_table = DATA_CGM_GET()->funtable;
     char *parent_name = DATA_CGM_GET()->name;
 
@@ -29,10 +25,16 @@ node_st *CGMfundecl(node_st *node) {
     ID_VAL(FUNDECL_ID(node)) = e->mangled_name;
 
     DATA_CGM_GET()->name = e->mangled_name;
-    DATA_CGM_GET()->funtable = FUNBODY_FUNTABLE(FUNDECL_BODY(node));
     TRAVchildren(node);
-    DATA_CGM_GET()->funtable = parent_table;
     DATA_CGM_GET()->name = parent_name;
 
+    return node;
+}
+
+node_st *CGMfunbody(node_st *node) {
+    funtable *parent_table = DATA_CGM_GET()->funtable;
+    DATA_CGM_GET()->funtable = FUNBODY_FUNTABLE(node);
+    TRAVchildren(node);
+    DATA_CGM_GET()->funtable = parent_table;
     return node;
 }
