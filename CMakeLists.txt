@@ -60,6 +60,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/trivialcontrolflow.c
     src/astopt/valueprop.c
     src/astopt/valueproploop.c
+    src/codegen/assembly.c
     src/codegen/constants.c
     src/codegen/mangling.c
     src/desugar/arrayassign.c

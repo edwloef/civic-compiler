@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "palm/hash_table.h"
 
@@ -23,6 +24,8 @@ struct globals {
     bool associative_math;
     bool finite_math_only;
     bool signed_zeros;
+
+    FILE *output_stream;
 };
 
 extern struct globals globals;

@@ -50,7 +50,7 @@ TEST_CFLAGS := ""
 
 # Whether to run tests that compare program output. Set to 1 after you have
 # implemented your assembly phase.
-TEST_RUN_FUNCTIONAL := 0
+TEST_RUN_FUNCTIONAL := 1
 
 # Path to toolchain files, relative to the root directory (used for functional
 # test).
