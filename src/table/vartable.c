@@ -1,8 +1,8 @@
+#include "table/vartable.h"
 #include "ccngen/ast.h"
 #include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
-#include "table/vartable.h"
 
 vartype vartype_new(enum BasicType ty) {
     return (vartype){0, 0, NULL, ty};
@@ -41,7 +41,7 @@ vartable_ref vartable_insert(vartable *self, vartable_entry e, node_st *id) {
             emit_message_with_span(entry.span, L_INFO,
                                    "variable '%s' previously declared here",
                                    e.name);
-            vartype_free(e.ty);
+            vartable_entry_free(e);
             return (vartable_ref){0, -1};
         }
     }
@@ -53,7 +53,6 @@ vartable_ref vartable_push_loopvar(vartable *self, vartable_entry e) {
     for (int l = 0; l < self->len; l++) {
         vartable_entry entry = self->buf[l];
         if (entry.loopvar) {
-            vartype_free(e.ty);
             self->buf[l] = e;
             return (vartable_ref){0, l};
         }
@@ -110,7 +109,7 @@ node_st *vartable_get_ref(vartable *self, vartable_ref r) {
         return NULL;
     }
 
-    node_st *ref = ASTvarref(ASTid(STRcpy(e->name)), NULL);
+    node_st *ref = ASTvarref(ASTid(e->name), NULL);
     VARREF_N(ref) = r.n;
     VARREF_L(ref) = r.l;
     VARREF_RESOLVED_TY(ref) = e->ty.ty;
@@ -126,6 +125,7 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
 node_st *vartable_named_temp_var(vartable *self, enum BasicType ty,
                                  char *name) {
     vartable_entry e = {name,
+                        NULL,
                         vartype_new(ty),
                         {0, 0, 0, 0, NULL},
                         0,
@@ -142,11 +142,20 @@ node_st *vartable_named_temp_var(vartable *self, enum BasicType ty,
     return ref;
 }
 
-void vartable_free(vartable *self) {
-    for (int i = 0; i < self->len; i++) {
-        vartype_free(self->buf[i].ty);
-    }
+void vartable_entry_free(vartable_entry e) {
+    MEMfree(e.name);
+    MEMfree(e.unmangled_name);
+    vartype_free(e.ty);
+}
 
+void vartable_shallow_free(vartable *self) {
     MEMfree(self->buf);
     MEMfree(self);
+}
+
+void vartable_free(vartable *self) {
+    for (int i = 0; i < self->len; i++) {
+        vartable_entry_free(self->buf[i]);
+    }
+    vartable_shallow_free(self);
 }

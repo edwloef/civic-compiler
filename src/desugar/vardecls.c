@@ -1,6 +1,6 @@
 #include "ccn/ccn.h"
+#include "ccngen/ast.h"
 #include "macros.h"
-#include "palm/memory.h"
 #include "palm/str.h"
 #include "table/funtable.h"
 
@@ -12,7 +12,7 @@ node_st *DVDprogram(node_st *node) {
 
     TRAVchildren(node);
 
-    node_st *decl = ASTfundecl(ASTid(STRcpy("__init")), NULL, TY_void);
+    node_st *decl = ASTfundecl(ASTid("__init"), NULL, TY_void);
     node_st *body = ASTfunbody(NULL, DATA_DVD_GET()->stmts);
 
     FUNDECL_EXPORTED(decl) = true;
@@ -21,7 +21,8 @@ node_st *DVDprogram(node_st *node) {
     FUNDECL_VARTABLE(decl) = vartable_new(PROGRAM_VARTABLE(node));
     FUNBODY_FUNTABLE(body) = funtable_new(PROGRAM_FUNTABLE(node));
 
-    funtable_entry e = {"__init",
+    funtable_entry e = {STRcpy("__init"),
+                        NULL,
                         funtype_new(TY_void),
                         {0, 0, 0, 0, NULL},
                         0,
@@ -77,10 +78,11 @@ node_st *DVDdecls(node_st *node) {
              expr = EXPRS_NEXT(expr), i++) {
             node_st *ref;
             if (VARDECL_EXTERNAL(decl)) {
-                MEMfree(ID_VAL(VARREF_ID(EXPRS_EXPR(expr))));
                 char *name = STRfmt("%s+%d", ID_VAL(VARDECL_ID(decl)), i);
                 vartable_ref r = {0, VARREF_L(EXPRS_EXPR(expr))};
-                vartable_get(DATA_DVD_GET()->vartable, r)->name = name;
+                vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
+                e->unmangled_name = e->name;
+                e->name = name;
                 ID_VAL(VARREF_ID(EXPRS_EXPR(expr))) = name;
                 continue;
             } else if (VARDECL_EXPORTED(decl)) {
@@ -138,6 +140,7 @@ node_st *DVDdecls(node_st *node) {
             DATA_DVD_GET()->stmts = root;
         }
 
+        ID_VAL(VARDECL_ID(decl)) = NULL;
         TAKE(DECLS_NEXT(node));
     }
 

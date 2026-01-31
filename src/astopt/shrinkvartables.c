@@ -6,9 +6,9 @@ static vartable *CGSVshrink(void) {
     for (int i = 0; i < DATA_CGSV_GET()->vartable->len; i++) {
         vartable_entry *e = &DATA_CGSV_GET()->vartable->buf[i];
         if (e->read_count > 0 || e->write_count > 0) {
-            vartable_entry ne = *e;
-            ne.ty = vartype_copy(&e->ty);
-            e->new_l = vartable_push(vartable, ne).l;
+            e->new_l = vartable_push(vartable, *e).l;
+        } else {
+            vartable_entry_free(*e);
         }
     }
 
@@ -24,7 +24,7 @@ node_st *CGSVprogram(node_st *node) {
 
     TRAVchildren(node);
 
-    vartable_free(PROGRAM_VARTABLE(node));
+    vartable_shallow_free(PROGRAM_VARTABLE(node));
     PROGRAM_VARTABLE(node) = DATA_CGSV_GET()->new;
 
     return node;
@@ -39,7 +39,7 @@ node_st *CGSVfundecl(node_st *node) {
 
     DATA_CGSV_GET()->vartable = DATA_CGSV_GET()->vartable->parent;
 
-    vartable_free(FUNDECL_VARTABLE(node));
+    vartable_shallow_free(FUNDECL_VARTABLE(node));
     FUNDECL_VARTABLE(node) = DATA_CGSV_GET()->new;
     DATA_CGSV_GET()->new = prev;
 

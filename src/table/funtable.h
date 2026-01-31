@@ -32,6 +32,7 @@ void funtype_free(funtype self);
 
 typedef struct {
     char *name;
+    char *mangled_name;
     funtype ty;
     span span;
     int new_l, call_count, read_capture, write_capture, scalar_read_capture,
@@ -55,5 +56,9 @@ funtable_ref funtable_push(funtable *self, funtable_entry e);
 funtable_ref funtable_resolve(funtable *self, node_st *call);
 
 funtable_entry *funtable_get(funtable *self, funtable_ref r);
+
+void funtable_entry_free(funtable_entry e);
+
+void funtable_shallow_free(funtable *self);
 
 void funtable_free(funtable *self);

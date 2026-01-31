@@ -29,6 +29,7 @@ node_st *AFfundecl(node_st *node) {
     }
 
     funtable_entry e = {ID_VAL(FUNDECL_ID(node)),
+                        NULL,
                         ty,
                         SPAN(FUNDECL_ID(node)),
                         0,

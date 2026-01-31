@@ -32,3 +32,9 @@ node_st *Ffunbody(node_st *node) {
 
     return node;
 }
+
+node_st *Fid(node_st *node) {
+    TRAVchildren(node);
+    ID_VAL(node) = NULL;
+    return node;
+}

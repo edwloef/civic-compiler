@@ -6,9 +6,9 @@ static funtable *CGSFshrink(void) {
     for (int i = 0; i < DATA_CGSF_GET()->funtable->len; i++) {
         funtable_entry *e = &DATA_CGSF_GET()->funtable->buf[i];
         if (e->call_count > 0) {
-            funtable_entry ne = *e;
-            ne.ty = funtype_copy(&e->ty);
-            e->new_l = funtable_push(funtable, ne).l;
+            e->new_l = funtable_push(funtable, *e).l;
+        } else {
+            funtable_entry_free(*e);
         }
     }
 
@@ -24,7 +24,7 @@ node_st *CGSFprogram(node_st *node) {
 
     TRAVchildren(node);
 
-    funtable_free(PROGRAM_FUNTABLE(node));
+    funtable_shallow_free(PROGRAM_FUNTABLE(node));
     PROGRAM_FUNTABLE(node) = DATA_CGSF_GET()->new;
 
     return node;
@@ -48,7 +48,7 @@ node_st *CGSFfunbody(node_st *node) {
 
     DATA_CGSF_GET()->funtable = DATA_CGSF_GET()->funtable->parent;
 
-    funtable_free(FUNBODY_FUNTABLE(node));
+    funtable_shallow_free(FUNBODY_FUNTABLE(node));
     FUNBODY_FUNTABLE(node) = DATA_CGSF_GET()->new;
     DATA_CGSF_GET()->new = prev;
 

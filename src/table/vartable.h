@@ -27,6 +27,7 @@ void vartype_free(vartype self);
 
 typedef struct {
     char *name;
+    char *unmangled_name;
     vartype ty;
     span span;
     int new_l, read_count, write_count;
@@ -58,4 +59,8 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty);
 
 node_st *vartable_named_temp_var(vartable *self, enum BasicType ty, char *name);
 
+void vartable_entry_free(vartable_entry e);
+
 void vartable_free(vartable *self);
+
+void vartable_shallow_free(vartable *self);

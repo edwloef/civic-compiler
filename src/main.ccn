@@ -64,6 +64,15 @@ phase Analysis {
 
 phase Desugar {
     actions {
+        traversal OwnedTables {
+            uid = DOT,
+            nodes = { Program, FunDecl, VarDecl, VarRef, Param, Call },
+            travdata {
+                user funtable_ptr funtable,
+                user vartable_ptr vartable
+            }
+        };
+
         traversal BoolCasts {
             uid = DBC,
             nodes = { Cast }
@@ -384,7 +393,7 @@ traversal EstimateCost {
 
 traversal Free {
     uid = F,
-    nodes = { Program, Fundecl, Funbody }
+    nodes = { Program, Fundecl, Funbody, Id }
 };
 
 node Scope {
@@ -531,6 +540,10 @@ node Param {
     children {
         Type ty { constructor, mandatory },
         Id id { constructor, mandatory }
+    },
+
+    attributes {
+        int l
     }
 };
 
@@ -669,7 +682,7 @@ node VarRef {
 
 node Id {
     attributes {
-        string val { constructor, mandatory }
+        user tablestring val { constructor }
     }
 };
 

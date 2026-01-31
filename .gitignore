@@ -4,6 +4,7 @@ build-release
 civcc
 civas
 civvm
+civcc
 test/fuzzer-generated
 civic.dict
 fuzz-outputs
