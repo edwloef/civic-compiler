@@ -25,16 +25,15 @@ node_st *AOTCFfunbody(node_st *node) {
 }
 
 node_st *AOTCFstmts(node_st *node) {
-    if (STMT_DIVERGES(STMTS_STMT(node)) && STMTS_NEXT(node)) {
-        STMTS_NEXT(node) = CCNfree(STMTS_NEXT(node));
-        CCNcycleNotify();
-    }
-
     TRAVchildren(node);
 
     node_st *stmt = STMTS_STMT(node);
     switch (NODE_TYPE(stmt)) {
     case NT_IFELSE:
+        IFELSE_DIVERGES(stmt) =
+            IFELSE_IF_BLOCK(stmt) && STMTS_DIVERGES(IFELSE_IF_BLOCK(stmt)) &&
+            IFELSE_ELSE_BLOCK(stmt) && STMTS_DIVERGES(IFELSE_ELSE_BLOCK(stmt));
+
         if (NODE_TYPE(IFELSE_EXPR(stmt)) == NT_BOOL) {
             node_st *stmts;
             if (BOOL_VAL(IFELSE_EXPR(stmt)) == true) {
@@ -69,6 +68,7 @@ node_st *AOTCFstmts(node_st *node) {
                 SWAP(IFELSE_IF_BLOCK(stmt), IFELSE_IF_BLOCK(STMTS_STMT(tmp)));
             }
         } else if (IFELSE_ELSE_BLOCK(stmt)) {
+
             IFELSE_EXPR(stmt) = ASTmonop(IFELSE_EXPR(stmt), MO_not);
             MONOP_RESOLVED_TY(IFELSE_EXPR(stmt)) = TY_bool;
 
@@ -89,6 +89,11 @@ node_st *AOTCFstmts(node_st *node) {
         }
         break;
     case NT_DOWHILE:
+        DOWHILE_DIVERGES(stmt) =
+            (DOWHILE_STMTS(stmt) && STMTS_DIVERGES(DOWHILE_STMTS(stmt))) ||
+            (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL &&
+             BOOL_VAL(DOWHILE_EXPR(stmt)) == true);
+
         if (NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BOOL &&
             BOOL_VAL(DOWHILE_EXPR(stmt)) == false) {
             node_st *stmts = DOWHILE_STMTS(stmt);
@@ -96,6 +101,9 @@ node_st *AOTCFstmts(node_st *node) {
             TAKE(STMTS_NEXT(node));
             node = inline_stmts(node, stmts);
         }
+        break;
+    case NT_RETURN:
+        RETURN_DIVERGES(stmt) = true;
         break;
     case NT_CALL: {
         funtable_ref r = {CALL_N(stmt), CALL_L(stmt)};
@@ -114,6 +122,17 @@ node_st *AOTCFstmts(node_st *node) {
     }
     default:
         break;
+    }
+
+    if (node) {
+        STMTS_DIVERGES(node) =
+            STMT_DIVERGES(STMTS_STMT(node)) ||
+            (STMTS_NEXT(node) && STMTS_DIVERGES(STMTS_NEXT(node)));
+
+        if (STMT_DIVERGES(STMTS_STMT(node)) && STMTS_NEXT(node)) {
+            STMTS_NEXT(node) = CCNfree(STMTS_NEXT(node));
+            CCNcycleNotify();
+        }
     }
 
     return node;

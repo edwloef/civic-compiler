@@ -205,11 +205,6 @@ gate = is_optimize_enabled,
                     }
                 };
 
-                traversal Divergence {
-                    uid = AOD,
-                    nodes = { Stmts, IfElse, DoWhile, Return }
-                };
-
                 traversal TrivialControlFlow {
                     uid = AOTCF,
                     nodes = { Program, FunBody, Stmts },
