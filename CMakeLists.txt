@@ -30,7 +30,7 @@ include(./coconut/coconut.cmake)
 
 # Whenever you add a file, add it here too.
 add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
-    src/analysis/divergence.c
+    src/analysis/checkdivergence.c
     src/analysis/functions.c
     src/analysis/globals.c
     src/analysis/resolve.c
@@ -47,6 +47,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/deadfunctions.c
     src/astopt/deadstores.c
     src/astopt/directcaptures.c
+    src/astopt/divergence.c
     src/astopt/escapes.c
     src/astopt/estimatecost.c
     src/astopt/extractstmts.c

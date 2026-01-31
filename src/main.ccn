@@ -55,8 +55,8 @@ phase Analysis {
             }
         };
 
-        traversal Divergence {
-            uid = AD,
+        traversal CheckDivergence {
+            uid = ACD,
             nodes = { Program, Stmts, FunDecl, IfElse, While, DoWhile, Return }
         };
     }
@@ -204,6 +204,11 @@ cycle AstOpt {
             travdata {
                 user funtable_ptr funtable
             }
+        };
+
+        traversal Divergence {
+            uid = AOD,
+            nodes = { Stmts, IfElse, DoWhile, Return }
         };
 
         traversal TrivialControlFlow {

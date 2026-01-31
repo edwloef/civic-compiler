@@ -15,14 +15,12 @@ static void ARlint_vartable_usage(vartable *vartable) {
                 emit_message_with_span(
                     e->span, L_WARNING,
                     "variable '%s' is never read from or written to", e->name);
-            } else {
-                if (!e->external && !e->exported &&
-                    !(e->param && e->ty.len != 0)) {
-                    emit_message_with_span(
-                        e->span, L_WARNING,
-                        "variable '%s' is never read from, only written to",
-                        e->name);
-                }
+            } else if (!e->external && !e->exported &&
+                       !(e->param && e->ty.len != 0)) {
+                emit_message_with_span(
+                    e->span, L_WARNING,
+                    "variable '%s' is never read from, only written to",
+                    e->name);
             }
         } else if (e->write_count == 0) {
             if (!e->external && !e->exported && !e->param) {

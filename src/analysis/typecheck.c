@@ -120,22 +120,20 @@ node_st *ATCarrexprs(node_st *node) {
                       fmt_BasicType(self_ty.ty), resolved_ty.dims,
                       fmt_BasicType(resolved_ty.ty));
             }
+        } else if (resolved_ty.dims == 0) {
+            ERROR(ARREXPRS_EXPR(expr),
+                  "encountered inconsistent array literal containing "
+                  "%d-dimensional array of type '%s' and value of type "
+                  "'%s'",
+                  self_ty.dims, fmt_BasicType(self_ty.ty),
+                  fmt_BasicType(resolved_ty.ty));
         } else {
-            if (resolved_ty.dims == 0) {
-                ERROR(ARREXPRS_EXPR(expr),
-                      "encountered inconsistent array literal containing "
-                      "%d-dimensional array of type '%s' and value of type "
-                      "'%s'",
-                      self_ty.dims, fmt_BasicType(self_ty.ty),
-                      fmt_BasicType(resolved_ty.ty));
-            } else {
-                ERROR(ARREXPRS_EXPR(expr),
-                      "encountered inconsistent array literal containing "
-                      "%d-dimensional array of type '%s' and %d-dimensional "
-                      "array of type '%s'",
-                      self_ty.dims, fmt_BasicType(self_ty.ty), resolved_ty.dims,
-                      fmt_BasicType(resolved_ty.ty));
-            }
+            ERROR(ARREXPRS_EXPR(expr),
+                  "encountered inconsistent array literal containing "
+                  "%d-dimensional array of type '%s' and %d-dimensional "
+                  "array of type '%s'",
+                  self_ty.dims, fmt_BasicType(self_ty.ty), resolved_ty.dims,
+                  fmt_BasicType(resolved_ty.ty));
         }
 
         error = true;
@@ -354,13 +352,11 @@ node_st *ATCreturn(node_st *node) {
                       fmt_BasicType(DATA_ATC_GET()->ret_ty));
             }
         }
-    } else {
-        if (DATA_ATC_GET()->ret_ty != TY_void) {
-            ERROR(node,
-                  "can't return from function returning type '%s' without "
-                  "providing a value of that type",
-                  fmt_BasicType(DATA_ATC_GET()->ret_ty));
-        }
+    } else if (DATA_ATC_GET()->ret_ty != TY_void) {
+        ERROR(node,
+              "can't return from function returning type '%s' without "
+              "providing a value of that type",
+              fmt_BasicType(DATA_ATC_GET()->ret_ty));
     }
 
     return node;
@@ -583,20 +579,18 @@ node_st *ATCcall(node_st *node) {
                               fmt_BasicType(expected_ty.ty), resolved_ty.dims,
                               fmt_BasicType(resolved_ty.ty));
                     }
+                } else if (resolved_ty.dims == 0) {
+                    ERROR(EXPRS_EXPR(arg),
+                          "expected %d-dimensional array of type '%s', "
+                          "found value of type '%s'",
+                          expected_ty.dims, fmt_BasicType(expected_ty.ty),
+                          fmt_BasicType(resolved_ty.ty));
                 } else {
-                    if (resolved_ty.dims == 0) {
-                        ERROR(EXPRS_EXPR(arg),
-                              "expected %d-dimensional array of type '%s', "
-                              "found value of type '%s'",
-                              expected_ty.dims, fmt_BasicType(expected_ty.ty),
-                              fmt_BasicType(resolved_ty.ty));
-                    } else {
-                        ERROR(EXPRS_EXPR(arg),
-                              "expected %d-dimensional array of type '%s', "
-                              "found %d-dimensional array of type '%s'",
-                              expected_ty.dims, fmt_BasicType(expected_ty.ty),
-                              resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
-                    }
+                    ERROR(EXPRS_EXPR(arg),
+                          "expected %d-dimensional array of type '%s', "
+                          "found %d-dimensional array of type '%s'",
+                          expected_ty.dims, fmt_BasicType(expected_ty.ty),
+                          resolved_ty.dims, fmt_BasicType(resolved_ty.ty));
                 }
             }
         }
