@@ -377,6 +377,23 @@ node_st *CGAcall(node_st *node) {
     return node;
 }
 
+node_st *CGAstmts(node_st *node) {
+    node_st *stmt = STMTS_STMT(node);
+    TRAVdo(stmt);
+
+    if (NODE_TYPE(stmt) == NT_CALL && CALL_RESOLVED_TY(stmt) != TY_void) {
+        oprintf("\t");
+        short_basic_ty(CALL_RESOLVED_TY(stmt));
+        oprintf("pop\n");
+    }
+
+    if (STMTS_NEXT(node) != NULL) {
+        TRAVdo(STMTS_NEXT(node));
+    }
+
+    return node;
+}
+
 node_st *CGAreturn(node_st *node) {
     TRAVchildren(node);
 

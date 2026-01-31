@@ -293,7 +293,7 @@ phase CodeGen {
 
         traversal Assembly {
             uid = CGA,
-            nodes = { Program, FunDecl, IfElse, DoWhile, Assign, Call, Return, Malloc, Binop, Monop, Cast, VarRef, Int, Float, Bool, ConstRef },
+            nodes = { Program, FunDecl, IfElse, DoWhile, Assign, Call, Stmts, Return, Malloc, Binop, Monop, Cast, VarRef, Int, Float, Bool, ConstRef },
             travdata {
                 int label,
                 int nesting,
