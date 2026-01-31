@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ccngen/enum.h"
 
 char *fmt_BasicType(enum BasicType ty);

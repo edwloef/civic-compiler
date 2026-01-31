@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ccngen/ast.h"
 #include "palm/dbug.h"
 
