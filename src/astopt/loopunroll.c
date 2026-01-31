@@ -92,7 +92,8 @@ node_st *AOLUstmts(node_st *node) {
             long long llend = end;
             long long llstep = step;
 
-            count = (llend - llstart) / llstep;
+            long long lllen = llend - llstart;
+            count = lllen / llstep + (lllen % llstep != 0);
 
             if (count <= 1) {
                 count = 1;
