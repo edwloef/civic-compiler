@@ -87,6 +87,8 @@ node_st *DVDdecls(node_st *node) {
                 ref = vartable_named_temp_var(
                     DATA_DVD_GET()->vartable, TY_int,
                     STRfmt("%s+%d", ID_VAL(VARDECL_ID(decl)), i));
+                vartable_ref r = {0, VARREF_L(ref)};
+                vartable_get(DATA_DVD_GET()->vartable, r)->exported = true;
             } else {
                 ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
             }

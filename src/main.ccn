@@ -85,7 +85,7 @@ phase Desugar {
 
         traversal ArrayParams {
             uid = DAP,
-            nodes = { Program, FunDecl, Params },
+            nodes = { Program, FunDecl, Params, Exprs },
             travdata {
                 user vartable_ptr vartable,
                 Stmts stmts
