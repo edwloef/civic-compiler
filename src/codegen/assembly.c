@@ -484,14 +484,17 @@ node_st *CGAbinop(node_st *node) {
 node_st *CGAmonop(node_st *node) {
     TRAVchildren(node);
 
-    oprintf("\t");
-    short_ty(TYPE(MONOP_EXPR(node)));
-
     switch (MONOP_OP(node)) {
     case MO_not:
+        oprintf("\t");
+        short_ty(TYPE(MONOP_EXPR(node)));
         oprintf("not\n");
         break;
+    case MO_pos:
+        break;
     case MO_neg:
+        oprintf("\t");
+        short_ty(TYPE(MONOP_EXPR(node)));
         oprintf("neg\n");
         break;
     default:
@@ -531,8 +534,9 @@ node_st *CGAcast(node_st *node) {
         oprintf("\ti2f\n");
     } else if (from == TY_float && to == TY_int) {
         oprintf("\tf2i\n");
-    } else {
-        DBUG_ASSERT(false, "unexpected cast");
+    } else if (from != to) {
+        DBUG_ASSERT(false, "unexpected cast %s -> %s", fmt_BasicType(from),
+                    fmt_BasicType(to));
     }
 
     return node;
