@@ -1,0 +1,8 @@
+extern void overloaded();
+extern void overloaded(int a, int b);
+
+export int main() {
+	overloaded();
+	overloaded(8, 9);
+	return 0;
+}

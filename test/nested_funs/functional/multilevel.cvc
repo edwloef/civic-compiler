@@ -1,0 +1,43 @@
+extern void printInt(int n);
+extern void printSpaces(int n);
+
+export int main() {
+	void above(bool rec) {
+		void neighbor() {
+			printInt(2);
+			printSpaces(1);
+		}
+
+		void scope() {
+			void inside(bool rec) {
+				if (rec) {
+					inside(true);
+				} else {
+					printInt(1);
+					printSpaces(1);
+				}
+			}
+
+			inside(false);
+			neighbor();
+			above(true);
+			global();
+			printInt(16);
+		}
+
+		if (rec) {
+			printInt(4);
+			printSpaces(1);
+			return;
+		}
+		scope();
+	}
+
+	above(false);
+	return 0;
+}
+
+void global() {
+	printInt(8);
+	printSpaces(1);
+}

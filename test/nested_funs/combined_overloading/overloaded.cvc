@@ -1,0 +1,15 @@
+extern void printInt(int n);
+
+export void overloaded(int a, int b) {
+	printInt(a);
+	printInt(b);
+}
+
+export void overloaded(int[n] b) {
+	overloaded(b[0], b[1]);
+}
+
+export void overloaded() {
+	int[2] m = [6, 7];
+	overloaded(m);
+}
