@@ -37,7 +37,7 @@ node_st *AOTCFstmts(node_st *node) {
     } else if (NODE_TYPE(stmt) == NT_STMTS) {
         STMTS_STMT(node) = NULL;
         TAKE(STMTS_NEXT(node));
-        node = inline_stmts(stmt, node);
+        node = inline_stmts(node, stmt);
     }
 
     stmt = STMTS_STMT(node);
