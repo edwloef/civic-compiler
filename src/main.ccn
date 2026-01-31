@@ -216,7 +216,7 @@ phase MaybeOpt {
 
                 traversal TrivialControlFlow {
                     uid = AOTCF,
-                    nodes = { Program, FunBody, Stmts },
+                    nodes = { Program, FunBody, Stmts, IfElse, DoWhile, Return },
                     travdata {
                         user funtable_ptr funtable
                     }
