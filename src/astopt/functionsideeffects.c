@@ -1,19 +1,19 @@
 #include "ccn/ccn.h"
 
-void AOSFinit(void) {}
-void AOSFfini(void) {}
+void AOFSFinit(void) {}
+void AOFSFfini(void) {}
 
-node_st *AOSFprogram(node_st *node) {
-    DATA_AOSF_GET()->funtable = PROGRAM_FUNTABLE(node);
+node_st *AOFSFprogram(node_st *node) {
+    DATA_AOFSF_GET()->funtable = PROGRAM_FUNTABLE(node);
 
     TRAVchildren(node);
 
     return node;
 }
 
-node_st *AOSFfundecl(node_st *node) {
+node_st *AOFSFfundecl(node_st *node) {
     funtable_ref r = {0, FUNDECL_L(node)};
-    funtable_entry *e = funtable_get(DATA_AOSF_GET()->funtable, r);
+    funtable_entry *e = funtable_get(DATA_AOFSF_GET()->funtable, r);
     e->side_effects = e->write_capture > 0;
 
     for (int i = 0; !e->side_effects && i < FUNDECL_VARTABLE(node)->len; i++) {
@@ -26,12 +26,12 @@ node_st *AOSFfundecl(node_st *node) {
     return node;
 }
 
-node_st *AOSFfunbody(node_st *node) {
-    DATA_AOSF_GET()->funtable = FUNBODY_FUNTABLE(node);
+node_st *AOFSFfunbody(node_st *node) {
+    DATA_AOFSF_GET()->funtable = FUNBODY_FUNTABLE(node);
 
     TRAVchildren(node);
 
-    DATA_AOSF_GET()->funtable = DATA_AOSF_GET()->funtable->parent;
+    DATA_AOFSF_GET()->funtable = DATA_AOFSF_GET()->funtable->parent;
 
     return node;
 }

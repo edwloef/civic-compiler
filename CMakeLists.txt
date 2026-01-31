@@ -49,13 +49,14 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/directcaptures.c
     src/astopt/escapes.c
     src/astopt/estimatecost.c
+    src/astopt/exprsideeffects.c
     src/astopt/extractstmts.c
+    src/astopt/functionsideeffects.c
     src/astopt/identities.c
     src/astopt/indirectcalls.c
     src/astopt/loopunroll.c
     src/astopt/reassoc.c
     src/astopt/shrinktables.c
-    src/astopt/sideeffects.c
     src/astopt/trivialcontrolflow.c
     src/astopt/valueprop.c
     src/astopt/valueproploop.c

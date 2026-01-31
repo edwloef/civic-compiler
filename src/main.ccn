@@ -196,6 +196,22 @@ phase MaybeOpt {
                     }
                 };
 
+                traversal FunctionSideEffects {
+                    uid = AOFSF,
+                    nodes = { Program, FunDecl, FunBody },
+                    travdata {
+                        user funtable_ptr funtable
+                    }
+                };
+
+                traversal ExprSideEffects {
+                    uid = AOESF,
+                    nodes = { Program, FunBody, Exprs, Call },
+                    travdata {
+                        user funtable_ptr funtable
+                    }
+                };
+
                 traversal Reassoc {
                     uid = AOR,
                     nodes = { Binop }
@@ -204,14 +220,6 @@ phase MaybeOpt {
                 traversal ConstFold {
                     uid = AOCF,
                     nodes = { Monop, Binop, Cast }
-                };
-
-                traversal SideEffects {
-                    uid = AOSF,
-                    nodes = { Program, FunDecl, FunBody },
-                    travdata {
-                        user funtable_ptr funtable
-                    }
                 };
 
                 traversal TrivialControlFlow {
@@ -475,6 +483,10 @@ node Exprs {
     children {
         Expr expr { constructor, mandatory },
         Exprs next { constructor }
+    },
+
+    attributes {
+        bool side_effects
     }
 };
 
@@ -483,7 +495,8 @@ nodeset Expr {
 
     attributes {
         BasicType resolved_ty,
-        int resolved_dims
+        int resolved_dims,
+        bool side_effects
     }
 };
 
