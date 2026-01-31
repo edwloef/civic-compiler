@@ -71,6 +71,7 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
                    DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1));
 
         INT_RESOLVED_TY(FOR_LOOP_START(loop)) = TY_int;
+        INT_RESOLVED_TY(FOR_LOOP_STEP(loop)) = TY_int;
 
         return ASTstmts(loop, NULL);
     }
