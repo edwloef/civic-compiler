@@ -1,5 +1,6 @@
 #include "ccn/ccn.h"
 #include "macros.h"
+#include "palm/memory.h"
 #include "palm/str.h"
 #include "table/funtable.h"
 
@@ -74,7 +75,19 @@ node_st *DVDdecls(node_st *node) {
         int i = 0;
         for (node_st *expr = TYPE_EXPRS(VARDECL_TY(decl)); expr;
              expr = EXPRS_NEXT(expr), i++) {
-            node_st *ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
+            node_st *ref;
+            if (VARDECL_EXTERNAL(decl)) {
+                MEMfree(ID_VAL(VARREF_ID(EXPRS_EXPR(expr))));
+                ID_VAL(VARREF_ID(EXPRS_EXPR(expr))) =
+                    STRfmt("%s+%d", ID_VAL(VARDECL_ID(decl)), i);
+                continue;
+            } else if (VARDECL_EXPORTED(decl)) {
+                ref = vartable_named_temp_var(
+                    DATA_DVD_GET()->vartable, TY_int,
+                    STRfmt("%s+%d", ID_VAL(VARDECL_ID(decl)), i));
+            } else {
+                ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
+            }
 
             vartable_ref tr = {VARREF_N(ref), VARREF_L(ref)};
             vartable_get(DATA_DVD_GET()->vartable, r)->ty.buf[i] = tr;
@@ -104,7 +117,7 @@ node_st *DVDdecls(node_st *node) {
             DATA_DVD_GET()->stmts = ASTstmts(assign, DATA_DVD_GET()->stmts);
         }
 
-        if (TYPE_EXPRS(VARDECL_TY(decl))) {
+        if (TYPE_EXPRS(VARDECL_TY(decl)) && !VARDECL_EXTERNAL(decl)) {
             node_st *malloc = ASTmalloc(TYPE_EXPRS(VARDECL_TY(decl)));
             EXPR_RESOLVED_TY(malloc) = TYPE_TY(VARDECL_TY(decl));
             TYPE_EXPRS(VARDECL_TY(decl)) = NULL;

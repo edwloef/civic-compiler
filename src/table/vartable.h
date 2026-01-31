@@ -56,4 +56,6 @@ node_st *vartable_get_ref(vartable *self, vartable_ref r);
 
 node_st *vartable_temp_var(vartable *self, enum BasicType ty);
 
+node_st *vartable_named_temp_var(vartable *self, enum BasicType ty, char *name);
+
 void vartable_free(vartable *self);
