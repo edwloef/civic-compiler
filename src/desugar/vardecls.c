@@ -78,8 +78,10 @@ node_st *DVDdecls(node_st *node) {
             node_st *ref;
             if (VARDECL_EXTERNAL(decl)) {
                 MEMfree(ID_VAL(VARREF_ID(EXPRS_EXPR(expr))));
-                ID_VAL(VARREF_ID(EXPRS_EXPR(expr))) =
-                    STRfmt("%s+%d", ID_VAL(VARDECL_ID(decl)), i);
+                char *name = STRfmt("%s+%d", ID_VAL(VARDECL_ID(decl)), i);
+                vartable_ref r = {0, VARREF_L(EXPRS_EXPR(expr))};
+                vartable_get(DATA_DVD_GET()->vartable, r)->name = name;
+                ID_VAL(VARREF_ID(EXPRS_EXPR(expr))) = name;
                 continue;
             } else if (VARDECL_EXPORTED(decl)) {
                 ref = vartable_named_temp_var(
