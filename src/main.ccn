@@ -134,7 +134,7 @@ phase Desugar {
 };
 
 phase MaybeOpt {
-gate = is_optimize_enabled,
+    gate = is_optimize_enabled,
     actions {
         cycle AstOpt {
             actions {
@@ -278,6 +278,15 @@ phase CodeGen {
             nodes = { Program, Int, Float },
             travdata {
                 user consttable_ptr consttable
+            }
+        };
+
+        traversal Mangling {
+            uid = CGM,
+            nodes = { Program, FunDecl },
+            travdata {
+                string name,
+                user funtable_ptr funtable
             }
         };
     }
