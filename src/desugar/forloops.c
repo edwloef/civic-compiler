@@ -70,6 +70,7 @@ node_st *DFLstmts(node_st *node) {
         if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
             INT_VAL(ASSIGN_EXPR(step_assign)) > 0) {
             node_st *positive_step_overflow = NULL;
+            node_st *positive_step_no_overflow = NULL;
 
             if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
                 INT_VAL(ASSIGN_EXPR(step_assign)) != 1) {
@@ -93,12 +94,15 @@ node_st *DFLstmts(node_st *node) {
                              ASTstmts(positive_step_overflow_if, NULL)));
             }
 
-            node_st *positive_step_no_overflow_while =
-                ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
-                         CCNcopy(FOR_STMTS(stmt)));
+            if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
+                INT_VAL(ASSIGN_EXPR(step_assign)) == 1) {
+                node_st *positive_step_no_overflow_while = ASTwhile(
+                    ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_lt),
+                    CCNcopy(FOR_STMTS(stmt)));
 
-            node_st *positive_step_no_overflow =
-                ASTstmts(positive_step_no_overflow_while, NULL);
+                positive_step_no_overflow =
+                    ASTstmts(positive_step_no_overflow_while, NULL);
+            }
 
             node_st *positive_overflowed;
             if (!positive_step_no_overflow) {
@@ -109,11 +113,13 @@ node_st *DFLstmts(node_st *node) {
                 positive_overflowed =
                     ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
                 BINOP_RESOLVED_TY(positive_overflowed) = TY_int;
+                positive_overflowed =
+                    ASTbinop(positive_overflowed, CCNcopy(end_ref), BO_lt);
             }
 
-            node_st *positive_step_ifelse = ASTifelse(
-                ASTbinop(positive_overflowed, CCNcopy(end_ref), BO_lt),
-                positive_step_overflow, positive_step_no_overflow);
+            node_st *positive_step_ifelse =
+                ASTifelse(positive_overflowed, positive_step_overflow,
+                          positive_step_no_overflow);
 
             positive_step = ASTstmts(positive_step_ifelse, NULL);
         }
@@ -121,6 +127,7 @@ node_st *DFLstmts(node_st *node) {
         if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
             INT_VAL(ASSIGN_EXPR(step_assign)) < 0) {
             node_st *negative_step_overflow = NULL;
+            node_st *negative_step_no_overflow = NULL;
 
             if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
                 INT_VAL(ASSIGN_EXPR(step_assign)) != -1) {
@@ -144,12 +151,15 @@ node_st *DFLstmts(node_st *node) {
                              ASTstmts(negative_step_overflow_if, NULL)));
             }
 
-            node_st *negative_step_no_overflow_while =
-                ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
-                         CCNcopy(FOR_STMTS(stmt)));
+            if (NODE_TYPE(ASSIGN_EXPR(step_assign)) != NT_INT ||
+                INT_VAL(ASSIGN_EXPR(step_assign)) == -1) {
+                node_st *negative_step_no_overflow_while = ASTwhile(
+                    ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), BO_gt),
+                    CCNcopy(FOR_STMTS(stmt)));
 
-            node_st *negative_step_no_overflow =
-                ASTstmts(negative_step_no_overflow_while, NULL);
+                negative_step_no_overflow =
+                    ASTstmts(negative_step_no_overflow_while, NULL);
+            }
 
             node_st *negative_overflowed;
             if (!negative_step_no_overflow) {
@@ -160,11 +170,13 @@ node_st *DFLstmts(node_st *node) {
                 negative_overflowed =
                     ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
                 BINOP_RESOLVED_TY(negative_overflowed) = TY_int;
+                negative_overflowed =
+                    ASTbinop(negative_overflowed, CCNcopy(end_ref), BO_gt);
             }
 
-            node_st *negative_step_ifelse = ASTifelse(
-                ASTbinop(negative_overflowed, CCNcopy(end_ref), BO_gt),
-                negative_step_overflow, negative_step_no_overflow);
+            node_st *negative_step_ifelse =
+                ASTifelse(negative_overflowed, negative_step_overflow,
+                          negative_step_no_overflow);
 
             negative_step = ASTstmts(negative_step_ifelse, NULL);
         }
