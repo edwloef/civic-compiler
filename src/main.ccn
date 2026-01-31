@@ -55,8 +55,8 @@ phase Analysis {
             }
         };
 
-        traversal CheckDivergence {
-            uid = ACD,
+        traversal DivergeCheck {
+            uid = ADC,
             nodes = { Program, Stmts, FunDecl, IfElse, While, DoWhile, Return }
         };
     }

@@ -2,7 +2,7 @@
 #include "error/error.h"
 #include "print/print.h"
 
-node_st *ACDprogram(node_st *node) {
+node_st *ADCprogram(node_st *node) {
     TRAVchildren(node);
 
     abort_on_error();
@@ -10,7 +10,7 @@ node_st *ACDprogram(node_st *node) {
     return node;
 }
 
-node_st *ACDstmts(node_st *node) {
+node_st *ADCstmts(node_st *node) {
     TRAVchildren(node);
 
     if (STMT_DIVERGES(STMTS_STMT(node)) && STMTS_NEXT(node)) {
@@ -26,7 +26,7 @@ node_st *ACDstmts(node_st *node) {
     return node;
 }
 
-node_st *ACDfundecl(node_st *node) {
+node_st *ADCfundecl(node_st *node) {
     TRAVchildren(node);
 
     if (!FUNDECL_EXTERNAL(node) && FUNDECL_TY(node) != TY_void &&
@@ -42,7 +42,7 @@ node_st *ACDfundecl(node_st *node) {
     return node;
 }
 
-node_st *ACDifelse(node_st *node) {
+node_st *ADCifelse(node_st *node) {
     TRAVchildren(node);
 
     IFELSE_DIVERGES(node) =
@@ -52,7 +52,7 @@ node_st *ACDifelse(node_st *node) {
     return node;
 }
 
-node_st *ACDwhile(node_st *node) {
+node_st *ADCwhile(node_st *node) {
     TRAVchildren(node);
 
     WHILE_EXPR(node) = TRAVstart(WHILE_EXPR(node), TRAV_AOCF);
@@ -62,7 +62,7 @@ node_st *ACDwhile(node_st *node) {
     return node;
 }
 
-node_st *ACDdowhile(node_st *node) {
+node_st *ADCdowhile(node_st *node) {
     TRAVchildren(node);
 
     DOWHILE_EXPR(node) = TRAVstart(DOWHILE_EXPR(node), TRAV_AOCF);
@@ -74,7 +74,7 @@ node_st *ACDdowhile(node_st *node) {
     return node;
 }
 
-node_st *ACDreturn(node_st *node) {
+node_st *ADCreturn(node_st *node) {
     TRAVchildren(node);
 
     RETURN_DIVERGES(node) = true;
