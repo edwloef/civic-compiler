@@ -37,7 +37,7 @@ function check_output {
     total_tests=$((total_tests+1))
     printf "%-${ALIGN}s " $file:
 
-    if $CIVCC $CGLAGS -o tmp.s $file > tmp.out 2>&1 &&
+    if $CIVCC $CFLAGS -o tmp.s $file > tmp.out 2>&1 &&
        $CIVAS tmp.s -o tmp.o > tmp.out 2>&1 &&
        $CIVVM tmp.o > tmp.out 2>&1 &&
        mv tmp.out tmp.res &&
@@ -80,7 +80,7 @@ function check_combined {
         ofile=${file%.*}.o
         ofiles="$ofiles $ofile"
 
-        if $CIVCC $CGLAGS -o $asfile $file > /dev/null 2>&1 &&
+        if $CIVCC $CFLAGS -o $asfile $file > /dev/null 2>&1 &&
            $CIVAS -o $ofile $asfile 2>&1
         then
             compiled_files="$compiled_files `basename $file`"

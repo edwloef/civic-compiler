@@ -30,6 +30,7 @@ check:
 	CIVAS=../$(TEST_CIVAS) \
 	CIVVM=../$(TEST_CIVVM) \
 	CIVCC=../$(TEST_CIVCC) \
+	CFLAGS=$(TEST_CFLAGS) \
 	RUN_FUNCTIONAL=$(TEST_RUN_FUNCTIONAL) \
 	bash run.bash $(TEST_DIRS)
 
