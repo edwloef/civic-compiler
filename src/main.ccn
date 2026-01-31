@@ -290,6 +290,18 @@ phase CodeGen {
                 user funtable_ptr funtable
             }
         };
+
+        traversal Assembly {
+            uid = CGA,
+            nodes = { Program, FunDecl, IfElse, DoWhile, Assign, Call, Return, Malloc, Binop, Monop, Cast, VarRef, Int, Float, Bool, ConstRef },
+            travdata {
+                int label,
+                int nesting,
+                user funtable_ptr funtable,
+                user vartable_ptr vartable,
+                user consttable_ptr consttable
+            }
+        };
     }
 };
 
