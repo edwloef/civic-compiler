@@ -697,23 +697,14 @@ node_st *ATCtype(node_st *node) {
 }
 
 node_st *ATCint(node_st *node) {
-    INT_RESOLVED_TY(node) = TY_int;
-    INT_RESOLVED_DIMS(node) = 0;
-
     return node;
 }
 
 node_st *ATCfloat(node_st *node) {
-    FLOAT_RESOLVED_TY(node) = TY_float;
-    FLOAT_RESOLVED_DIMS(node) = 0;
-
     return node;
 }
 
 node_st *ATCbool(node_st *node) {
-    BOOL_RESOLVED_TY(node) = TY_bool;
-    BOOL_RESOLVED_DIMS(node) = 0;
-
     return node;
 }
 

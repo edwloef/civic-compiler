@@ -1,24 +1,9 @@
 #include "ccn/ccn.h"
 #include "palm/dbug.h"
 
-#define CONST_INT(val)                                                         \
-    {                                                                          \
-        node_st *intval = ASTint(val);                                         \
-        INT_RESOLVED_TY(intval) = TY_int;                                      \
-        CONST_RETURN(intval);                                                  \
-    }
-#define CONST_FLOAT(val)                                                       \
-    {                                                                          \
-        node_st *floatval = ASTfloat(val);                                     \
-        FLOAT_RESOLVED_TY(floatval) = TY_float;                                \
-        CONST_RETURN(floatval);                                                \
-    }
-#define CONST_BOOL(val)                                                        \
-    {                                                                          \
-        node_st *boolval = ASTbool(val);                                       \
-        BOOL_RESOLVED_TY(boolval) = TY_bool;                                   \
-        CONST_RETURN(boolval);                                                 \
-    }
+#define CONST_INT(val) CONST_RETURN(ASTint(val, TY_int));
+#define CONST_FLOAT(val) CONST_RETURN(ASTfloat(val, TY_float));
+#define CONST_BOOL(val) CONST_RETURN(ASTbool(val, TY_bool));
 #define CONST_RETURN(val)                                                      \
     {                                                                          \
         node_st *constval = val;                                               \

@@ -34,8 +34,7 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
                 node_st *inner_ref = CCNcopy(ref);
 
                 VARREF_EXPRS(inner_ref) =
-                    ASTexprs(ASTint(i), VARREF_EXPRS(inner_ref));
-                INT_RESOLVED_TY(EXPRS_EXPR(VARREF_EXPRS(inner_ref))) = TY_int;
+                    ASTexprs(ASTint(i, TY_int), VARREF_EXPRS(inner_ref));
 
                 node_st *stmt = DAAbuild_array_assign(
                     inner_ref, dims + 1, ARREXPRS_EXPR(inner), ref_dims - 1);
@@ -65,13 +64,10 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
         vartable_ref dr = dims[0];
         dr.n += VARREF_N(ref);
 
-        node_st *loop =
-            ASTfor(loopvar, ASTint(0),
-                   vartable_get_ref(DATA_DAA_GET()->vartable, dr), ASTint(1),
-                   DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1));
-
-        INT_RESOLVED_TY(FOR_LOOP_START(loop)) = TY_int;
-        INT_RESOLVED_TY(FOR_LOOP_STEP(loop)) = TY_int;
+        node_st *loop = ASTfor(
+            loopvar, ASTint(0, TY_int),
+            vartable_get_ref(DATA_DAA_GET()->vartable, dr), ASTint(1, TY_int),
+            DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1));
 
         return ASTstmts(loop, NULL);
     }

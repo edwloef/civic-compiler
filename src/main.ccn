@@ -701,19 +701,22 @@ node Type {
 
 node Int {
     attributes {
-        int val { constructor }
+        int val { constructor },
+        BasicType resolved_ty { constructor }
     }
 };
 
 node Float {
     attributes {
-        double val { constructor }
+        double val { constructor },
+        BasicType resolved_ty { constructor }
     }
 };
 
 node Bool {
     attributes {
-        bool val { constructor }
+        bool val { constructor },
+        BasicType resolved_ty { constructor }
     }
 };
 

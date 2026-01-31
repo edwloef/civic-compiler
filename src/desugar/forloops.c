@@ -156,9 +156,8 @@ node_st *DFLstmts(node_st *node) {
         }
 
         node_st *transformed =
-            ASTifelse(ASTbinop(CCNcopy(step_ref), ASTint(0), BO_gt),
+            ASTifelse(ASTbinop(CCNcopy(step_ref), ASTint(0, TY_int), BO_gt),
                       positive_step, negative_step);
-        INT_RESOLVED_TY(BINOP_RIGHT(IFELSE_EXPR(transformed))) = TY_int;
 
         CCNfree(clamped_end_ref);
 

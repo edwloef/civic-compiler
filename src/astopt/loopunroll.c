@@ -79,7 +79,7 @@ node_st *AOLUstmts(node_st *node) {
                 can_unroll = end + step < end;
             } else {
                 CCNfree(DOWHILE_EXPR(stmt));
-                DOWHILE_EXPR(stmt) = ASTbool(true);
+                DOWHILE_EXPR(stmt) = ASTbool(true, TY_bool);
                 can_unroll = false;
                 CCNcycleNotify();
             }

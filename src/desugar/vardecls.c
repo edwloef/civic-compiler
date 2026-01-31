@@ -125,7 +125,7 @@ node_st *DVDdecls(node_st *node) {
 
         if (TYPE_EXPRS(VARDECL_TY(decl)) && !VARDECL_EXTERNAL(decl)) {
             node_st *malloc = ASTmalloc(TYPE_EXPRS(VARDECL_TY(decl)));
-            EXPR_RESOLVED_TY(malloc) = TYPE_TY(VARDECL_TY(decl));
+            MALLOC_RESOLVED_TY(malloc) = TYPE_TY(VARDECL_TY(decl));
             TYPE_EXPRS(VARDECL_TY(decl)) = NULL;
 
             node_st *assign = ASTassign(ref, malloc);

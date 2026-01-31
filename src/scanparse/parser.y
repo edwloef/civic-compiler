@@ -223,7 +223,7 @@ stmt: expr ";"
       }
     | "for" "(" "int" id "=" expr "," expr ")" block
       {
-        $$ = ASTfor(ASTvarref($4, NULL), $6, $8, ASTint(1), $10);
+        $$ = ASTfor(ASTvarref($4, NULL), $6, $8, ASTint(1, TY_int), $10);
         add_loc_to_node($$, @$);
       }
     | "for" "(" "int" id "=" expr "," expr "," expr ")" block
@@ -361,17 +361,17 @@ expr: "(" basictype ")" expr %prec "monop"
       }
     | "integer literal"
       {
-        $$ = ASTint($1);
+        $$ = ASTint($1, TY_int);
         add_loc_to_node($$, @$);
       }
     | "floating point literal"
       {
-        $$ = ASTfloat($1);
+        $$ = ASTfloat($1, TY_float);
         add_loc_to_node($$, @$);
       }
     | "boolean literal"
       {
-        $$ = ASTbool($1);
+        $$ = ASTbool($1, TY_bool);
         add_loc_to_node($$, @$);
       }
     | "[" arrexprs "]"
