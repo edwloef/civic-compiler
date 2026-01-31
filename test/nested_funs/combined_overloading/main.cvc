@@ -1,8 +1,19 @@
+extern void printNewlines(int n);
+
 extern void overloaded();
-extern void overloaded(int a, int b);
+extern void overloaded(int[n, m] x);
+extern void overloaded(int a, int[n] b);
+extern void overloaded(int a, int b, int c);
 
 export int main() {
+	int[2] a = [1, 2];
+	int[2, 3] b = [[0,1,2], [4,5,6]];
 	overloaded();
-	overloaded(8, 9);
+	printNewlines(1);
+	overloaded(0, a);
+	printNewlines(1);
+	overloaded(b);
+	printNewlines(1);
+	overloaded(7, 5, 3);
 	return 0;
 }

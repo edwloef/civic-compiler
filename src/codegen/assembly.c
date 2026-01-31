@@ -15,8 +15,8 @@
 void CGAinit(void) {}
 void CGAfini(void) {}
 
-int oprintf(const char *f, ...) __attribute__((format(printf, 1, 2)));
-int oprintf(const char *f, ...) {
+static int oprintf(const char *f, ...) __attribute__((format(printf, 1, 2)));
+static int oprintf(const char *f, ...) {
     va_list ap;
 
     va_start(ap, f);
@@ -36,9 +36,6 @@ static void short_basic_ty(enum BasicType ty) {
         break;
     case TY_bool:
         oprintf("b");
-        break;
-    case TY_NULL:
-        oprintf("NULL");
         break;
     default:
         DBUG_ASSERT(false, "unknown output ty %s", fmt_BasicType(ty));
@@ -124,7 +121,23 @@ node_st *CGAprogram(node_st *node) {
             continue;
         }
 
-        oprintf(" \"%s\" ", e.name);
+        bool has_array = false;
+        for (int ty_i = 0; ty_i < e.ty.len; ty_i++) {
+            thin_vartype ty = e.ty.buf[ty_i];
+            if (ty.dims > 0) {
+                has_array = true;
+                break;
+            }
+        }
+
+        oprintf(" \"");
+        if (has_array) {
+            oprintf("%s", e.mangled_name);
+        } else {
+            oprintf("%s", e.name);
+        }
+        oprintf("\" ");
+
         long_basic_ty(e.ty.ty);
         for (int ty_i = 0; ty_i < e.ty.len; ty_i++) {
             thin_vartype ty = e.ty.buf[ty_i];
@@ -217,7 +230,7 @@ node_st *CGAfundecl(node_st *node) {
     return node;
 }
 
-int create_label(void) {
+static int create_label(void) {
     return DATA_CGA_GET()->label++;
 }
 
@@ -383,7 +396,7 @@ node_st *CGAstmts(node_st *node) {
 
     if (NODE_TYPE(stmt) == NT_CALL && CALL_RESOLVED_TY(stmt) != TY_void) {
         oprintf("\t");
-        short_basic_ty(CALL_RESOLVED_TY(stmt));
+        short_ty(TYPE(stmt));
         oprintf("pop\n");
     }
 
