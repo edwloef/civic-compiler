@@ -6,6 +6,7 @@
 #include "ccn/ccn.h"
 #include "error/error.h"
 #include "globals/globals.h"
+#include "palm/str.h"
 
 static void Usage(char *program) {
     char *program_bin = strrchr(program, '/');
@@ -36,13 +37,16 @@ static void Usage(char *program) {
            "floating-point arithmetic that ignore the signedness of zero.\n");
 }
 
-#define UNROLL_LIMIT 256
-#define FASSOCIATIVE_MATH 257
-#define FNO_ASSOCIATIVE_MATH 258
-#define FFINITE_MATH_ONLY 259
-#define FNO_FINITE_MATH_ONLY 260
-#define FSIGNED_ZEROS 261
-#define FNO_SIGNED_ZEROS 262
+enum {
+    no_preprocessor = 256,
+    unroll_limit,
+    fassociative_math,
+    fno_associative_math,
+    ffinite_math_only,
+    fno_finite_math_only,
+    fsigned_zeros,
+    fno_signed_zeros
+};
 
 static struct option options[] = {
     {"help", no_argument, 0, 'h'},
@@ -51,13 +55,14 @@ static struct option options[] = {
     {"optimize", no_argument, 0, 'O'},
     {"breakpoint", required_argument, 0, 'b'},
     {"structure", no_argument, 0, 's'},
-    {"unroll-limit", required_argument, 0, UNROLL_LIMIT},
-    {"fassociative-math", no_argument, 0, FASSOCIATIVE_MATH},
-    {"fno-associative-math", no_argument, 0, FNO_ASSOCIATIVE_MATH},
-    {"ffinite-math-only", no_argument, 0, FASSOCIATIVE_MATH},
-    {"fno-finite-math-only", no_argument, 0, FNO_ASSOCIATIVE_MATH},
-    {"fsigned-zeros", no_argument, 0, FASSOCIATIVE_MATH},
-    {"fno-signed-zeros", no_argument, 0, FNO_ASSOCIATIVE_MATH},
+    {"no-preprocessor", no_argument, 0, no_preprocessor},
+    {"unroll-limit", required_argument, 0, unroll_limit},
+    {"fassociative-math", no_argument, 0, fassociative_math},
+    {"fno-associative-math", no_argument, 0, fno_associative_math},
+    {"ffinite-math-only", no_argument, 0, fassociative_math},
+    {"fno-finite-math-only", no_argument, 0, fno_associative_math},
+    {"fsigned-zeros", no_argument, 0, fassociative_math},
+    {"fno-signed-zeros", no_argument, 0, fno_associative_math},
     {0, 0, 0, 0}};
 
 static void ProcessArgs(int argc, char *argv[]) {
@@ -88,25 +93,28 @@ static void ProcessArgs(int argc, char *argv[]) {
         case 's':
             CCNshowTree();
             exit(EXIT_SUCCESS);
-        case UNROLL_LIMIT:
+        case no_preprocessor:
+            globals.preprocessor = false;
+            break;
+        case unroll_limit:
             globals.unroll_limit = atoi(optarg);
             break;
-        case FASSOCIATIVE_MATH:
+        case fassociative_math:
             globals.fassociative_math = true;
             break;
-        case FNO_ASSOCIATIVE_MATH:
+        case fno_associative_math:
             globals.fassociative_math = false;
             break;
-        case FFINITE_MATH_ONLY:
+        case ffinite_math_only:
             globals.ffinite_math_only = true;
             break;
-        case FNO_FINITE_MATH_ONLY:
+        case fno_finite_math_only:
             globals.ffinite_math_only = false;
             break;
-        case FSIGNED_ZEROS:
+        case fsigned_zeros:
             globals.fsigned_zeros = true;
             break;
-        case FNO_SIGNED_ZEROS:
+        case fno_signed_zeros:
             globals.fsigned_zeros = false;
             break;
         default:
@@ -121,6 +129,7 @@ static void ProcessArgs(int argc, char *argv[]) {
     }
 
     globals.input_file = argv[optind];
+    globals.file = STRcpy(globals.input_file);
 
     if (globals.fassociative_math && globals.fsigned_zeros) {
         emit_message(L_ERROR, "-fassociative-math requires -fno-signed-zeros");

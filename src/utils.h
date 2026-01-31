@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #include "ccngen/ast.h"
 #include "palm/dbug.h"
 
@@ -42,3 +44,5 @@
     }
 
 node_st *inline_stmts(node_st *node, node_st *stmts);
+
+FILE *spawn_command(FILE *in, const char *cmd, char *const argv[]);

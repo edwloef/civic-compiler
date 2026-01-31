@@ -9,9 +9,10 @@
 #include "globals/globals.h"
 #include "palm/ctinfo.h"
 #include "palm/dbug.h"
-#include "palm/str.h"
 #include "palm/memory.h"
+#include "palm/str.h"
 #include "parser.h"
+#include "utils.h"
 
 int yylex();
 
@@ -662,31 +663,42 @@ node_st *scanparse(node_st *root) {
         emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
         abort_on_error();
     }
-    fclose(yyin);
 
-    char *cmd = STRfmt("cpp -traditional-cpp %s", globals.input_file);
+    if (globals.preprocessor) {
+        fclose(yyin);
 
-    struct sigaction sa;
-    sa.sa_sigaction = sigchld_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART|SA_SIGINFO|SA_NOCLDWAIT;
-    sigaction(SIGCHLD, &sa, NULL);
+        struct sigaction sa;
+        sa.sa_sigaction = sigchld_handler;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = SA_RESTART|SA_SIGINFO|SA_NOCLDWAIT;
+        sigaction(SIGCHLD, &sa, NULL);
 
-    yyin = popen(cmd, "r");
-    MEMfree(cmd);
+        char* file_name = globals.input_file;
+        bool minus_file = globals.input_file[0] == '-';
+        if (minus_file) {
+            file_name = STRfmt("./%s", file_name);
+        }
 
-    if (yyin == NULL) {
-        emit_message(L_ERROR, "couldn't start c preprocessor: %s (os error %d)\n", strerror(errno), errno);
-        abort_on_error();
-    } else {
-        yyparse();
+        char *const argv[] = {"cpp", "-traditional-cpp", "-nostdinc", file_name, NULL};
+        yyin = spawn_command(NULL, "cpp", argv);
+
+        if (minus_file) {
+            MEMfree(file_name);
+        }
+
+        if (yyin == NULL) {
+            emit_message(L_ERROR, "couldn't start c preprocessor: %s (os error %d)\n", strerror(errno), errno);
+            abort_on_error();
+        }
     }
+
+    yyparse();
 
     if (cpp_status) {
         exit(cpp_status);
     }
 
-    pclose(yyin);
+    fclose(yyin);
     MEMfree(globals.file);
     globals.file = NULL;
 

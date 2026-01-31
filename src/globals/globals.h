@@ -16,6 +16,7 @@ struct globals {
 
     bool quiet;
     bool optimize;
+    bool preprocessor;
 
     int unroll_limit;
 

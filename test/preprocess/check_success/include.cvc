@@ -1,0 +1,5 @@
+#include "add.cvc"
+
+export int main() {
+	return add(-5, 5);
+}

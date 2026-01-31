@@ -1,0 +1,6 @@
+extern void printInt(int n);
+
+export int main() {
+	printInt(__LINE__);
+	return 0;
+}
