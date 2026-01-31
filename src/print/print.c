@@ -249,8 +249,10 @@ node_st *PRTifelse(node_st *node) {
     TRAVexpr(node);
     printf(") {\n");
     WITH_INDENT(TRAVif_block(node));
-    printf("} else {\n");
-    WITH_INDENT(TRAVelse_block(node));
+    if (IFELSE_ELSE_BLOCK(node)) {
+        printf("} else {\n");
+        WITH_INDENT(TRAVelse_block(node));
+    }
     printf("}\n");
 
     return node;
@@ -375,7 +377,7 @@ node_st *PRTint(node_st *node) {
 }
 
 node_st *PRTfloat(node_st *node) {
-    printf("%lf", FLOAT_VAL(node));
+    printf("%lg", FLOAT_VAL(node));
 
     return node;
 }

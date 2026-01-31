@@ -100,9 +100,12 @@ node_st *DFLstmts(node_st *node) {
             node_st *positive_step_no_overflow =
                 ASTstmts(positive_step_no_overflow_while, NULL);
 
+            node_st *positive_overflowed =
+                ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
+            BINOP_RESOLVED_TY(positive_overflowed) = TY_int;
+
             node_st *positive_step_ifelse = ASTifelse(
-                ASTbinop(ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add),
-                         CCNcopy(end_ref), BO_lt),
+                ASTbinop(positive_overflowed, CCNcopy(end_ref), BO_lt),
                 positive_step_overflow, positive_step_no_overflow);
 
             positive_step = ASTstmts(positive_step_ifelse, NULL);
@@ -141,9 +144,12 @@ node_st *DFLstmts(node_st *node) {
             node_st *negative_step_no_overflow =
                 ASTstmts(negative_step_no_overflow_while, NULL);
 
+            node_st *negative_overflowed =
+                ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
+            BINOP_RESOLVED_TY(negative_overflowed) = TY_int;
+
             node_st *negative_step_ifelse = ASTifelse(
-                ASTbinop(ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add),
-                         CCNcopy(end_ref), BO_gt),
+                ASTbinop(negative_overflowed, CCNcopy(end_ref), BO_gt),
                 negative_step_overflow, negative_step_no_overflow);
 
             negative_step = ASTstmts(negative_step_ifelse, NULL);
