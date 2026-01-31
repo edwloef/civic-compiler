@@ -1,15 +1,31 @@
 extern void printInt(int n);
-
-export void overloaded(int a, int b) {
-	printInt(a);
-	printInt(b);
-}
-
-export void overloaded(int[n] b) {
-	overloaded(b[0], b[1]);
-}
+extern void printSpaces(int n);
 
 export void overloaded() {
-	int[2] m = [6, 7];
+	int[1, 2] m = [[6, 7]];
 	overloaded(m);
+}
+
+export void overloaded(int[n, m] x) {
+	for (int i = 0, m, 1) {
+		printInt(x[n-1, i]);
+	}
+}
+
+export void overloaded(int a, int[n] b) {
+	int[1, n] x;
+	printInt(a);
+	printSpaces(1);
+	for (int i = 0, n, 1) {
+		x[0, i] = b[i];
+	}
+	overloaded(x);
+}
+
+export void overloaded(int a, int b, int c) {
+	printInt(a);
+	printSpaces(1);
+	printInt(b);
+	printSpaces(1);
+	printInt(c);
 }
