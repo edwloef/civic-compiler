@@ -136,7 +136,7 @@ static void ProcessArgs(int argc, char *argv[]) {
         abort_on_error();
     }
 
-    if (optind <= argc) {
+    if (optind + 1 < argc) {
         Usage(argv[0]);
         exit(EXIT_FAILURE);
     } else if (optind + 1 == argc) {
