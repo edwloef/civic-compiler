@@ -54,8 +54,7 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/indirectcalls.c
     src/astopt/loopunroll.c
     src/astopt/reassoc.c
-    src/astopt/shrinkfuntables.c
-    src/astopt/shrinkvartables.c
+    src/astopt/shrinktables.c
     src/astopt/sideeffects.c
     src/astopt/trivialcontrolflow.c
     src/astopt/valueprop.c
@@ -74,11 +73,11 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/error/error.c
     src/free/free.c
     src/globals/globals.c
+    src/main.c
     src/print/print.c
     src/table/consttable.c
     src/table/funtable.c
     src/table/vartable.c
-    src/main.c
     src/utils.c
 )
 

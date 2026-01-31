@@ -251,21 +251,14 @@ phase MaybeOpt {
             }
         };
 
-        traversal ShrinkFuntables {
-            uid = CGSF,
-            nodes = { Program, FunDecl, FunBody, Call },
+        traversal ShrinkTables {
+            uid = AOST,
+            nodes = { Program, FunDecl, FunBody, Call, VarRef },
             travdata {
                 user funtable_ptr funtable,
-                user funtable_ptr new
-            }
-        };
-
-        traversal ShrinkVartables {
-            uid = CGSV,
-            nodes = { Program, FunDecl, VarRef },
-            travdata {
+                user funtable_ptr new_funtable,
                 user vartable_ptr vartable,
-                user vartable_ptr new
+                user vartable_ptr new_vartable
             }
         };
     }
