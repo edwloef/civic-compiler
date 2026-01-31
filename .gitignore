@@ -1,6 +1,7 @@
 build-debug
 build-release
 .cache
+civcc
 civas
 civvm
 test/fuzzer-generated

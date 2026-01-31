@@ -19,9 +19,14 @@ node_st *AODFdecls(node_st *node) {
     node_st *decl = DECLS_DECL(node);
     funtable_ref r = {0, FUNDECL_L(decl)};
     funtable_entry *e = funtable_get(DATA_AODF_GET()->funtable, r);
-    if (e->call_count == 0 ||
-        (STReq(e->name, "__init") && NODE_TYPE(STMTS_STMT(FUNBODY_STMTS(
-                                         FUNDECL_BODY(decl)))) == NT_RETURN)) {
+    if (e->call_count == 0) {
+        TRAVstart(decl, TRAV_F);
+        TAKE(DECLS_NEXT(node));
+    } else if (STReq(e->name, "__init") &&
+               NODE_TYPE(STMTS_STMT(FUNBODY_STMTS(FUNDECL_BODY(decl)))) ==
+                   NT_RETURN) {
+        funtable_ref r = {0, FUNDECL_L(decl)};
+        funtable_get(DATA_AODF_GET()->funtable, r)->exported = false;
         TRAVstart(decl, TRAV_F);
         TAKE(DECLS_NEXT(node));
     }
