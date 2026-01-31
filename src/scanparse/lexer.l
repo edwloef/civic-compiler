@@ -10,6 +10,8 @@
 #include "palm/str.h"
 #include "parser.h"
 
+int tab_size(void);
+char *replace_tabs();
 void yyerror(char const *err);
 void token_action(void);
 
@@ -107,7 +109,7 @@ void token_action(void);
                                                          }
 
 " "                                                      { globals.col += 1; }
-\t                                                       { globals.col += 4; }
+\t                                                       { globals.col += tab_size(); }
 "//".*                                                   { globals.col += yyleng; }
 
 .                                                        { yyerror("unexpected token found, quit parsing"); }
@@ -141,7 +143,7 @@ void token_action(void);
                                                                }
                                                                int *lineno = malloc(sizeof(int));
                                                                *lineno = globals.line;
-                                                               HTinsert(inner, lineno, STRcpy(yytext));
+                                                               HTinsert(inner, lineno, replace_tabs());
                                                            }
                                                            yyless(0);
                                                            globals.col = 0;
@@ -151,6 +153,38 @@ void token_action(void);
 }
 
 %%
+
+int tab_size(void) {
+    return 4 - globals.col % 4;
+}
+
+char *replace_tabs(void) {
+    globals.col = 0;
+    for (int i = 0; i < yyleng; i++) {
+        if (yytext[i] == '\t') {
+            globals.col += tab_size();
+        } else {
+            globals.col += 1;
+        }
+    }
+    char *buf = MEMmalloc(globals.col + 1);
+    char *head = buf;
+    globals.col = 0;
+    for (int i = 0; i < yyleng; i++) {
+        if (yytext[i] == '\t') {
+            int len = tab_size();
+            for (int i = 0; i < len; i++) {
+                *head++ = ' ';
+            }
+            globals.col += len;
+        } else {
+            *head++ = yytext[i];
+            globals.col += 1;
+        }
+    }
+    *head = 0;
+    return buf;
+}
 
 void token_action(void) {
     yylloc.first_line = yylloc.last_line = globals.line;
