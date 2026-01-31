@@ -247,8 +247,6 @@ gate = is_optimize_enabled,
             }
         };
 
-        CountCalls;
-
         traversal ShrinkFuntables {
             uid = CGSF,
             nodes = { Program, FunDecl, FunBody, Call },
@@ -257,10 +255,6 @@ gate = is_optimize_enabled,
                 user funtable_ptr new
             }
         };
-
-        CountReads;
-
-        CountWrites;
 
         traversal ShrinkVartables {
             uid = CGSV,
