@@ -14,7 +14,7 @@ static void Usage(char *program) {
         program = program_bin + 1;
     }
 
-    printf("Usage: %s [OPTION...] <civic file>\n", program);
+    printf("Usage: %s [OPTION...] <input>\n", program);
     printf("Options:\n");
     printf("  -h --help                     This help message.\n");
     printf("  -o --output <output>          Output assembly to output file "
@@ -26,26 +26,30 @@ static void Usage(char *program) {
     printf("  -b --breakpoint <breakpoint>  Set a breakpoint.\n");
     printf("  -s --structure                Pretty print the structure of the "
            "compiler.\n");
+    printf("     --[no-]preprocessor        Disable the C preprocessor.\n");
     printf("     --unroll-limit <limit>     Set the number of operations "
            "allowed to be unrolled in a loop. Default value: 256\n");
-    printf("  -f[no]associative-math        Allow re-association of "
-           "floating-point operations. Requires -fno-signed-zeros.\n");
-    printf("  -f[no]finite-math-only        Allow optimizations for "
+    printf("     --[no-]associative-math    Allow re-association of "
+           "floating-point operations. Requires --no-signed-zeros.\n");
+    printf("     --[no-]finite-math-only    Allow optimizations for "
            "floating-point arithmetic that assume arguments and results are "
            "not NaNs or +-Infs.\n");
-    printf("  -f[no]signed-zeros            Allow optimizations for "
+    printf("     --[no-]signed-zeros        Allow optimizations for "
            "floating-point arithmetic that ignore the signedness of zero.\n");
+    printf("  <input>                       Optional input file. Defaults to "
+           "stdin.\n");
 }
 
 enum {
-    no_preprocessor = 256,
+    preprocessor = 256,
+    no_preprocessor,
     unroll_limit,
-    fassociative_math,
-    fno_associative_math,
-    ffinite_math_only,
-    fno_finite_math_only,
-    fsigned_zeros,
-    fno_signed_zeros
+    associative_math,
+    no_associative_math,
+    finite_math_only,
+    no_finite_math_only,
+    signed_zeros,
+    no_signed_zeros
 };
 
 static struct option options[] = {
@@ -55,14 +59,15 @@ static struct option options[] = {
     {"optimize", no_argument, 0, 'O'},
     {"breakpoint", required_argument, 0, 'b'},
     {"structure", no_argument, 0, 's'},
+    {"preprocessor", no_argument, 0, no_preprocessor},
     {"no-preprocessor", no_argument, 0, no_preprocessor},
     {"unroll-limit", required_argument, 0, unroll_limit},
-    {"fassociative-math", no_argument, 0, fassociative_math},
-    {"fno-associative-math", no_argument, 0, fno_associative_math},
-    {"ffinite-math-only", no_argument, 0, fassociative_math},
-    {"fno-finite-math-only", no_argument, 0, fno_associative_math},
-    {"fsigned-zeros", no_argument, 0, fassociative_math},
-    {"fno-signed-zeros", no_argument, 0, fno_associative_math},
+    {"associative-math", no_argument, 0, associative_math},
+    {"no-associative-math", no_argument, 0, no_associative_math},
+    {"finite-math-only", no_argument, 0, associative_math},
+    {"no-finite-math-only", no_argument, 0, no_associative_math},
+    {"signed-zeros", no_argument, 0, associative_math},
+    {"no-signed-zeros", no_argument, 0, no_associative_math},
     {0, 0, 0, 0}};
 
 static void ProcessArgs(int argc, char *argv[]) {
@@ -93,29 +98,32 @@ static void ProcessArgs(int argc, char *argv[]) {
         case 's':
             CCNshowTree();
             exit(EXIT_SUCCESS);
+        case preprocessor:
+            globals.preprocessor = true;
+            break;
         case no_preprocessor:
             globals.preprocessor = false;
             break;
         case unroll_limit:
             globals.unroll_limit = atoi(optarg);
             break;
-        case fassociative_math:
-            globals.fassociative_math = true;
+        case associative_math:
+            globals.associative_math = true;
             break;
-        case fno_associative_math:
-            globals.fassociative_math = false;
+        case no_associative_math:
+            globals.associative_math = false;
             break;
-        case ffinite_math_only:
-            globals.ffinite_math_only = true;
+        case finite_math_only:
+            globals.finite_math_only = true;
             break;
-        case fno_finite_math_only:
-            globals.ffinite_math_only = false;
+        case no_finite_math_only:
+            globals.finite_math_only = false;
             break;
-        case fsigned_zeros:
-            globals.fsigned_zeros = true;
+        case signed_zeros:
+            globals.signed_zeros = true;
             break;
-        case fno_signed_zeros:
-            globals.fsigned_zeros = false;
+        case no_signed_zeros:
+            globals.signed_zeros = false;
             break;
         default:
             Usage(argv[0]);
@@ -123,17 +131,19 @@ static void ProcessArgs(int argc, char *argv[]) {
         }
     }
 
-    if (optind + 1 != argc) {
-        Usage(argv[0]);
-        exit(EXIT_FAILURE);
+    if (globals.associative_math && globals.signed_zeros) {
+        emit_message(L_ERROR, "--associative-math requires --no-signed-zeros");
+        abort_on_error();
     }
 
-    globals.input_file = argv[optind];
-    globals.file = STRcpy(globals.input_file);
-
-    if (globals.fassociative_math && globals.fsigned_zeros) {
-        emit_message(L_ERROR, "-fassociative-math requires -fno-signed-zeros");
-        abort_on_error();
+    if (optind <= argc) {
+        Usage(argv[0]);
+        exit(EXIT_FAILURE);
+    } else if (optind + 1 == argc) {
+        globals.input_file = argv[optind];
+        globals.file = STRcpy(globals.input_file);
+    } else {
+        globals.file = STRcpy("<stdin>");
     }
 
 #ifdef NDEBUG

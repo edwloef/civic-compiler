@@ -5,8 +5,8 @@
 #include "globals/globals.h"
 #include "utils.h"
 
-#define CHECK_FFINITE_MATH_ONLY()                                              \
-    if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \
+#define CHECK_FINITE_MATH_ONLY()                                               \
+    if (EXPR_RESOLVED_TY(node) == TY_float && !globals.finite_math_only)       \
         break;
 
 node_st *AOImonop(node_st *node) {
@@ -132,7 +132,7 @@ node_st *AOIbinop(node_st *node) {
     case BO_sub:
         if ((BINOP_OP(node) == BO_sub || BINOP_RESOLVED_TY(node) == TY_bool) &&
             BINOP_IDENTICAL_REFS()) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             switch (BINOP_RESOLVED_TY(node)) {
             case TY_int:
                 // (x - x) => 0
@@ -167,14 +167,14 @@ node_st *AOIbinop(node_st *node) {
                    VARREF_N(BINOP_RIGHT(left)) == VARREF_N(right) &&
                    VARREF_L(BINOP_RIGHT(left)) == VARREF_L(right) &&
                    !VARREF_EXPRS(right)) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // ((y + x) - x) => y
             // ((y - x) + x) => y
             TAKE(BINOP_LEFT(BINOP_LEFT(node)));
             break;
         } else if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
                    (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0 &&
-                    (!globals.fsigned_zeros || signbit(FLOAT_VAL(left)))) ||
+                    (!globals.signed_zeros || signbit(FLOAT_VAL(left)))) ||
                    (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false)) {
             // ({0, 0.0, false} + x) => x
             // ({0, 0.0} - x) => (-x)
@@ -232,7 +232,7 @@ node_st *AOIbinop(node_st *node) {
                    ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
                     (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
                     (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false))) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // ({0, 0.0, false} * x) => {0, 0.0, false}
             TAKE(BINOP_LEFT(node));
         } else if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 1) ||
@@ -257,7 +257,7 @@ node_st *AOIbinop(node_st *node) {
         break;
     case BO_div:
         if (BINOP_IDENTICAL_REFS()) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // (x / x) => {1, 1.0}
             enum BasicType ty = BINOP_RESOLVED_TY(node);
             CCNfree(node);
@@ -296,7 +296,7 @@ node_st *AOIbinop(node_st *node) {
             CCNcycleNotify();
         } else if (!EXPR_SIDE_EFFECTS(left) && NODE_TYPE(right) == NT_INT &&
                    (INT_VAL(right) == 1 || (INT_VAL(right) == -1))) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // (x % 1) => 0 | x no side effects
             // (x % -1) => 0 | x no side effects
             CCNfree(node);
@@ -334,7 +334,7 @@ node_st *AOIbinop(node_st *node) {
         break;
     case BO_eq:
         if (BINOP_IDENTICAL_REFS()) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // (x == x) => true
             CCNfree(node);
             node = ASTbool(true, TY_bool);
@@ -357,7 +357,7 @@ node_st *AOIbinop(node_st *node) {
         break;
     case BO_le:
         if (BINOP_IDENTICAL_REFS()) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // (x <= x) => true
             CCNfree(node);
             node = ASTbool(true, TY_bool);
@@ -371,7 +371,7 @@ node_st *AOIbinop(node_st *node) {
         break;
     case BO_ge:
         if (BINOP_IDENTICAL_REFS()) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // (x >= x) => true
             CCNfree(node);
             node = ASTbool(true, TY_bool);
@@ -394,7 +394,7 @@ node_st *AOIbinop(node_st *node) {
                 TAKE(BINOP_RIGHT(node));
             }
         } else if (BINOP_IDENTICAL_REFS()) {
-            CHECK_FFINITE_MATH_ONLY();
+            CHECK_FINITE_MATH_ONLY();
             // (x != x) => false
             CCNfree(node);
             node = ASTbool(false, TY_bool);

@@ -35,7 +35,7 @@ node_st *CGCint(node_st *node) {
 node_st *CGCfloat(node_st *node) {
     if (isnan(FLOAT_VAL(node))) {
         FLOAT_VAL(node) = NAN;
-    } else if (FLOAT_VAL(node) == 0.0 && !globals.fsigned_zeros) {
+    } else if (FLOAT_VAL(node) == 0.0 && !globals.signed_zeros) {
         FLOAT_VAL(node) = 0.0;
     }
 

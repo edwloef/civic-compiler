@@ -20,9 +20,9 @@ struct globals {
 
     int unroll_limit;
 
-    bool fassociative_math;
-    bool ffinite_math_only;
-    bool fsigned_zeros;
+    bool associative_math;
+    bool finite_math_only;
+    bool signed_zeros;
 };
 
 extern struct globals globals;

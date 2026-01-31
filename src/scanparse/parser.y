@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "ccn/ccn.h"
 #include "error/error.h"
@@ -658,14 +659,20 @@ node_st *scanparse(node_st *root) {
 
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
 
-    yyin = fopen(globals.input_file, "r");
-    if (yyin == NULL) {
-        emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
-        abort_on_error();
+    if (globals.input_file) {
+        yyin = fopen(globals.input_file, "r");
+        if (yyin == NULL) {
+            emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+            abort_on_error();
+        }
+    } else {
+        yyin = stdin;
     }
 
     if (globals.preprocessor) {
-        fclose(yyin);
+        if (globals.input_file) {
+            fclose(yyin);
+        }
 
         struct sigaction sa;
         sa.sa_sigaction = sigchld_handler;
@@ -673,20 +680,36 @@ node_st *scanparse(node_st *root) {
         sa.sa_flags = SA_RESTART|SA_SIGINFO|SA_NOCLDWAIT;
         sigaction(SIGCHLD, &sa, NULL);
 
-        char* file_name = globals.input_file;
-        bool minus_file = globals.input_file[0] == '-';
-        if (minus_file) {
-            file_name = STRfmt("./%s", file_name);
+        int static_argv_count = 3;
+        char *argv[] = {"cpp", "-traditional-cpp", "-nostdinc", NULL, NULL, NULL};
+
+        if (globals.input_file) {
+            char *file_name = globals.input_file;
+            if (file_name[0] == '-') {
+                file_name = STRfmt("./%s", file_name);
+            }
+            argv[static_argv_count] = file_name;
+        } else {
+            char *cwd = getcwd(NULL, 0);
+            if (cwd) {
+                argv[static_argv_count] = "-I";
+                argv[static_argv_count + 1] = cwd;
+            } else {
+                emit_message(L_WARNING, "couldn't get current working directory: %s (os error %d)\n", strerror(errno), errno);
+            }
         }
 
-        char *const argv[] = {"cpp", "-traditional-cpp", "-nostdinc", file_name, NULL};
         yyin = spawn_command(NULL, "cpp", argv);
 
-        if (minus_file) {
-            MEMfree(file_name);
+        if (globals.input_file) {
+            if (argv[static_argv_count] != globals.input_file) {
+                MEMfree(argv[static_argv_count]);
+            }
+        } else {
+            MEMfree(argv[static_argv_count + 1]);
         }
 
-        if (yyin == NULL) {
+        if (!yyin) {
             emit_message(L_ERROR, "couldn't start c preprocessor: %s (os error %d)\n", strerror(errno), errno);
             abort_on_error();
         }
