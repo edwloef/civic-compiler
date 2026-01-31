@@ -100,9 +100,16 @@ node_st *DFLstmts(node_st *node) {
             node_st *positive_step_no_overflow =
                 ASTstmts(positive_step_no_overflow_while, NULL);
 
-            node_st *positive_overflowed =
-                ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
-            BINOP_RESOLVED_TY(positive_overflowed) = TY_int;
+            node_st *positive_overflowed;
+            if (!positive_step_no_overflow) {
+                positive_overflowed = ASTbool(true, TY_bool);
+            } else if (!positive_step_overflow) {
+                positive_overflowed = ASTbool(false, TY_bool);
+            } else {
+                positive_overflowed =
+                    ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
+                BINOP_RESOLVED_TY(positive_overflowed) = TY_int;
+            }
 
             node_st *positive_step_ifelse = ASTifelse(
                 ASTbinop(positive_overflowed, CCNcopy(end_ref), BO_lt),
@@ -144,9 +151,16 @@ node_st *DFLstmts(node_st *node) {
             node_st *negative_step_no_overflow =
                 ASTstmts(negative_step_no_overflow_while, NULL);
 
-            node_st *negative_overflowed =
-                ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
-            BINOP_RESOLVED_TY(negative_overflowed) = TY_int;
+            node_st *negative_overflowed;
+            if (!negative_step_no_overflow) {
+                negative_overflowed = ASTbool(true, TY_bool);
+            } else if (!negative_step_overflow) {
+                negative_overflowed = ASTbool(false, TY_bool);
+            } else {
+                negative_overflowed =
+                    ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref), BO_add);
+                BINOP_RESOLVED_TY(negative_overflowed) = TY_int;
+            }
 
             node_st *negative_step_ifelse = ASTifelse(
                 ASTbinop(negative_overflowed, CCNcopy(end_ref), BO_gt),
