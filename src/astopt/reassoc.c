@@ -48,6 +48,8 @@ node_st *AORbinop(node_st *node) {
                 if (BINOP_OP(node) == BO_sub) {
                     BINOP_OP(node) = BO_add;
                     right = ASTmonop(right, MO_neg);
+                    MONOP_RESOLVED_TY(right) =
+                        EXPR_RESOLVED_TY(MONOP_EXPR(right));
                 }
                 BINOP_LEFT(node) = right;
                 BINOP_RIGHT(node) = left;
