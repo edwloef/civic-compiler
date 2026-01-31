@@ -65,11 +65,14 @@ static node_st *DAAbuild_array_assign(node_st *ref, vartable_ref *dims,
         vartable_ref dr = dims[0];
         dr.n += VARREF_N(ref);
 
-        return ASTstmts(
+        node_st *loop =
             ASTfor(loopvar, ASTint(0),
                    vartable_get_ref(DATA_DAA_GET()->vartable, dr), ASTint(1),
-                   DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1)),
-            NULL);
+                   DAAbuild_array_assign(ref, dims + 1, expr, ref_dims - 1));
+
+        INT_RESOLVED_TY(FOR_LOOP_START(loop)) = TY_int;
+
+        return ASTstmts(loop, NULL);
     }
 }
 

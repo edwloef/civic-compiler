@@ -275,8 +275,6 @@ node_st *ATCdowhile(node_st *node) {
 node_st *ATCfor(node_st *node) {
     TRAVchildren(node);
 
-    VARREF_RESOLVED_TY(FOR_REF(node)) = TY_int;
-
     thin_vartype start_ty = TYPE(FOR_LOOP_START(node));
     if (start_ty.ty != TY_error) {
         if (start_ty.dims == 0) {
