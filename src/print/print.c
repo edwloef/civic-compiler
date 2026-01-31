@@ -1,7 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "macros.h"
-#include "palm/dbug.h"
+#include "utils.h"
 
 #define EMIT_INDENT() printf("%*s", DATA_PRT_GET()->indent * 4, "");
 #define WITH_INDENT(e)                                                         \

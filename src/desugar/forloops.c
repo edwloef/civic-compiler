@@ -1,8 +1,8 @@
 #include <limits.h>
 
 #include "ccn/ccn.h"
-#include "macros.h"
 #include "table/vartable.h"
+#include "utils.h"
 
 void DFLinit(void) {}
 void DFLfini(void) {}

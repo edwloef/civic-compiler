@@ -1,7 +1,5 @@
 #include "ccn/ccn.h"
-#include "macros.h"
-
-#include <stdio.h>
+#include "utils.h"
 
 void AOICinit(void) {}
 void AOICfini(void) {}

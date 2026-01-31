@@ -206,7 +206,7 @@ phase MaybeOpt {
 
                 traversal ExprSideEffects {
                     uid = AOESF,
-                    nodes = { Program, FunBody, Exprs, Call },
+                    nodes = Expr | { Program, FunBody, Exprs },
                     travdata {
                         user funtable_ptr funtable
                     }

@@ -1,8 +1,7 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "macros.h"
-#include "palm/dbug.h"
 #include "table/vartable.h"
+#include "utils.h"
 
 void CDinit(void) {
     DATA_CD_GET()->assign_is_dead = true;

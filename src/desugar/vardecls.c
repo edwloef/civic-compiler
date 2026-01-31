@@ -1,8 +1,7 @@
 #include "ccn/ccn.h"
-#include "ccngen/ast.h"
-#include "macros.h"
 #include "palm/str.h"
 #include "table/funtable.h"
+#include "utils.h"
 
 void DVDinit(void) {}
 void DVDfini(void) {}

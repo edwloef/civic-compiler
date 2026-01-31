@@ -1,7 +1,7 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "macros.h"
 #include "table/vartable.h"
+#include "utils.h"
 
 static node_st *DAArev_exprs(node_st *root) {
     node_st *curr = root;

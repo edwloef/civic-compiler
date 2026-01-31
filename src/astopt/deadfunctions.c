@@ -1,6 +1,6 @@
 #include "ccn/ccn.h"
-#include "macros.h"
 #include "palm/str.h"
+#include "utils.h"
 
 void AODFinit(void) {}
 void AODFfini(void) {}

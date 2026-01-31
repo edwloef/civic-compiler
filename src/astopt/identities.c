@@ -3,8 +3,7 @@
 
 #include "ccn/ccn.h"
 #include "globals/globals.h"
-#include "macros.h"
-#include "palm/dbug.h"
+#include "utils.h"
 
 #define CHECK_FFINITE_MATH_ONLY()                                              \
     if (EXPR_RESOLVED_TY(node) == TY_float && !globals.ffinite_math_only)      \

@@ -1,9 +1,8 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "error/error.h"
-#include "macros.h"
-#include "palm/dbug.h"
 #include "print/print.h"
+#include "utils.h"
 
 static void ATCcheckassign(node_st *from_node, vartype to, node_st *node) {
     thin_vartype from = TYPE(from_node);

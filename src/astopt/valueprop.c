@@ -1,7 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "macros.h"
-#include "palm/dbug.h"
+#include "utils.h"
 
 void VPinit(void) {}
 void VPfini(void) {}

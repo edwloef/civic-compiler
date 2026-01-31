@@ -1,6 +1,5 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "macros.h"
 #include "utils.h"
 
 void AODSinit(void) {}
