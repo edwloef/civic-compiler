@@ -126,45 +126,30 @@ phase Desugar {
 
 phase MaybeOpt {
 gate = is_optimize_enabled,
-actions {
-
-cycle AstOpt {
     actions {
-        CountCalls;
-
-        traversal DeadFunctions {
-            uid = AODF,
-            nodes = { Program, Decls, FunBody },
-            travdata {
-                user funtable_ptr funtable
-            }
-        };
-
-        traversal Escapes {
-            uid = AOE,
-            nodes = { Program, FunDecl, VarRef },
-            travdata {
-                user vartable_ptr vartable
-            }
-        };
-
-        traversal DirectCaptures {
-            uid = AODC,
-            nodes = { Program, FunDecl, FunBody, VarRef },
-            travdata {
-                user funtable_ptr funtable,
-                int read_capture,
-                int write_capture,
-                int scalar_read_capture,
-                int scalar_write_capture
-            }
-        };
-
-        cycle IndirectCaptures {
+        cycle AstOpt {
             actions {
-                traversal IndirectCalls {
-                    uid = AOIC,
-                    nodes = { Program, FunDecl, FunBody, Call },
+                CountCalls;
+
+                traversal DeadFunctions {
+                    uid = AODF,
+                    nodes = { Program, Decls, FunBody },
+                    travdata {
+                        user funtable_ptr funtable
+                    }
+                };
+
+                traversal Escapes {
+                    uid = AOE,
+                    nodes = { Program, FunDecl, VarRef },
+                    travdata {
+                        user vartable_ptr vartable
+                    }
+                };
+
+                traversal DirectCaptures {
+                    uid = AODC,
+                    nodes = { Program, FunDecl, FunBody, VarRef },
                     travdata {
                         user funtable_ptr funtable,
                         int read_capture,
@@ -173,124 +158,128 @@ cycle AstOpt {
                         int scalar_write_capture
                     }
                 };
+
+                cycle IndirectCaptures {
+                    actions {
+                        traversal IndirectCalls {
+                            uid = AOIC,
+                            nodes = { Program, FunDecl, FunBody, Call },
+                            travdata {
+                                user funtable_ptr funtable,
+                                int read_capture,
+                                int write_capture,
+                                int scalar_read_capture,
+                                int scalar_write_capture
+                            }
+                        };
+                    }
+                };
+
+                CountWrites;
+
+                traversal CopyProp {
+                    uid = AOCP,
+                    nodes = { Program, FunDecl, FunBody, Stmts },
+                    travdata {
+                        Scope parent,
+                        user funtable_ptr funtable,
+                        user vartable_ptr vartable
+                    }
+                };
+
+                traversal Reassoc {
+                    uid = AOR,
+                    nodes = { Binop }
+                };
+
+                traversal ConstFold {
+                    uid = AOCF,
+                    nodes = { Monop, Binop, Cast }
+                };
+
+                traversal SideEffects {
+                    uid = AOSF,
+                    nodes = { Program, FunDecl, FunBody },
+                    travdata {
+                        user funtable_ptr funtable
+                    }
+                };
+
+                traversal Divergence {
+                    uid = AOD,
+                    nodes = { Stmts, IfElse, DoWhile, Return }
+                };
+
+                traversal TrivialControlFlow {
+                    uid = AOTCF,
+                    nodes = { Program, FunBody, Stmts },
+                    travdata {
+                        user funtable_ptr funtable
+                    }
+                };
+
+                traversal Identities {
+                    uid = AOI,
+                    nodes = { Monop, Binop, Cast }
+                };
+
+                CountReads;
+
+                traversal DeadStores {
+                    uid = AODS,
+                    nodes = { Program, FunDecl, FunBody, Stmts },
+                    travdata {
+                        Scope parent,
+                        Scope outer_loop,
+                        user funtable_ptr funtable,
+                        user vartable_ptr vartable
+                    }
+                };
+
+                traversal LoopUnroll {
+                    uid = AOLU,
+                    nodes = { Program, FunDecl, FunBody, Stmts },
+                    travdata {
+                        user funtable_ptr funtable,
+                        user vartable_ptr vartable
+                    }
+                };
             }
         };
 
-        CountWrites;
+        CountCalls;
 
-        traversal CopyProp {
-            uid = AOCP,
-            nodes = { Program, FunDecl, FunBody, Stmts },
+        traversal ShrinkFuntables {
+            uid = CGSF,
+            nodes = { Program, FunDecl, FunBody, Call },
             travdata {
-                Scope parent,
                 user funtable_ptr funtable,
-                user vartable_ptr vartable
+                user funtable_ptr new
             }
-        };
-
-        traversal Reassoc {
-            uid = AOR,
-            nodes = { Binop }
-        };
-
-        traversal ConstFold {
-            uid = AOCF,
-            nodes = { Monop, Binop, Cast }
-        };
-
-        traversal SideEffects {
-            uid = AOSF,
-            nodes = { Program, FunDecl, FunBody },
-            travdata {
-                user funtable_ptr funtable
-            }
-        };
-
-        traversal Divergence {
-            uid = AOD,
-            nodes = { Stmts, IfElse, DoWhile, Return }
-        };
-
-        traversal TrivialControlFlow {
-            uid = AOTCF,
-            nodes = { Program, FunBody, Stmts },
-            travdata {
-                user funtable_ptr funtable
-            }
-        };
-
-        traversal Identities {
-            uid = AOI,
-            nodes = { Monop, Binop, Cast }
         };
 
         CountReads;
 
-        traversal DeadStores {
-            uid = AODS,
-            nodes = { Program, FunDecl, FunBody, Stmts },
-            travdata {
-                Scope parent,
-                Scope outer_loop,
-                user funtable_ptr funtable,
-                user vartable_ptr vartable
-            }
-        };
+        CountWrites;
 
-        traversal LoopUnroll {
-            uid = AOLU,
-            nodes = { Program, FunDecl, FunBody, Stmts },
+        traversal ShrinkVartables {
+            uid = CGSV,
+            nodes = { Program, FunDecl, VarRef },
             travdata {
-                user funtable_ptr funtable,
-                user vartable_ptr vartable
+                user vartable_ptr vartable,
+                user vartable_ptr new
             }
         };
     }
 };
 
-}
-};
-
 phase CodeGen {
     actions {
-        phase Tables {
-            actions {
-                phase OptTables {
-                    gate = is_optimize_enabled,
-                    actions {
-                        CountCalls;
-
-                        traversal ShrinkFuntables {
-                            uid = CGSF,
-                            nodes = { Program, FunDecl, FunBody, Call },
-                            travdata {
-                                user funtable_ptr funtable,
-                                user funtable_ptr new
-                            }
-                        };
-
-                        CountReads;
-
-                        CountWrites;
-
-                        traversal ShrinkVartables {
-                            uid = CGSV,
-                            nodes = { Program, FunDecl, VarRef },
-                            travdata {
-                                user vartable_ptr vartable,
-                                user vartable_ptr new
-                            }
-                        };
-                    }
-                };
-
-                traversal Constants {
-                    uid = CGC,
-                    nodes = { Program, Int, Float },
-                    travdata {
-                        user consttable_ptr consttable
-                    }
-                };
+        traversal Constants {
+            uid = CGC,
+            nodes = { Program, Int, Float },
+            travdata {
+                user consttable_ptr consttable
             }
         };
     }

@@ -56,12 +56,12 @@ add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/astopt/loopunroll.c
     src/astopt/reassoc.c
     src/astopt/sideeffects.c
+    src/astopt/shrinkfuntables.c
+    src/astopt/shrinkvartables.c
     src/astopt/trivialcontrolflow.c
     src/astopt/valueprop.c
     src/astopt/valueproploop.c
     src/codegen/constants.c
-    src/codegen/shrinkfuntables.c
-    src/codegen/shrinkvartables.c
     src/desugar/arrayassign.c
     src/desugar/arrayparams.c
     src/desugar/boolcasts.c
