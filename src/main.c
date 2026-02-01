@@ -59,17 +59,17 @@ static struct option options[] = {
     {"quiet", no_argument, 0, 'q'},
     {"breakpoint", required_argument, 0, 'b'},
     {"structure", no_argument, 0, 's'},
-    {"preprocessor", no_argument, 0, no_preprocessor},
+    {"preprocessor", no_argument, 0, preprocessor},
     {"no-preprocessor", no_argument, 0, no_preprocessor},
     {"optimize", no_argument, 0, optimize},
     {"no-optimize", no_argument, 0, no_optimize},
     {"unroll-limit", required_argument, 0, unroll_limit},
     {"associative-math", no_argument, 0, associative_math},
     {"no-associative-math", no_argument, 0, no_associative_math},
-    {"finite-math-only", no_argument, 0, associative_math},
-    {"no-finite-math-only", no_argument, 0, no_associative_math},
-    {"signed-zeros", no_argument, 0, associative_math},
-    {"no-signed-zeros", no_argument, 0, no_associative_math},
+    {"finite-math-only", no_argument, 0, finite_math_only},
+    {"no-finite-math-only", no_argument, 0, no_finite_math_only},
+    {"signed-zeros", no_argument, 0, signed_zeros},
+    {"no-signed-zeros", no_argument, 0, no_signed_zeros},
     {0, 0, 0, 0}};
 
 static void ProcessArgs(int argc, char *argv[]) {
