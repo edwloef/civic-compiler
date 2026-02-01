@@ -1,3 +1,6 @@
+#include <limits.h>
+#include <math.h>
+
 #include "ccn/ccn.h"
 #include "palm/dbug.h"
 
@@ -110,10 +113,10 @@ node_st *AOCFbinop(node_st *node) {
     case BO_div:
         switch (NODE_TYPE(BINOP_LEFT(node))) {
         case NT_INT:
-            if (INT_VAL(BINOP_RIGHT(node)) != 0) {
-                CONST_INT(INT_BINOP(/));
-            } else {
+            if (INT_VAL(BINOP_RIGHT(node)) == 0) {
                 return node;
+            } else {
+                CONST_INT(INT_BINOP(/));
             }
         case NT_FLOAT:
             CONST_FLOAT(FLOAT_BINOP(/));
@@ -123,10 +126,10 @@ node_st *AOCFbinop(node_st *node) {
     case BO_mod:
         switch (NODE_TYPE(BINOP_LEFT(node))) {
         case NT_INT:
-            if (INT_VAL(BINOP_RIGHT(node)) != 0) {
-                CONST_INT(INT_BINOP(%));
-            } else {
+            if (INT_VAL(BINOP_RIGHT(node)) == 0) {
                 return node;
+            } else {
+                CONST_INT(INT_BINOP(%));
             }
         default:
             return node;
@@ -203,7 +206,13 @@ node_st *AOCFcast(node_st *node) {
         case NT_INT:
             CONST_INT(INT_VAL(CAST_EXPR(node)));
         case NT_FLOAT:
-            CONST_INT(FLOAT_VAL(CAST_EXPR(node)));
+            if (isnan(FLOAT_VAL(CAST_EXPR(node))) ||
+                trunc(FLOAT_VAL(CAST_EXPR(node))) > (double)INT_MAX ||
+                trunc(FLOAT_VAL(CAST_EXPR(node))) < (double)INT_MIN) {
+                return node;
+            } else {
+                CONST_INT(FLOAT_VAL(CAST_EXPR(node)));
+            }
         case NT_BOOL:
             CONST_INT(BOOL_VAL(CAST_EXPR(node)));
         default:
