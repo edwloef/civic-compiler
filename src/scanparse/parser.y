@@ -226,11 +226,13 @@ stmt: expr ";"
     | "for" "(" "int" id "=" expr "," expr ")" block
       {
         $$ = ASTfor(ASTvarref($4, NULL), $6, $8, ASTint(1, TY_int), $10);
+        add_loc_to_node(FOR_REF($$), @4);
         add_loc_to_node($$, @$);
       }
     | "for" "(" "int" id "=" expr "," expr "," expr ")" block
       {
         $$ = ASTfor(ASTvarref($4, NULL), $6, $8, $10, $12);
+        add_loc_to_node(FOR_REF($$), @4);
         add_loc_to_node($$, @$);
       }
     | "return" ";"
