@@ -61,7 +61,7 @@ node_st *ECbinop(node_st *node) {
 }
 
 node_st *ECcast(node_st *node) {
-    if (EXPR_RESOLVED_TY(MONOP_EXPR(node)) == TY_bool) {
+    if (EXPR_RESOLVED_TY(CAST_EXPR(node)) == TY_bool) {
         COST(4);
     } else {
         COST(1);
