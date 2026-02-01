@@ -237,7 +237,7 @@ node_st *AOIbinop(node_st *node) {
                     (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
                     (NODE_TYPE(left) == NT_BOOL && BOOL_VAL(left) == false))) {
             CHECK_FINITE_MATH_ONLY();
-            // ({0, 0.0, false} * x) => {0, 0.0, false}
+            // ({0, 0.0, false} * x) => {0, 0.0, false} | x no side effects
             TAKE(BINOP_LEFT(node));
         } else if ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 1) ||
                    (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 1.0) ||
