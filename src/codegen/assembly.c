@@ -5,12 +5,12 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "globals/globals.h"
-#include "macros.h"
 #include "palm/dbug.h"
 #include "print/print.h"
 #include "table/consttable.h"
 #include "table/funtable.h"
 #include "table/vartable.h"
+#include "utils.h"
 
 void CGAinit(void) {}
 void CGAfini(void) {}
