@@ -21,12 +21,11 @@ static void Usage(char *program) {
            "instead of STDOUT.\n");
     printf(
         "  -q --quiet                    Make compiler output less verbose.\n");
-    printf("  -O --optimize                 Run optimizations on generated "
-           "code.\n");
     printf("  -b --breakpoint <breakpoint>  Set a breakpoint.\n");
     printf("  -s --structure                Pretty print the structure of the "
            "compiler.\n");
     printf("     --[no-]preprocessor        Disable the C preprocessor.\n");
+    printf("     --[no-]optimize            Disable compiler optimizations.\n");
     printf("     --unroll-limit <limit>     Set the number of operations "
            "allowed to be unrolled in a loop. Default value: 256\n");
     printf("     --[no-]associative-math    Allow re-association of "
@@ -43,6 +42,8 @@ static void Usage(char *program) {
 enum {
     preprocessor = 256,
     no_preprocessor,
+    optimize,
+    no_optimize,
     unroll_limit,
     associative_math,
     no_associative_math,
@@ -56,11 +57,12 @@ static struct option options[] = {
     {"help", no_argument, 0, 'h'},
     {"output", required_argument, 0, 'o'},
     {"quiet", no_argument, 0, 'q'},
-    {"optimize", no_argument, 0, 'O'},
     {"breakpoint", required_argument, 0, 'b'},
     {"structure", no_argument, 0, 's'},
     {"preprocessor", no_argument, 0, no_preprocessor},
     {"no-preprocessor", no_argument, 0, no_preprocessor},
+    {"optimize", no_argument, 0, optimize},
+    {"no-optimize", no_argument, 0, no_optimize},
     {"unroll-limit", required_argument, 0, unroll_limit},
     {"associative-math", no_argument, 0, associative_math},
     {"no-associative-math", no_argument, 0, no_associative_math},
@@ -73,8 +75,7 @@ static struct option options[] = {
 static void ProcessArgs(int argc, char *argv[]) {
     int c;
 
-    while ((c = getopt_long_only(argc, argv, "ho:qOb:s", options, NULL)) !=
-           -1) {
+    while ((c = getopt_long_only(argc, argv, "ho:qb:s", options, NULL)) != -1) {
         switch (c) {
         case 'h':
             Usage(argv[0]);
@@ -84,9 +85,6 @@ static void ProcessArgs(int argc, char *argv[]) {
             break;
         case 'q':
             globals.quiet = true;
-            break;
-        case 'O':
-            globals.optimize = true;
             break;
         case 'b':
             if (isdigit(optarg[0])) {
@@ -103,6 +101,12 @@ static void ProcessArgs(int argc, char *argv[]) {
             break;
         case no_preprocessor:
             globals.preprocessor = false;
+            break;
+        case optimize:
+            globals.optimize = true;
+            break;
+        case no_optimize:
+            globals.optimize = false;
             break;
         case unroll_limit:
             globals.unroll_limit = atoi(optarg);

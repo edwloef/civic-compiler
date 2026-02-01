@@ -15,8 +15,8 @@ struct globals {
     htable_st *linemap; // file => (lineno => line)
 
     bool quiet;
-    bool optimize;
     bool preprocessor;
+    bool optimize;
 
     int unroll_limit;
 
