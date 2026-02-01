@@ -674,6 +674,7 @@ node_st *scanparse(node_st *root) {
     if (globals.preprocessor) {
         if (globals.input_file) {
             fclose(yyin);
+            yyin = NULL;
         }
 
         struct sigaction sa;
@@ -701,7 +702,7 @@ node_st *scanparse(node_st *root) {
             }
         }
 
-        yyin = spawn_command(NULL, "cpp", argv);
+        yyin = spawn_command(yyin, "cpp", argv);
 
         if (globals.input_file) {
             if (argv[static_argv_count] != globals.input_file) {
