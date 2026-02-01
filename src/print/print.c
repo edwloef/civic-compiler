@@ -325,7 +325,7 @@ node_st *PRTmonop(node_st *node) {
 }
 
 node_st *PRTcast(node_st *node) {
-    printf("((%s) ", fmt_BasicType(CAST_TY(node)));
+    printf("((%s) ", fmt_BasicType(CAST_RESOLVED_TY(node)));
     TRAVexpr(node);
     printf(")");
 

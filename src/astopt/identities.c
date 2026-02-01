@@ -34,7 +34,8 @@ node_st *AOImonop(node_st *node) {
                     // (-(7 + x)) => ((-7) - x)
                     // (-(7 - x)) => ((-7) + x)
                     TAKE(MONOP_EXPR(node));
-                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
+                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg,
+                                                EXPR_RESOLVED_TY(right));
                     BINOP_OP(node) = BINOP_OP(node) == BO_add ? BO_sub : BO_add;
                 }
                 break;
@@ -42,19 +43,22 @@ node_st *AOImonop(node_st *node) {
                 if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
                     // (-(7 * x)) => ((-7) * x)
                     TAKE(MONOP_EXPR(node));
-                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
+                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg,
+                                                EXPR_RESOLVED_TY(right));
                 }
                 break;
             case BO_div:
                 if (NODE_TYPE(left) == NT_INT || NODE_TYPE(left) == NT_FLOAT) {
                     // (-(7 / x)) => ((-7) / x)
                     TAKE(MONOP_EXPR(node));
-                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg);
+                    BINOP_LEFT(node) = ASTmonop(BINOP_LEFT(node), MO_neg,
+                                                EXPR_RESOLVED_TY(right));
                 } else if (NODE_TYPE(right) == NT_INT ||
                            NODE_TYPE(right) == NT_FLOAT) {
                     // (-(x / 7)) => (x / (-7))
                     TAKE(MONOP_EXPR(node));
-                    BINOP_RIGHT(node) = ASTmonop(BINOP_RIGHT(node), MO_neg);
+                    BINOP_RIGHT(node) = ASTmonop(BINOP_RIGHT(node), MO_neg,
+                                                 EXPR_RESOLVED_TY(right));
                 }
                 break;
             default:
@@ -179,8 +183,8 @@ node_st *AOIbinop(node_st *node) {
             // ({0, 0.0, false} + x) => x
             // ({0, 0.0} - x) => (-x)
             if (BINOP_OP(node) == BO_sub) {
-                BINOP_RIGHT(node) = ASTmonop(right, MO_neg);
-                MONOP_RESOLVED_TY(BINOP_RIGHT(node)) = EXPR_RESOLVED_TY(right);
+                BINOP_RIGHT(node) =
+                    ASTmonop(right, MO_neg, EXPR_RESOLVED_TY(right));
             }
             TAKE(BINOP_RIGHT(node));
         } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_not &&
@@ -189,13 +193,13 @@ node_st *AOIbinop(node_st *node) {
             BINOP_OP(node) = BO_mul;
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-            WRAP(MO_not);
+            node = ASTmonop(node, MO_not, TY_bool);
         } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_neg) {
             // ((-x) + y) => (-(x - y))
             // ((-x) - y) => (-(x + y))
             BINOP_OP(node) = BINOP_OP(node) == BO_add ? BO_sub : BO_add;
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
-            WRAP(MO_neg);
+            node = ASTmonop(node, MO_neg, EXPR_RESOLVED_TY(node));
         } else if (NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_neg) {
             // (x + (-y)) => (x - y)
             // (x - (-y)) => (x + y)
@@ -227,7 +231,7 @@ node_st *AOIbinop(node_st *node) {
             BINOP_OP(node) = BO_add;
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-            WRAP(MO_not);
+            node = ASTmonop(node, MO_not, TY_bool);
         } else if (!EXPR_SIDE_EFFECTS(right) &&
                    ((NODE_TYPE(left) == NT_INT && INT_VAL(left) == 0) ||
                     (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == 0.0) ||
@@ -244,15 +248,15 @@ node_st *AOIbinop(node_st *node) {
                    (NODE_TYPE(left) == NT_FLOAT && FLOAT_VAL(left) == -1.0)) {
             // ({-1, -1.0} * x) => (-x)
             TAKE(BINOP_RIGHT(node));
-            WRAP(MO_neg);
+            node = ASTmonop(node, MO_neg, EXPR_RESOLVED_TY(node));
         } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_neg) {
             // ((-x) * y) => (-(x * y))
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
-            WRAP(MO_neg);
+            node = ASTmonop(node, MO_neg, EXPR_RESOLVED_TY(node));
         } else if (NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_neg) {
             // (x * (-y)) => (-(x * y))
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-            WRAP(MO_neg);
+            node = ASTmonop(node, MO_neg, EXPR_RESOLVED_TY(node));
         }
         break;
     case BO_div:
@@ -277,15 +281,15 @@ node_st *AOIbinop(node_st *node) {
                    (NODE_TYPE(right) == NT_FLOAT && FLOAT_VAL(right) == -1.0)) {
             // (x / {-1, -1.0}) => -x
             TAKE(BINOP_LEFT(node));
-            WRAP(MO_neg);
+            node = ASTmonop(node, MO_neg, EXPR_RESOLVED_TY(node));
         } else if (NODE_TYPE(left) == NT_MONOP && MONOP_OP(left) == MO_neg) {
             // ((-x) / y) => (-(x / y))
             SWAP(BINOP_LEFT(node), MONOP_EXPR(tmp));
-            WRAP(MO_neg);
+            node = ASTmonop(node, MO_neg, EXPR_RESOLVED_TY(node));
         } else if (NODE_TYPE(right) == NT_MONOP && MONOP_OP(right) == MO_neg) {
             // (x / (-y)) => (-(x / y))
             SWAP(BINOP_RIGHT(node), MONOP_EXPR(tmp));
-            WRAP(MO_neg);
+            node = ASTmonop(node, MO_neg, EXPR_RESOLVED_TY(node));
         }
         break;
     case BO_mod:
@@ -351,7 +355,7 @@ node_st *AOIbinop(node_st *node) {
             } else {
                 // (false == x) => (!x)
                 TAKE(BINOP_RIGHT(node));
-                WRAP(MO_not);
+                node = ASTmonop(node, MO_not, TY_bool);
             }
         }
         break;
@@ -388,7 +392,7 @@ node_st *AOIbinop(node_st *node) {
             if (BOOL_VAL(left) == true) {
                 // (true != x) => (!x)
                 TAKE(BINOP_RIGHT(node));
-                WRAP(MO_not);
+                node = ASTmonop(node, MO_not, TY_bool);
             } else {
                 // (false != x) => x
                 TAKE(BINOP_RIGHT(node));
@@ -442,14 +446,14 @@ node_st *AOIbinop(node_st *node) {
 node_st *AOIcast(node_st *node) {
     TRAVchildren(node);
 
-    if (CAST_TY(node) == EXPR_RESOLVED_TY(CAST_EXPR(node))) {
+    if (CAST_RESOLVED_TY(node) == EXPR_RESOLVED_TY(CAST_EXPR(node))) {
         // ((int) intval) => intval
         // ((float) floatval) => floatval
         // ((bool) boolval) => boolval
         TAKE(CAST_EXPR(node));
-    } else if (CAST_TY(node) == TY_int) {
+    } else if (CAST_RESOLVED_TY(node) == TY_int) {
         if (NODE_TYPE(CAST_EXPR(node)) == NT_CAST &&
-            CAST_TY(CAST_EXPR(node)) == TY_float) {
+            CAST_RESOLVED_TY(CAST_EXPR(node)) == TY_float) {
             // ((int) ((float) x)) => (int) x
             SWAP(CAST_EXPR(node), CAST_EXPR(tmp));
         }

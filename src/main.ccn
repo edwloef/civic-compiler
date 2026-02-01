@@ -645,7 +645,8 @@ node Monop {
     },
 
     attributes {
-        MonOpKind op { constructor }
+        MonOpKind op { constructor },
+        BasicType resolved_ty { constructor }
     }
 };
 
@@ -656,7 +657,8 @@ node Binop {
     },
 
     attributes {
-        BinOpKind op { constructor }
+        BinOpKind op { constructor },
+        BasicType resolved_ty { constructor }
     }
 };
 
@@ -666,7 +668,7 @@ node Cast {
     },
 
     attributes {
-        BasicType ty { constructor }
+        BasicType resolved_ty { constructor }
     }
 };
 
@@ -735,7 +737,8 @@ node Bool {
 
 node ConstRef {
     attributes {
-        int l { constructor }
+        int l { constructor },
+        BasicType resolved_ty { constructor }
     },
 
     lifetime {

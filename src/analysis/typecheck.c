@@ -532,16 +532,14 @@ node_st *ATCcast(node_st *node) {
                   "can't cast %d-dimensional array of type '%s' to value of "
                   "type '%s'",
                   resolved_ty.dims, fmt_BasicType(resolved_ty.ty),
-                  fmt_BasicType(CAST_TY(node)));
+                  fmt_BasicType(CAST_RESOLVED_TY(node)));
         } else if (resolved_ty.ty != TY_int && resolved_ty.ty != TY_float &&
                    resolved_ty.ty != TY_bool) {
             ERROR(node, "can't cast value of type '%s' to value of type '%s'",
-                  fmt_BasicType(resolved_ty.ty), fmt_BasicType(CAST_TY(node)));
+                  fmt_BasicType(resolved_ty.ty),
+                  fmt_BasicType(CAST_RESOLVED_TY(node)));
         }
     }
-
-    CAST_RESOLVED_TY(node) = CAST_TY(node);
-    CAST_RESOLVED_DIMS(node) = 0;
 
     return node;
 }

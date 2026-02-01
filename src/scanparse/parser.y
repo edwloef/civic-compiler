@@ -265,82 +265,82 @@ expr: "(" basictype ")" expr %prec "monop"
       }
     | "+" expr %prec "monop"
       {
-        $$ = ASTmonop($2, MO_pos);
+        $$ = ASTmonop($2, MO_pos, 0);
         add_loc_to_node($$, @$);
       }
     | "-" expr %prec "monop"
       {
-        $$ = ASTmonop($2, MO_neg);
+        $$ = ASTmonop($2, MO_neg, 0);
         add_loc_to_node($$, @$);
       }
     | "!" expr %prec "monop"
       {
-        $$ = ASTmonop($2, MO_not);
+        $$ = ASTmonop($2, MO_not, 0);
         add_loc_to_node($$, @$);
       }
     | expr "*" expr
       {
-        $$ = ASTbinop($1, $3, BO_mul);
+        $$ = ASTbinop($1, $3, BO_mul, 0);
         add_loc_to_node($$, @$);
       }
     | expr "/" expr
       {
-        $$ = ASTbinop($1, $3, BO_div);
+        $$ = ASTbinop($1, $3, BO_div, 0);
         add_loc_to_node($$, @$);
       }
     | expr "%" expr
       {
-        $$ = ASTbinop($1, $3, BO_mod);
+        $$ = ASTbinop($1, $3, BO_mod, 0);
         add_loc_to_node($$, @$);
       }
     | expr "+" expr
       {
-        $$ = ASTbinop($1, $3, BO_add);
+        $$ = ASTbinop($1, $3, BO_add, 0);
         add_loc_to_node($$, @$);
       }
     | expr "-" expr
       {
-        $$ = ASTbinop($1, $3, BO_sub);
+        $$ = ASTbinop($1, $3, BO_sub, 0);
         add_loc_to_node($$, @$);
       }
     | expr "<" expr
       {
-        $$ = ASTbinop($1, $3, BO_lt);
+        $$ = ASTbinop($1, $3, BO_lt, 0);
         add_loc_to_node($$, @$);
       }
     | expr "<=" expr
       {
-        $$ = ASTbinop($1, $3, BO_le);
+        $$ = ASTbinop($1, $3, BO_le, 0);
         add_loc_to_node($$, @$);
       }
     | expr ">" expr
       {
-        $$ = ASTbinop($1, $3, BO_gt);
+        $$ = ASTbinop($1, $3, BO_gt, 0);
         add_loc_to_node($$, @$);
       }
     | expr ">=" expr
       {
-        $$ = ASTbinop($1, $3, BO_ge);
+        $$ = ASTbinop($1, $3, BO_ge, 0);
         add_loc_to_node($$, @$);
       }
     | expr "==" expr
       {
-        $$ = ASTbinop($1, $3, BO_eq);
+        $$ = ASTbinop($1, $3, BO_eq, 0);
         add_loc_to_node($$, @$);
       }
     | expr "!=" expr
       {
-        $$ = ASTbinop($1, $3, BO_ne);
+        $$ = ASTbinop($1, $3, BO_ne, 0);
         add_loc_to_node($$, @$);
       }
     | expr "&&" expr
       {
-        $$ = ASTbinop($1, $3, BO_and);
+        $$ = ASTbinop($1, $3, BO_and, 0);
         add_loc_to_node($$, @$);
       }
     | expr "||" expr
       {
-        $$ = ASTbinop($1, $3, BO_or);
+        $$ = ASTbinop($1, $3, BO_or, 0);
         add_loc_to_node($$, @$);
       }
     | "(" expr ")"

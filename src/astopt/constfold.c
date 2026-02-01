@@ -197,7 +197,7 @@ node_st *AOCFbinop(node_st *node) {
 
 node_st *AOCFcast(node_st *node) {
     TRAVchildren(node);
-    switch (CAST_TY(node)) {
+    switch (CAST_RESOLVED_TY(node)) {
     case TY_int:
         switch (NODE_TYPE(CAST_EXPR(node))) {
         case NT_INT:

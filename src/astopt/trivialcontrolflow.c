@@ -99,17 +99,16 @@ node_st *AOTCFifelse(node_st *node) {
         } else if (!STMTS_NEXT(IFELSE_IF_BLOCK(node)) &&
                    NODE_TYPE(STMTS_STMT(IFELSE_IF_BLOCK(node))) == NT_IFELSE &&
                    !IFELSE_ELSE_BLOCK(STMTS_STMT(IFELSE_IF_BLOCK(node)))) {
-            IFELSE_EXPR(node) = ASTbinop(
-                IFELSE_EXPR(node),
-                IFELSE_EXPR(STMTS_STMT(IFELSE_IF_BLOCK(node))), BO_and);
-            BINOP_RESOLVED_TY(IFELSE_EXPR(node)) = TY_bool;
+            IFELSE_EXPR(node) =
+                ASTbinop(IFELSE_EXPR(node),
+                         IFELSE_EXPR(STMTS_STMT(IFELSE_IF_BLOCK(node))), BO_and,
+                         TY_bool);
             IFELSE_EXPR(STMTS_STMT(IFELSE_IF_BLOCK(node))) = NULL;
 
             SWAP(IFELSE_IF_BLOCK(node), IFELSE_IF_BLOCK(STMTS_STMT(tmp)));
         }
     } else if (IFELSE_ELSE_BLOCK(node)) {
-        IFELSE_EXPR(node) = ASTmonop(IFELSE_EXPR(node), MO_not);
-        MONOP_RESOLVED_TY(IFELSE_EXPR(node)) = TY_bool;
+        IFELSE_EXPR(node) = ASTmonop(IFELSE_EXPR(node), MO_not, TY_bool);
 
         node_st *tmp = IFELSE_IF_BLOCK(node);
         IFELSE_IF_BLOCK(node) = IFELSE_ELSE_BLOCK(node);

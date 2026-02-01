@@ -36,13 +36,6 @@
         CCNcycleNotify();                                                      \
     }
 
-#define WRAP(o)                                                                \
-    {                                                                          \
-        node = ASTmonop(node, o);                                              \
-        MONOP_RESOLVED_TY(node) = EXPR_RESOLVED_TY(MONOP_EXPR(node));          \
-        CCNcycleNotify();                                                      \
-    }
-
 node_st *inline_stmts(node_st *node, node_st *stmts);
 
 FILE *spawn_command(FILE *in, const char *cmd, char *const argv[]);

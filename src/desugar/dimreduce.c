@@ -32,8 +32,7 @@ node_st *DDRmalloc(node_st *node) {
 
     for (node_st *right = EXPRS_NEXT(exprs); right; right = EXPRS_NEXT(right)) {
         EXPRS_EXPR(exprs) =
-            ASTbinop(EXPRS_EXPR(exprs), EXPRS_EXPR(right), BO_mul);
-        BINOP_RESOLVED_TY(EXPRS_EXPR(exprs)) = TY_int;
+            ASTbinop(EXPRS_EXPR(exprs), EXPRS_EXPR(right), BO_mul, TY_int);
         EXPRS_EXPR(right) = NULL;
     }
 
@@ -59,12 +58,11 @@ node_st *DDRvarref(node_st *node) {
         vartable_ref dr = e->ty.buf[i];
         dr.n += r.n;
 
-        EXPRS_EXPR(exprs) = ASTbinop(
-            ASTbinop(EXPRS_EXPR(exprs),
-                     vartable_get_ref(DATA_DDR_GET()->vartable, dr), BO_mul),
-            EXPRS_EXPR(right), BO_add);
-        BINOP_RESOLVED_TY(BINOP_LEFT(EXPRS_EXPR(exprs))) = TY_int;
-        BINOP_RESOLVED_TY(EXPRS_EXPR(exprs)) = TY_int;
+        EXPRS_EXPR(exprs) =
+            ASTbinop(ASTbinop(EXPRS_EXPR(exprs),
+                              vartable_get_ref(DATA_DDR_GET()->vartable, dr),
+                              BO_mul, TY_int),
+                     EXPRS_EXPR(right), BO_add, TY_int);
         EXPRS_EXPR(right) = NULL;
     }
 
