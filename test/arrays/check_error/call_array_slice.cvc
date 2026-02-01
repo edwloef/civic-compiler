@@ -1,0 +1,6 @@
+extern void bar(int[n] a);
+
+void foo() {
+    int[2, 2] a = 1;
+    bar(a[1]);
+}

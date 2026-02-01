@@ -553,8 +553,13 @@ node_st *ATCcall(node_st *node) {
     node_st *arg = CALL_EXPRS(node);
     for (int i = 0; i < ty.len; i++) {
         if (NODE_TYPE(EXPRS_EXPR(arg)) == NT_ARREXPRS) {
-            ERROR(EXPRS_EXPR(arg),
-                  "array literals are not allowed outside of assignments");
+            ERROR(EXPRS_EXPR(arg), "array literals are not allowed outside of "
+                                   "the right-hand side of array assignments");
+        } else if (NODE_TYPE(EXPRS_EXPR(arg)) == NT_VARREF &&
+                   VARREF_EXPRS(EXPRS_EXPR(arg)) &&
+                   VARREF_RESOLVED_DIMS(EXPRS_EXPR(arg)) != 0) {
+            ERROR(EXPRS_EXPR(arg), "array slices are not allowed outside of "
+                                   "the left-hand side of array assignments");
         }
 
         thin_vartype expected_ty = ty.buf[i];
@@ -640,9 +645,8 @@ node_st *ATCvarref(node_st *node) {
     }
 
     if (ty.ty == TY_error) {
-    } else if (index_count == 0) {
-    } else if (index_count == ty.len) {
-        ty.len = 0;
+    } else if (index_count <= ty.len) {
+        ty.len -= index_count;
     } else if (ty.len == 0) {
         ERROR(node, "can't index into value of type '%s'",
               fmt_BasicType(ty.ty));

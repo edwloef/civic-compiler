@@ -142,8 +142,9 @@ node_st *DAAassign(node_st *node) {
     vartable_ref r = {VARREF_N(ASSIGN_REF(node)), VARREF_L(ASSIGN_REF(node))};
     vartable_entry *e = vartable_get(DATA_DAA_GET()->vartable, r);
 
-    node_st *stmt = DAAbuild_array_assign(ASSIGN_REF(node), e->ty.buf,
-                                          ASSIGN_EXPR(node), e->ty.len);
+    int diff = e->ty.len - VARREF_RESOLVED_DIMS(ASSIGN_REF(node));
+    node_st *stmt = DAAbuild_array_assign(ASSIGN_REF(node), e->ty.buf + diff,
+                                          ASSIGN_EXPR(node), e->ty.len - diff);
 
     if (DATA_DAA_GET()->stmts) {
         node_st *tmp = DATA_DAA_GET()->stmts;
