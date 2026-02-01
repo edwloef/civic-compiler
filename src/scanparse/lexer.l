@@ -19,15 +19,18 @@ void token_action(void);
     globals.col += yyleng; \
     return token;
 
-#define YY_USER_INIT BEGIN(SAVELINE);
+#define YY_USER_INIT yy_push_state(SAVELINE);
 #define YY_USER_ACTION token_action();
 
 %}
 
 %option noinput
 %option nounput
+%option noyy_top_state
 %option noyywrap
+%option stack
 
+%x COMMENT
 %x SAVELINE
 
 %%
@@ -105,14 +108,30 @@ void token_action(void);
 
 \n                                                       {
                                                            globals.line += 1;
-                                                           BEGIN(SAVELINE);
+                                                           yy_push_state(SAVELINE);
                                                          }
 
 " "                                                      { globals.col += 1; }
 \t                                                       { globals.col += tab_size(); }
 "//".*                                                   { globals.col += yyleng; }
+"/*"                                                     {
+                                                           globals.col += yyleng;
+                                                           yy_push_state(SAVELINE);
+                                                         }
 
 .                                                        { yyerror("unexpected token found, quit parsing"); }
+
+<COMMENT>{
+  ([^*\n]*)|("*"+[^*/\n]*)                               { globals.col += yyleng; }
+  "*/"                                                   {
+                                                           globals.col += yyleng;
+                                                           yy_pop_state();
+                                                         }
+  \n                                                     {
+                                                           globals.line += 1;
+                                                           yy_push_state(SAVELINE);
+                                                         }
+}
 
 <SAVELINE>{
   "# "[0-9]+" \"".*"\"".*\n                              {
@@ -147,7 +166,7 @@ void token_action(void);
                                                            }
                                                            yyless(0);
                                                            globals.col = 0;
-                                                           BEGIN(INITIAL);
+                                                           yy_pop_state();
                                                          }
   \n                                                     { globals.line += 1; }
 }
