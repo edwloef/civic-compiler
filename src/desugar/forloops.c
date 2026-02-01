@@ -4,6 +4,56 @@
 #include "table/vartable.h"
 #include "utils.h"
 
+static node_st *DFLfor_branch(node_st *stmt, node_st *start_ref,
+                              node_st *end_ref, node_st *step_ref,
+                              node_st *clamped_end_ref,
+                              node_st *clamped_end_assign, enum BinOpKind op) {
+    node_st *step_overflow = NULL;
+    node_st *step_no_overflow = NULL;
+
+    if (clamped_end_ref) {
+        node_st *step_overflow_while = ASTwhile(
+            ASTbinop(CCNcopy(start_ref), CCNcopy(clamped_end_ref), op, TY_bool),
+            CCNcopy(FOR_STMTS(stmt)));
+
+        node_st *step_overflow_if = ASTifelse(
+            ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), op, TY_int),
+            CCNcopy(FOR_STMTS(stmt)), NULL);
+
+        if (clamped_end_assign) {
+            step_overflow =
+                ASTstmts(CCNcopy(clamped_end_assign),
+                         ASTstmts(step_overflow_while,
+                                  ASTstmts(step_overflow_if, NULL)));
+            VARREF_WRITE(ASSIGN_REF(STMTS_STMT(step_overflow))) = true;
+        } else {
+            step_overflow =
+                ASTstmts(step_overflow_while, ASTstmts(step_overflow_if, NULL));
+        }
+    }
+
+    if (!(clamped_end_ref && NODE_TYPE(clamped_end_ref) == NT_INT)) {
+        step_no_overflow =
+            ASTstmts(ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref), op,
+                                       TY_bool),
+                              CCNcopy(FOR_STMTS(stmt))),
+                     NULL);
+    }
+
+    if (!step_no_overflow) {
+        return step_overflow;
+    } else if (!step_overflow) {
+        return step_no_overflow;
+    } else {
+        return ASTstmts(
+            ASTifelse(ASTbinop(ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref),
+                                        BO_add, TY_int),
+                               CCNcopy(end_ref), op, TY_bool),
+                      step_overflow, step_no_overflow),
+            NULL);
+    }
+}
+
 void DFLinit(void) {}
 void DFLfini(void) {}
 
@@ -109,107 +159,15 @@ node_st *DFLstmts(node_st *node) {
         node_st *negative_step = NULL;
 
         if (!(NODE_TYPE(step_ref) == NT_INT && INT_VAL(step_ref) <= 0)) {
-            node_st *positive_step_overflow = NULL;
-            node_st *positive_step_no_overflow = NULL;
-
-            if (clamped_end_ref) {
-                node_st *positive_step_overflow_while =
-                    ASTwhile(ASTbinop(CCNcopy(start_ref),
-                                      CCNcopy(clamped_end_ref), BO_lt, TY_bool),
-                             CCNcopy(FOR_STMTS(stmt)));
-
-                node_st *positive_step_overflow_if =
-                    ASTifelse(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref),
-                                       BO_lt, TY_int),
-                              CCNcopy(FOR_STMTS(stmt)), NULL);
-
-                if (clamped_end_assign) {
-                    positive_step_overflow = ASTstmts(
-                        CCNcopy(clamped_end_assign),
-                        ASTstmts(positive_step_overflow_while,
-                                 ASTstmts(positive_step_overflow_if, NULL)));
-                    VARREF_WRITE(
-                        ASSIGN_REF(STMTS_STMT(positive_step_overflow))) = true;
-                } else {
-                    positive_step_overflow =
-                        ASTstmts(positive_step_overflow_while,
-                                 ASTstmts(positive_step_overflow_if, NULL));
-                }
-            }
-
-            if (!(clamped_end_ref && NODE_TYPE(clamped_end_ref) == NT_INT)) {
-                positive_step_no_overflow = ASTstmts(
-                    ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref),
-                                      BO_lt, TY_bool),
-                             CCNcopy(FOR_STMTS(stmt))),
-                    NULL);
-            }
-
-            if (!positive_step_no_overflow) {
-                positive_step = positive_step_overflow;
-            } else if (!positive_step_overflow) {
-                positive_step = positive_step_no_overflow;
-            } else {
-                positive_step = ASTstmts(
-                    ASTifelse(
-                        ASTbinop(ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref),
-                                          BO_add, TY_int),
-                                 CCNcopy(end_ref), BO_lt, TY_bool),
-                        positive_step_overflow, positive_step_no_overflow),
-                    NULL);
-            }
+            positive_step =
+                DFLfor_branch(stmt, start_ref, end_ref, step_ref,
+                              clamped_end_ref, clamped_end_assign, BO_lt);
         }
 
         if (!(NODE_TYPE(step_ref) == NT_INT && INT_VAL(step_ref) >= 0)) {
-            node_st *negative_step_overflow = NULL;
-            node_st *negative_step_no_overflow = NULL;
-
-            if (clamped_end_ref) {
-                node_st *negative_step_overflow_while =
-                    ASTwhile(ASTbinop(CCNcopy(start_ref),
-                                      CCNcopy(clamped_end_ref), BO_gt, TY_bool),
-                             CCNcopy(FOR_STMTS(stmt)));
-
-                node_st *negative_step_overflow_if =
-                    ASTifelse(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref),
-                                       BO_gt, TY_int),
-                              CCNcopy(FOR_STMTS(stmt)), NULL);
-
-                if (clamped_end_assign) {
-                    negative_step_overflow = ASTstmts(
-                        CCNcopy(clamped_end_assign),
-                        ASTstmts(negative_step_overflow_while,
-                                 ASTstmts(negative_step_overflow_if, NULL)));
-                    VARREF_WRITE(
-                        ASSIGN_REF(STMTS_STMT(negative_step_overflow))) = true;
-                } else {
-                    negative_step_overflow =
-                        ASTstmts(negative_step_overflow_while,
-                                 ASTstmts(negative_step_overflow_if, NULL));
-                }
-            }
-
-            if (!(clamped_end_ref && NODE_TYPE(clamped_end_ref) == NT_INT)) {
-                negative_step_no_overflow = ASTstmts(
-                    ASTwhile(ASTbinop(CCNcopy(start_ref), CCNcopy(end_ref),
-                                      BO_gt, TY_bool),
-                             CCNcopy(FOR_STMTS(stmt))),
-                    NULL);
-            }
-
-            if (!negative_step_no_overflow) {
-                negative_step = negative_step_overflow;
-            } else if (!negative_step_overflow) {
-                negative_step = negative_step_no_overflow;
-            } else {
-                negative_step = ASTstmts(
-                    ASTifelse(
-                        ASTbinop(ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref),
-                                          BO_add, TY_int),
-                                 CCNcopy(end_ref), BO_gt, TY_bool),
-                        negative_step_overflow, negative_step_no_overflow),
-                    NULL);
-            }
+            negative_step =
+                DFLfor_branch(stmt, start_ref, end_ref, step_ref,
+                              clamped_end_ref, clamped_end_assign, BO_gt);
         }
 
         TAKE(STMTS_NEXT(node));
