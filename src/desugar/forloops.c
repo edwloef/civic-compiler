@@ -21,7 +21,7 @@ static node_st *DFLfor_branch(node_st *stmt, node_st *start_ref,
 
         if (NODE_TYPE(clamped_end_ref) == NT_VARREF) {
             step_overflow =
-                ASTstmts(ASTassign(clamped_end_ref,
+                ASTstmts(ASTassign(CCNcopy(clamped_end_ref),
                                    ASTbinop(CCNcopy(end_ref), CCNcopy(step_ref),
                                             BO_sub, TY_int)),
                          ASTstmts(step_overflow_while,
@@ -109,7 +109,7 @@ node_st *DFLstmts(node_st *node) {
 
         if (NODE_TYPE(step_ref) == NT_INT) {
             if (INT_VAL(step_ref) >= -1 && INT_VAL(step_ref) <= 1) {
-            } else if (NODE_TYPE(step_ref) == NT_INT) {
+            } else if (NODE_TYPE(end_ref) == NT_INT) {
                 if (INT_VAL(step_ref) > 0 &&
                     INT_VAL(end_ref) + INT_VAL(step_ref) > INT_VAL(end_ref)) {
                 } else if (INT_VAL(step_ref) < 0 &&

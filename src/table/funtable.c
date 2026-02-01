@@ -1,8 +1,8 @@
-#include "table/funtable.h"
 #include "ccngen/ast.h"
 #include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
+#include "table/funtable.h"
 
 funtype funtype_new(enum BasicType ty) {
     return (funtype){0, 0, NULL, ty};
@@ -42,6 +42,7 @@ funtable_ref funtable_insert(funtable *self, funtable_entry e, node_st *id) {
             emit_message_with_span(entry.span, L_INFO,
                                    "function '%s' previously declared here",
                                    e.name);
+            MEMfree(e.ty.buf);
             return (funtable_ref){0, -1};
         }
     }
