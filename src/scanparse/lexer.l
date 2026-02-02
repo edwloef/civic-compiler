@@ -11,7 +11,7 @@
 #include "parser.h"
 
 int tab_size(void);
-char *replace_tabs();
+char *replace_tabs(void);
 void yyerror(char const *err);
 void token_action(void);
 
