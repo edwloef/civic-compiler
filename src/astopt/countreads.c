@@ -35,7 +35,7 @@ node_st *CRfundecl(node_st *node) {
 node_st *CRvarref(node_st *node) {
     TRAVchildren(node);
 
-    if (!VARREF_WRITE(node)) {
+    if (!VARREF_WRITE(node) || VARREF_EXPRS(node) != NULL) {
         vartable_ref r = {VARREF_N(node), VARREF_L(node)};
         vartable_entry *e = vartable_get(DATA_CR_GET()->vartable, r);
         e->read_count++;
