@@ -34,11 +34,11 @@ node_st *AOCPfunbody(node_st *node) {
 }
 
 node_st *AOCPstmts(node_st *node) {
-    TRAVnext(node);
 
     node_st *stmt = STMTS_STMT(node);
     switch (NODE_TYPE(stmt)) {
     case NT_ASSIGN:
+        ASSIGN_EXPR(stmt) = TRAVstart(ASSIGN_EXPR(stmt), TRAV_AOCF);
         if (!VARREF_EXPRS(ASSIGN_REF(stmt)) &&
             (NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_INT ||
              NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_FLOAT ||
@@ -89,6 +89,8 @@ node_st *AOCPstmts(node_st *node) {
         TRAVstmt(node);
         break;
     }
+
+    TRAVnext(node);
 
     return node;
 }
