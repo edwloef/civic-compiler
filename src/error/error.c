@@ -56,10 +56,9 @@ static int error_count = 0;
 
 void abort_on_error(void) {
     if (error_count > 0) {
-        emit_message(L_ERROR,
-                     "couldn't compile '%s' due to %d previous error%s\n",
-                     globals.input_file ? globals.input_file : "stdin",
-                     error_count, error_count > 1 ? "s" : "");
+        emit_message(
+            L_ERROR, "couldn't compile '%s' due to %d previous error%s\n",
+            globals.input_file, error_count, error_count > 1 ? "s" : "");
         exit(EXIT_FAILURE);
     }
 }

@@ -718,6 +718,12 @@ node_st *scanparse(node_st *root) {
         }
     }
 
+    if (!globals.input_file) {
+        globals.input_file = STRcpy("<stdin>");
+    }
+
+    globals.file = STRcpy(globals.input_file);
+
     yyparse();
 
     if (cpp_status) {

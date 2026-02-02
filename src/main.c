@@ -145,9 +145,6 @@ static void ProcessArgs(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     } else if (optind + 1 == argc) {
         globals.input_file = argv[optind];
-        globals.file = STRcpy(globals.input_file);
-    } else {
-        globals.file = STRcpy("<stdin>");
     }
 
 #ifdef NDEBUG
