@@ -21,10 +21,44 @@ static vartable *AOSFshrink_vartable(void) {
     for (int i = 0; i < DATA_AOST_GET()->vartable->len; i++) {
         vartable_entry *e = &DATA_AOST_GET()->vartable->buf[i];
         if (e->read_count > 0 || e->write_count > 0) {
-            e->new_l = vartable_push(vartable, *e).l;
+            vartable_entry ne = *e;
+            ne.new_l = i;
+            e->new_l = vartable_push(vartable, ne).l;
         } else {
             vartable_entry_free(*e);
         }
+    }
+
+    for (int i = 0; i < vartable->len; i++) {
+        vartable_entry *ie = &vartable->buf[i];
+        vartable_entry *max_je = ie;
+
+        if (ie->param) {
+            continue;
+        }
+
+        for (int j = i + 1; j < vartable->len; j++) {
+            vartable_entry *je = &vartable->buf[j];
+            if (max_je->read_count < je->read_count) {
+                max_je = je;
+            }
+        }
+
+        if (ie == max_je) {
+            continue;
+        }
+
+        vartable_entry tmp_e = *ie;
+        *ie = *max_je;
+        *max_je = tmp_e;
+
+        vartable_entry *prev_ie = &DATA_AOST_GET()->vartable->buf[ie->new_l];
+        vartable_entry *prev_max_je =
+            &DATA_AOST_GET()->vartable->buf[max_je->new_l];
+
+        int tmp_l = prev_ie->new_l;
+        prev_ie->new_l = prev_max_je->new_l;
+        prev_max_je->new_l = tmp_l;
     }
 
     return vartable;
