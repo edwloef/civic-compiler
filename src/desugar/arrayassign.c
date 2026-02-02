@@ -106,16 +106,8 @@ node_st *DAAstmts(node_st *node) {
         }
     }
 
-    if (DATA_DAA_GET()->stmts) {
-        node_st *tmp = DATA_DAA_GET()->stmts;
-        while (STMTS_NEXT(tmp)) {
-            tmp = STMTS_NEXT(tmp);
-        }
-        STMTS_NEXT(tmp) = node;
-
-        node = DATA_DAA_GET()->stmts;
-        DATA_DAA_GET()->stmts = NULL;
-    }
+    node = inline_stmts(node, DATA_DAA_GET()->stmts);
+    DATA_DAA_GET()->stmts = NULL;
 
     return node;
 }
@@ -146,15 +138,7 @@ node_st *DAAassign(node_st *node) {
     node_st *stmt = DAAbuild_array_assign(ASSIGN_REF(node), e->ty.buf + diff,
                                           ASSIGN_EXPR(node), e->ty.len - diff);
 
-    if (DATA_DAA_GET()->stmts) {
-        node_st *tmp = DATA_DAA_GET()->stmts;
-        while (STMTS_NEXT(tmp)) {
-            tmp = STMTS_NEXT(tmp);
-        }
-        STMTS_NEXT(tmp) = stmt;
-    } else {
-        DATA_DAA_GET()->stmts = stmt;
-    }
+    DATA_DAA_GET()->stmts = inline_stmts(stmt, DATA_DAA_GET()->stmts);
 
     ASSIGN_REF(node) = NULL;
     ASSIGN_EXPR(node) = NULL;

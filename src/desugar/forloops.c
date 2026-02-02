@@ -133,15 +133,7 @@ node_st *DFLstmts(node_st *node) {
             ASTbinop(CCNcopy(start_ref), CCNcopy(step_ref), BO_add, TY_int));
         VARREF_WRITE(ASSIGN_REF(inc)) = true;
 
-        if (FOR_STMTS(stmt)) {
-            node_st *tmp = FOR_STMTS(stmt);
-            while (STMTS_NEXT(tmp)) {
-                tmp = STMTS_NEXT(tmp);
-            }
-            STMTS_NEXT(tmp) = ASTstmts(inc, NULL);
-        } else {
-            FOR_STMTS(stmt) = ASTstmts(inc, NULL);
-        }
+        FOR_STMTS(stmt) = inline_stmts(ASTstmts(inc, NULL), FOR_STMTS(stmt));
 
         FOR_REF(stmt) = NULL;
         FOR_LOOP_START(stmt) = NULL;
