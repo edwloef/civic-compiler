@@ -73,14 +73,8 @@ node_st *AOLUstmts(node_st *node) {
         if (can_unroll) {
             if (step > 0) {
                 can_unroll = end + step > end;
-                if (BINOP_OP(DOWHILE_EXPR(stmt)) != BO_eq) {
-                    can_unroll &= start < end;
-                }
             } else if (step < 0) {
                 can_unroll = end + step < end;
-                if (BINOP_OP(DOWHILE_EXPR(stmt)) != BO_eq) {
-                    can_unroll &= start > end;
-                }
             } else {
                 CCNfree(BINOP_RIGHT(DOWHILE_EXPR(stmt)));
                 BINOP_RIGHT(DOWHILE_EXPR(stmt)) = ASTint(start, TY_int);
@@ -101,15 +95,19 @@ node_st *AOLUstmts(node_st *node) {
             switch (BINOP_OP(DOWHILE_EXPR(stmt))) {
             case BO_lt:
                 count = lllen / llstep + (lllen % llstep != 0);
+                can_unroll = llend < llstart + llstep;
                 break;
             case BO_le:
                 count = lllen / llstep + 1;
+                can_unroll = llend <= llstart + llstep;
                 break;
             case BO_gt:
                 count = lllen / llstep + (lllen % llstep != 0);
+                can_unroll = llend > llstart + llstep;
                 break;
             case BO_ge:
                 count = lllen / llstep + 1;
+                can_unroll = llend >= llstart + llstep;
                 break;
             case BO_eq:
                 count = (llstart + llstep == llend) + 1;
