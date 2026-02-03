@@ -3,6 +3,7 @@ extern void printSpaces(int a);
 extern void printNewlines(int a);
 
 export int main() {
+    rizz();
     lt();
     le();
     gt();
@@ -10,6 +11,17 @@ export int main() {
     eq();
     ne();
     return 0;
+}
+
+void rizz() {
+    int i = 0;
+
+    do {
+        i = i + 3;
+        printInt(i);
+    } while (i > 100);
+
+    printNewlines(1);
 }
 
 void lt() {
