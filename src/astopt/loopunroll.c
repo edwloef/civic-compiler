@@ -73,8 +73,14 @@ node_st *AOLUstmts(node_st *node) {
         if (can_unroll) {
             if (step > 0) {
                 can_unroll = end + step > end;
+                if (BINOP_OP(DOWHILE_EXPR(stmt)) != BO_eq) {
+                    can_unroll &= start < end;
+                }
             } else if (step < 0) {
                 can_unroll = end + step < end;
+                if (BINOP_OP(DOWHILE_EXPR(stmt)) != BO_eq) {
+                    can_unroll &= start > end;
+                }
             } else {
                 CCNfree(BINOP_RIGHT(DOWHILE_EXPR(stmt)));
                 BINOP_RIGHT(DOWHILE_EXPR(stmt)) = ASTint(start, TY_int);
@@ -106,35 +112,27 @@ node_st *AOLUstmts(node_st *node) {
                 count = lllen / llstep + 1;
                 break;
             case BO_eq:
-                count = 1 + (llstart + llstep == llend);
+                count = (llstart + llstep == llend) + 1;
                 break;
             case BO_ne:
-                if (lllen % llstep == 0) {
-                    count = lllen / llstep;
-                } else {
-                    can_unroll = false;
-                }
+                count = lllen / llstep;
+                can_unroll = lllen % llstep == 0;
                 break;
             default:
                 DBUG_ASSERT(false, "Unknown binop detected.");
             }
         }
 
-        if (can_unroll) {
-            if (count <= 0) {
-                can_unroll = false;
-            } else if (count == 1) {
-            } else {
-                TRAVpush(TRAV_EC);
+        if (can_unroll && count != 1) {
+            TRAVpush(TRAV_EC);
 
-                TRAVdo(DOWHILE_STMTS(stmt));
+            TRAVdo(DOWHILE_STMTS(stmt));
 
-                long long cost = DATA_EC_GET()->cost;
+            long long cost = DATA_EC_GET()->cost;
 
-                TRAVpop();
+            TRAVpop();
 
-                can_unroll = count * cost <= globals.unroll_limit;
-            }
+            can_unroll = count * cost <= globals.unroll_limit;
         }
 
         if (can_unroll) {
