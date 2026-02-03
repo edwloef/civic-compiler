@@ -20,9 +20,17 @@ function echo_success {
 
 function echo_failed {
     if [[ -t 1 ]]; then
-        echo -e '\E[27;31m'"\033[1mfailed\033[0m"
+        if [ -z "$1" ]; then
+            echo -e '\E[27;31m'"\033[1mfailed\033[0m"
+        else
+            echo -e '\E[27;31m'"\033[1mfailed, $1\033[0m"
+        fi
     else
-        echo "failed"
+        if [ -z "$1" ]; then
+            echo "failed"
+        else
+            echo "failed, $1"
+        fi
     fi
 }
 
@@ -54,6 +62,33 @@ function check_output {
     fi
 
     rm -f tmp.res tmp.s tmp.o tmp.out
+}
+
+function check_timeout {
+    file=$1
+
+    if [ ! -f $file ]; then return; fi
+
+    total_tests=$((total_tests+1))
+    printf "%-${ALIGN}s " $file:
+
+    $CIVCC $CFLAGS -o tmp.s $file > tmp.out 2>&1 &&
+        $CIVAS tmp.s -o tmp.o > tmp.out 2>&1
+    if [ $? -ne 0 ]; then
+        echo_failed
+        failed_tests=$((failed_tests+1))
+        return
+    fi
+
+    timeout 1 $CIVVM tmp.o > tmp.out 2>&1
+    if [ $? -eq 124 ]; then
+        echo_success
+    else
+        echo_failed
+        failed_tests=$((failed_tests+1))
+    fi
+
+    rm -f tmp.s tmp.o tmp.out
 }
 
 # Special case: multiple files must be compiled and run together (e.g., for
@@ -105,7 +140,7 @@ function check_combined {
             failed_tests=$((failed_tests+1))
         fi
     else
-        echo "failed, only compiled$compiled_files"
+        echo_failed "only compiled$compiled_files"
         failed_tests=$((failed_tests+1))
     fi
 
@@ -124,24 +159,18 @@ function check_return {
     total_tests=$((total_tests+1))
     printf "%-${ALIGN}s " $file:
 
-    if $CIVCC $CFLAGS $file -o tmp.s > tmp.out 2>&1
-    then
-        if [ $expect_failure -eq 1 ]; then
-            echo_failed
-            failed_tests=$((failed_tests+1))
-        else
-            echo_success
-        fi
+    $CIVCC $CFLAGS $file -o tmp.s > tmp.out 2>&1
+
+    if [ $? -eq $expect_failure ]; then
+        echo_success
     else
-        if [ $expect_failure -eq 1 ]; then
-            echo_success
-        else
-            echo_failed
+        echo_failed
+        failed_tests=$((failed_tests+1))
+        if [ $expect_failure -eq 0 ]; then
             echo -------------------------------
             cat tmp.out
             echo -------------------------------
             echo
-            failed_tests=$((failed_tests+1))
         fi
     fi
 
@@ -166,6 +195,10 @@ function run_dir {
 
         for d in $BASE/combined_*; do
             check_combined $d
+        done
+
+        for f in $BASE/timeout/*.cvc; do
+            check_timeout $f
         done
     fi
 
