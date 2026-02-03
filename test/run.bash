@@ -197,7 +197,7 @@ function run_dir {
             check_combined $d
         done
 
-        for f in $BASE/timeout/*.cvc; do
+        for f in $BASE/check_timeout/*.cvc; do
             check_timeout $f
         done
     fi
