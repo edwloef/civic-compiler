@@ -3,7 +3,6 @@ extern void printSpaces(int a);
 extern void printNewlines(int a);
 
 export int main() {
-    rizz();
     lt();
     le();
     gt();
@@ -13,61 +12,82 @@ export int main() {
     return 0;
 }
 
-void rizz() {
-    int i = 0;
+void lt() {
+    int i = 5;
 
     do {
-        i = i + 3;
         printInt(i);
-    } while (i > 100);
+        printSpaces(1);
+        i = i - 1;
+    } while (0 < i);
 
     printNewlines(1);
-}
 
-void lt() {
-    int i = 0;
-
-    while (i < 5) {
+    do {
         printInt(i);
         printSpaces(1);
         i = i + 1;
-    }
+    } while (1 < i);
 
     printNewlines(1);
 }
 
 void le() {
-    int i = 0;
+    int i = 5;
 
-    while (i <= 5) {
+    do {
+        printInt(i);
+        printSpaces(1);
+        i = i - 1;
+    } while (0 <= i);
+
+    printNewlines(1);
+
+    do {
         printInt(i);
         printSpaces(1);
         i = i + 1;
-    }
+    } while (1 <= i);
 
     printNewlines(1);
 }
 
 void gt() {
-    int i = 5;
+    int i = 0;
 
-    while (i > 0) {
+    do {
+        printInt(i);
+        printSpaces(1);
+        i = i + 1;
+    } while (5 > i);
+
+    printNewlines(1);
+
+    do {
         printInt(i);
         printSpaces(1);
         i = i - 1;
-    }
+    } while (4 > i);
 
     printNewlines(1);
 }
 
 void ge() {
-    int i = 5;
+    int i = 0;
 
-    while (i >= 0) {
+    do {
+        printInt(i);
+        printSpaces(1);
+        i = i + 1;
+    } while (5 >= i);
+
+    printNewlines(1);
+
+    do {
         printInt(i);
         printSpaces(1);
         i = i - 1;
-    }
+    } while (4 >= i);
 
     printNewlines(1);
 }
