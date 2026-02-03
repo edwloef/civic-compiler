@@ -95,8 +95,9 @@ node_st *AOLUstmts(node_st *node) {
             long long lllen = llend - llstart;
             count = lllen / llstep + (lllen % llstep != 0);
 
-            if (count <= 1) {
-                count = 1;
+            if (count <= 0) {
+                can_unroll = false;
+            } else if (count == 1) {
             } else {
                 TRAVpush(TRAV_EC);
 
