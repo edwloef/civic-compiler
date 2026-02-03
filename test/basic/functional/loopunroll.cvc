@@ -1,0 +1,85 @@
+extern void printInt(int a);
+extern void printSpaces(int a);
+extern void printNewlines(int a);
+
+export int main() {
+    lt();
+    le();
+    gt();
+    ge();
+    eq();
+    ne();
+    return 0;
+}
+
+void lt() {
+    int i = 0;
+
+    while (i < 5) {
+        printInt(i);
+        printSpaces(1);
+        i = i + 1;
+    }
+
+    printNewlines(1);
+}
+
+void le() {
+    int i = 0;
+
+    while (i <= 5) {
+        printInt(i);
+        printSpaces(1);
+        i = i + 1;
+    }
+
+    printNewlines(1);
+}
+
+void gt() {
+    int i = 5;
+
+    while (i > 0) {
+        printInt(i);
+        printSpaces(1);
+        i = i - 1;
+    }
+
+    printNewlines(1);
+}
+
+void ge() {
+    int i = 5;
+
+    while (i >= 0) {
+        printInt(i);
+        printSpaces(1);
+        i = i - 1;
+    }
+
+    printNewlines(1);
+}
+
+void eq() {
+    int i = 0;
+
+    while (i == 0) {
+        printInt(i);
+        printSpaces(1);
+        i = i + 1;
+    }
+
+    printNewlines(1);
+}
+
+void ne() {
+    int i = 0;
+
+    while (i != 5) {
+        printInt(i);
+        printSpaces(1);
+        i = i + 1;
+    }
+
+    printNewlines(1);
+}
