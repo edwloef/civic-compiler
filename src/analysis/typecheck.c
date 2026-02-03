@@ -565,8 +565,8 @@ node_st *ATCcall(node_st *node) {
         thin_vartype expected_ty = ty.buf[i];
         thin_vartype resolved_ty = TYPE(EXPRS_EXPR(arg));
         if (resolved_ty.ty != TY_error) {
-            if ((expected_ty.dims != resolved_ty.dims ||
-                 expected_ty.ty != resolved_ty.ty)) {
+            if (expected_ty.dims != resolved_ty.dims ||
+                expected_ty.ty != resolved_ty.ty) {
                 if (expected_ty.dims == 0) {
                     if (resolved_ty.dims == 0) {
                         ERROR(EXPRS_EXPR(arg),

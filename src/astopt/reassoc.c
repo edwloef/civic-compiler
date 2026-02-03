@@ -26,6 +26,7 @@ node_st *AORbinop(node_st *node) {
                 BINOP_RIGHT(node) = BINOP_LEFT(right);
                 BINOP_LEFT(right) = node;
                 node = right;
+                CCNcycleNotify();
             }
         } else if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT ||
                    NODE_TYPE(right) == NT_BOOL) {
@@ -42,6 +43,7 @@ node_st *AORbinop(node_st *node) {
                 enum BinOpKind op = BINOP_OP(node);
                 BINOP_OP(node) = BINOP_OP(left);
                 BINOP_OP(left) = op;
+                CCNcycleNotify();
             } else {
                 // (x + 7) => (7 + x)
                 // (x - 7) => ((-7) + x)
@@ -51,6 +53,7 @@ node_st *AORbinop(node_st *node) {
                 }
                 BINOP_LEFT(node) = right;
                 BINOP_RIGHT(node) = left;
+                CCNcycleNotify();
             }
         }
         break;
@@ -62,6 +65,7 @@ node_st *AORbinop(node_st *node) {
                 BINOP_RIGHT(node) = BINOP_LEFT(right);
                 BINOP_LEFT(right) = node;
                 node = right;
+                CCNcycleNotify();
             }
         } else if (NODE_TYPE(right) == NT_INT || NODE_TYPE(right) == NT_FLOAT ||
                    NODE_TYPE(right) == NT_BOOL) {
@@ -71,10 +75,12 @@ node_st *AORbinop(node_st *node) {
                 node_st *tmp = BINOP_RIGHT(left);
                 BINOP_RIGHT(left) = right;
                 BINOP_RIGHT(node) = tmp;
+                CCNcycleNotify();
             } else {
                 // (x * 7) => (7 * x)
                 BINOP_LEFT(node) = right;
                 BINOP_RIGHT(node) = left;
+                CCNcycleNotify();
             }
         }
         break;
@@ -86,6 +92,7 @@ node_st *AORbinop(node_st *node) {
             BINOP_LEFT(node) = right;
             BINOP_RIGHT(node) = left;
             BINOP_OP(node) = BINOP_OP(node) == BO_lt ? BO_gt : BO_ge;
+            CCNcycleNotify();
         }
         break;
     case BO_gt:
@@ -96,6 +103,7 @@ node_st *AORbinop(node_st *node) {
             BINOP_LEFT(node) = right;
             BINOP_RIGHT(node) = left;
             BINOP_OP(node) = BINOP_OP(node) == BO_gt ? BO_lt : BO_le;
+            CCNcycleNotify();
         }
         break;
     case BO_eq:
@@ -106,19 +114,21 @@ node_st *AORbinop(node_st *node) {
             // (x != 7) => (7 != x)
             BINOP_LEFT(node) = right;
             BINOP_RIGHT(node) = left;
+            CCNcycleNotify();
         }
         break;
     case BO_and:
     case BO_or:
-        if ((NODE_TYPE(right) == NT_BOOL &&
-             (EXPR_SIDE_EFFECTS(left) ||
-              BOOL_VAL(right) == (BINOP_OP(node) == BO_and)))) {
+        if (NODE_TYPE(right) == NT_BOOL &&
+            (EXPR_SIDE_EFFECTS(left) ||
+             BOOL_VAL(right) == (BINOP_OP(node) == BO_and))) {
             // (x && true) => (true && x)
             // (x && false) => (false && x) | x no side effects
             // (x || true) => (true || x) | x no side effects
             // (x || false) => (false || x)
             BINOP_LEFT(node) = right;
             BINOP_RIGHT(node) = left;
+            CCNcycleNotify();
         }
         break;
     default:

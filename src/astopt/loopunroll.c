@@ -42,10 +42,8 @@ node_st *AOLUstmts(node_st *node) {
 
     node_st *stmt = STMTS_STMT(node);
     if (NODE_TYPE(stmt) == NT_DOWHILE) {
-
         bool can_unroll = DOWHILE_KNOWN_START(stmt) &&
-                          NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BINOP &&
-                          NODE_TYPE(BINOP_LEFT(DOWHILE_EXPR(stmt))) == NT_INT;
+                          NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BINOP;
 
         int start = DOWHILE_UNROLL_START(stmt);
         int end;
@@ -78,8 +76,8 @@ node_st *AOLUstmts(node_st *node) {
             } else if (step < 0) {
                 can_unroll = end + step < end;
             } else {
-                CCNfree(DOWHILE_EXPR(stmt));
-                DOWHILE_EXPR(stmt) = ASTbool(true, TY_bool);
+                CCNfree(BINOP_RIGHT(DOWHILE_EXPR(stmt)));
+                BINOP_RIGHT(DOWHILE_EXPR(stmt)) = ASTint(start, TY_int);
                 can_unroll = false;
                 CCNcycleNotify();
             }
@@ -93,8 +91,36 @@ node_st *AOLUstmts(node_st *node) {
             long long llstep = step;
 
             long long lllen = llend - llstart;
-            count = lllen / llstep + (lllen % llstep != 0);
 
+            switch (BINOP_OP(DOWHILE_EXPR(stmt))) {
+            case BO_lt:
+                count = lllen / llstep + (lllen % llstep != 0);
+                break;
+            case BO_le:
+                count = lllen / llstep + 1;
+                break;
+            case BO_gt:
+                count = lllen / llstep + (lllen % llstep != 0);
+                break;
+            case BO_ge:
+                count = lllen / llstep + 1;
+                break;
+            case BO_eq:
+                count = 1 + (llstart + llstep == llend);
+                break;
+            case BO_ne:
+                if (lllen % llstep == 0) {
+                    count = lllen / llstep;
+                } else {
+                    can_unroll = false;
+                }
+                break;
+            default:
+                DBUG_ASSERT(false, "Unknown binop detected.");
+            }
+        }
+
+        if (can_unroll) {
             if (count <= 0) {
                 can_unroll = false;
             } else if (count == 1) {
