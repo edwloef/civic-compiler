@@ -147,13 +147,6 @@ static void ProcessArgs(int argc, char *argv[]) {
         globals.input_file = argv[optind];
     }
 
-    if (globals.output_file) {
-        globals.output_stream = fopen(globals.output_file, "w");
-    }
-    if (globals.output_stream == NULL) {
-        globals.output_stream = stdout;
-    }
-
 #ifdef NDEBUG
     CCNsetTreeCheck(false);
 #endif
@@ -166,7 +159,6 @@ void BreakpointHandler(node_st *root) {
 int main(int argc, char **argv) {
     ProcessArgs(argc, argv);
     CCNrun(NULL);
-    fclose(globals.output_stream);
     return 0;
 }
 

@@ -1,6 +1,8 @@
 #include <assert.h>
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
@@ -12,15 +14,30 @@
 #include "table/vartable.h"
 #include "utils.h"
 
-void CGAinit(void) {}
-void CGAfini(void) {}
+void CGAinit(void) {
+    if (globals.output_file) {
+        DATA_CGA_GET()->output = fopen(globals.output_file, "w");
+        if (!DATA_CGA_GET()->output) {
+            emit_message(L_WARNING, "couldn't open '%s': %s (os error %d)",
+                         globals.input_file, strerror(errno), errno);
+            DATA_CGA_GET()->output = stdout;
+        }
+    } else {
+        DATA_CGA_GET()->output = stdout;
+    }
+}
+void CGAfini(void) {
+    if (DATA_CGA_GET()->output != stdout) {
+        fclose(DATA_CGA_GET()->output);
+    }
+}
 
 static int oprintf(const char *f, ...) __attribute__((format(printf, 1, 2)));
 static int oprintf(const char *f, ...) {
     va_list ap;
 
     va_start(ap, f);
-    int res = vfprintf(globals.output_stream, f, ap);
+    int res = vfprintf(DATA_CGA_GET()->output, f, ap);
     va_end(ap);
 
     return res;
@@ -45,10 +62,9 @@ static void short_basic_ty(enum BasicType ty) {
 static void short_ty(thin_vartype ty) {
     if (ty.dims > 0) {
         oprintf("a");
-        return;
+    } else {
+        short_basic_ty(ty.ty);
     }
-
-    short_basic_ty(ty.ty);
 }
 
 static void long_basic_ty(enum BasicType ty) {
@@ -87,7 +103,7 @@ static void constvalue(consttable_entry e) {
         oprintf("%lg", e.floatval);
         break;
     default:
-        break;
+        DBUG_ASSERT(false, "unknown constvalue ty %s", fmt_BasicType(e.ty));
     }
 }
 
@@ -130,13 +146,7 @@ node_st *CGAprogram(node_st *node) {
             }
         }
 
-        oprintf(" \"");
-        if (has_array) {
-            oprintf("%s", e.mangled_name);
-        } else {
-            oprintf("%s", e.name);
-        }
-        oprintf("\" ");
+        oprintf(" \"%s\" ", has_array ? e.mangled_name : e.name);
 
         long_basic_ty(e.ty.ty);
         for (int ty_i = 0; ty_i < e.ty.len; ty_i++) {
@@ -240,15 +250,15 @@ static void branch_on(node_st *cond, bool val) {
         return;
     }
 
-    bool not = NODE_TYPE(cond) == NT_MONOP && MONOP_OP(cond) == MO_not;
-    if (not) {
+    bool swap = NODE_TYPE(cond) == NT_MONOP && MONOP_OP(cond) == MO_not;
+    if (swap) {
         cond = MONOP_EXPR(cond);
     }
 
     TRAVdo(cond);
 
     oprintf("\tbranch_");
-    if (not == val) {
+    if (swap == val) {
         oprintf("f ");
     } else {
         oprintf("t ");

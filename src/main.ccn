@@ -297,6 +297,7 @@ phase CodeGen {
             travdata {
                 int label,
                 int nesting,
+                user FILE_ptr output,
                 user funtable_ptr funtable,
                 user vartable_ptr vartable,
                 user consttable_ptr consttable

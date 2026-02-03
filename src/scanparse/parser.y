@@ -664,7 +664,7 @@ node_st *scanparse(node_st *root) {
     if (globals.input_file) {
         yyin = fopen(globals.input_file, "r");
         if (yyin == NULL) {
-            emit_message(L_ERROR, "couldn't read '%s': %s (os error %d)\n", globals.input_file, strerror(errno), errno);
+            emit_message(L_ERROR, "couldn't open '%s': %s (os error %d)", globals.input_file, strerror(errno), errno);
             abort_on_error();
         }
     } else {
@@ -698,7 +698,7 @@ node_st *scanparse(node_st *root) {
                 argv[static_argv_count] = "-I";
                 argv[static_argv_count + 1] = cwd;
             } else {
-                emit_message(L_WARNING, "couldn't get current working directory: %s (os error %d)\n", strerror(errno), errno);
+                emit_message(L_WARNING, "couldn't get current working directory: %s (os error %d)", strerror(errno), errno);
             }
         }
 
@@ -713,7 +713,7 @@ node_st *scanparse(node_st *root) {
         }
 
         if (!yyin) {
-            emit_message(L_ERROR, "couldn't start c preprocessor: %s (os error %d)\n", strerror(errno), errno);
+            emit_message(L_ERROR, "couldn't start c preprocessor: %s (os error %d)", strerror(errno), errno);
             abort_on_error();
         }
     }
