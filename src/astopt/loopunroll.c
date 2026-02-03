@@ -94,20 +94,20 @@ node_st *AOLUstmts(node_st *node) {
 
             switch (BINOP_OP(DOWHILE_EXPR(stmt))) {
             case BO_lt:
-                count = lllen / llstep + (lllen % llstep != 0);
-                can_unroll = step < 0 && llend < llstart + llstep;
+                count = (step < 0) ? lllen / llstep + (lllen % llstep != 0) : 1;
+                can_unroll = (step < 0) == (llend < llstart + llstep);
                 break;
             case BO_le:
-                count = lllen / llstep + 1;
-                can_unroll = step < 0 && llend <= llstart + llstep;
+                count = (step < 0) ? lllen / llstep + 1 : 1;
+                can_unroll = (step < 0) == (llend <= llstart + llstep);
                 break;
             case BO_gt:
-                count = lllen / llstep + (lllen % llstep != 0);
-                can_unroll = step > 0 && llend > llstart + llstep;
+                count = (step > 0) ? lllen / llstep + (lllen % llstep != 0) : 1;
+                can_unroll = (step > 0) == (llend > llstart + llstep);
                 break;
             case BO_ge:
-                count = lllen / llstep + 1;
-                can_unroll = step > 0 && llend >= llstart + llstep;
+                count = (step > 0) ? lllen / llstep + 1 : 1;
+                can_unroll = (step > 0) == (llend >= llstart + llstep);
                 break;
             case BO_eq:
                 count = (llstart + llstep == llend) + 1;
