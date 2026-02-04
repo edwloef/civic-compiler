@@ -121,16 +121,20 @@ node_st *AOLUstmts(node_st *node) {
             }
         }
 
+        long long cost;
+        bool can_strip_mine = false;
+
         if (can_unroll && count != 1) {
             TRAVpush(TRAV_EC);
 
             TRAVdo(DOWHILE_STMTS(stmt));
 
-            long long cost = DATA_EC_GET()->cost;
+            cost = DATA_EC_GET()->cost;
 
             TRAVpop();
 
             can_unroll = count * cost <= globals.unroll_limit;
+            can_strip_mine = 2 * cost <= globals.unroll_limit;
         }
 
         if (can_unroll) {
@@ -143,6 +147,21 @@ node_st *AOLUstmts(node_st *node) {
 
             CCNfree(node);
             node = head;
+        } else if (can_strip_mine) {
+            int inner_count = globals.unroll_limit / cost;
+            int remainder = count % inner_count;
+
+            node_st *head = node;
+            for (int i = 0; i < remainder; i++) {
+                head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(stmt)));
+            }
+            node = head;
+
+            head = DOWHILE_STMTS(stmt);
+            for (int i = 1; i < inner_count; i++) {
+                head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(stmt)));
+            }
+            DOWHILE_STMTS(stmt) = head;
         }
     }
 
