@@ -6,7 +6,6 @@
 #include "ccn/ccn.h"
 #include "error/error.h"
 #include "globals/globals.h"
-#include "palm/str.h"
 
 static void Usage(char *program) {
     char *program_bin = strrchr(program, '/');
@@ -27,7 +26,7 @@ static void Usage(char *program) {
     printf("     --[no-]preprocessor        Disable the C preprocessor.\n");
     printf("     --[no-]optimize            Disable compiler optimizations.\n");
     printf("     --unroll-limit <limit>     Set the number of operations "
-           "allowed to be unrolled in a loop. Default value: 256\n");
+           "allowed to be unrolled in a loop. Default value: 100\n");
     printf("     --[no-]associative-math    Allow re-association of "
            "floating-point operations. Requires --no-signed-zeros.\n");
     printf("     --[no-]finite-math-only    Allow optimizations for "

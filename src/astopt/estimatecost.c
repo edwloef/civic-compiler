@@ -25,7 +25,11 @@ node_st *ECassign(node_st *node) {
 }
 
 node_st *ECifelse(node_st *node) {
-    COST((IFELSE_IF_BLOCK(node) != NULL) + (IFELSE_ELSE_BLOCK(node) != NULL));
+    if (IFELSE_ELSE_BLOCK(node)) {
+        COST(2);
+    } else {
+        COST(1);
+    }
 }
 
 node_st *ECwhile(node_st *node) {
@@ -49,7 +53,11 @@ node_st *ECarrexprs(node_st *node) {
 }
 
 node_st *ECmonop(node_st *node) {
-    COST(1);
+    if (MONOP_RESOLVED_TY(node) == EXPR_RESOLVED_TY(MONOP_EXPR(node))) {
+        COST(0);
+    } else {
+        COST(1);
+    }
 }
 
 node_st *ECbinop(node_st *node) {
@@ -61,7 +69,9 @@ node_st *ECbinop(node_st *node) {
 }
 
 node_st *ECcast(node_st *node) {
-    if (EXPR_RESOLVED_TY(CAST_EXPR(node)) == TY_bool) {
+    if (CAST_RESOLVED_TY(node) == EXPR_RESOLVED_TY(CAST_EXPR(node))) {
+        COST(0);
+    } else if (EXPR_RESOLVED_TY(CAST_EXPR(node)) == TY_bool) {
         COST(4);
     } else {
         COST(1);
@@ -69,16 +79,15 @@ node_st *ECcast(node_st *node) {
 }
 
 node_st *ECcall(node_st *node) {
-    int arg_count = 0;
-    for (node_st *param = CALL_EXPRS(node); param; param = EXPRS_NEXT(param)) {
-        arg_count++;
-    }
-
-    COST(arg_count + 3);
+    COST(2);
 }
 
 node_st *ECvarref(node_st *node) {
-    COST(1);
+    if (VARREF_WRITE(node) && VARREF_EXPRS(node)) {
+        COST(2);
+    } else {
+        COST(1);
+    }
 }
 
 node_st *ECint(node_st *node) {
