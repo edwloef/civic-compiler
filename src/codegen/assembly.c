@@ -363,14 +363,16 @@ node_st *CGAassign(node_st *node) {
 }
 
 node_st *CGAcall(node_st *node) {
-    funtable_entry *e = funtable_get(
-        DATA_CGA_GET()->funtable, (funtable_ref){CALL_N(node), CALL_L(node)});
+    int n = CALL_N(node);
 
-    int n = CALL_N(node) - 1;
-    if (n == DATA_CGA_GET()->nesting || e->external) {
+    funtable_entry *e =
+        funtable_get(DATA_CGA_GET()->funtable, (funtable_ref){n, CALL_L(node)});
+
+    if (n == DATA_CGA_GET()->nesting) {
         oprintf("\tisrg\n");
     } else {
-        switch (n) {
+        int local_n = n - 1;
+        switch (local_n) {
         case -1:
             oprintf("\tisrl\n");
             break;
@@ -378,7 +380,7 @@ node_st *CGAcall(node_st *node) {
             oprintf("\tisr\n");
             break;
         default:
-            oprintf("\tisrn %d\n", n);
+            oprintf("\tisrn %d\n", local_n);
             break;
         }
     }
@@ -392,7 +394,7 @@ node_st *CGAcall(node_st *node) {
     }
 
     if (e->external) {
-        oprintf("\tjsre %d\n", e->new_l);
+        oprintf("\tjsre %d ; %s\n", e->new_l, e->name);
     } else {
         oprintf("\tjsr %d %s\n", a, e->mangled_name);
     }
