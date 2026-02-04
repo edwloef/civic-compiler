@@ -53,11 +53,7 @@ node_st *ECarrexprs(node_st *node) {
 }
 
 node_st *ECmonop(node_st *node) {
-    if (MONOP_RESOLVED_TY(node) == EXPR_RESOLVED_TY(MONOP_EXPR(node))) {
-        COST(0);
-    } else {
-        COST(1);
-    }
+    COST(1);
 }
 
 node_st *ECbinop(node_st *node) {
@@ -69,9 +65,7 @@ node_st *ECbinop(node_st *node) {
 }
 
 node_st *ECcast(node_st *node) {
-    if (CAST_RESOLVED_TY(node) == EXPR_RESOLVED_TY(CAST_EXPR(node))) {
-        COST(0);
-    } else if (EXPR_RESOLVED_TY(CAST_EXPR(node)) == TY_bool) {
+    if (EXPR_RESOLVED_TY(CAST_EXPR(node)) == TY_bool) {
         COST(4);
     } else {
         COST(1);
