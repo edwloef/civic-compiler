@@ -1,5 +1,4 @@
 #include "ccn/ccn.h"
-#include "table/vartable.h"
 
 void DDRinit(void) {}
 void DDRfini(void) {}

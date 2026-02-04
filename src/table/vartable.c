@@ -1,6 +1,5 @@
 #include "table/vartable.h"
 #include "ccngen/ast.h"
-#include "error/error.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 

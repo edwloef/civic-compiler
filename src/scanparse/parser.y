@@ -6,10 +6,7 @@
 #include <unistd.h>
 
 #include "ccn/ccn.h"
-#include "error/error.h"
 #include "globals/globals.h"
-#include "palm/ctinfo.h"
-#include "palm/dbug.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 #include "parser.h"

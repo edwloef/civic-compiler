@@ -1,5 +1,3 @@
-#include <limits.h>
-
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "globals/globals.h"

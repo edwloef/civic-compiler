@@ -1,7 +1,5 @@
 #include "ccn/ccn.h"
 #include "palm/memory.h"
-#include "table/funtable.h"
-#include "table/vartable.h"
 
 void DOTinit(void) {}
 void DOTfini(void) {}

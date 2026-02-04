@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "ccn/ccn.h"
-#include "error/error.h"
 #include "globals/globals.h"
 
 static void Usage(char *program) {

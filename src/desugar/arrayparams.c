@@ -1,5 +1,4 @@
 #include "ccn/ccn.h"
-#include "table/vartable.h"
 
 void DAPinit(void) {}
 void DAPfini(void) {}

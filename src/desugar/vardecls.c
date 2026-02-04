@@ -1,6 +1,5 @@
 #include "ccn/ccn.h"
 #include "palm/str.h"
-#include "table/funtable.h"
 #include "utils.h"
 
 void DVDinit(void) {}

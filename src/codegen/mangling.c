@@ -1,7 +1,6 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav_data.h"
 #include "palm/str.h"
-#include "table/funtable.h"
 
 void CGMinit(void) {}
 void CGMfini(void) {}

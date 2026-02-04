@@ -4,16 +4,16 @@
 #include <limits.h>
 
 #include "ccn/ccn.h"
-#include "error/error.h"
 #include "globals/globals.h"
 #include "palm/memory.h"
 #include "palm/str.h"
 #include "parser.h"
 
-int tab_size(void);
 char *replace_tabs(void);
 void yyerror(char const *err);
 void token_action(void);
+
+#define tab_size() (4 - globals.col % 4)
 
 #define FILTER(token) \
     globals.col += yyleng; \
@@ -172,10 +172,6 @@ void token_action(void);
 }
 
 %%
-
-int tab_size(void) {
-    return 4 - globals.col % 4;
-}
 
 char *replace_tabs(void) {
     globals.col = 0;

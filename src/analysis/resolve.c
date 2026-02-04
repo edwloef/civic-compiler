@@ -1,7 +1,5 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "error/error.h"
-#include "table/vartable.h"
 
 static void ARlint_vartable_usage(vartable *vartable) {
     for (int i = 0; i < vartable->len; i++) {

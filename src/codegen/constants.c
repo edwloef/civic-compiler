@@ -2,7 +2,6 @@
 
 #include "ccn/ccn.h"
 #include "globals/globals.h"
-#include "table/consttable.h"
 
 void CGCinit(void) {}
 void CGCfini(void) {}

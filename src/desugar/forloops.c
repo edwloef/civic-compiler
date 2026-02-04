@@ -1,7 +1,4 @@
-#include <limits.h>
-
 #include "ccn/ccn.h"
-#include "table/vartable.h"
 #include "utils.h"
 
 static node_st *DFLfor_branch(node_st *stmt, node_st *start_ref,

@@ -1,6 +1,5 @@
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
-#include "table/vartable.h"
 #include "utils.h"
 
 static node_st *DAArev_exprs(node_st *root) {
