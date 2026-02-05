@@ -1,7 +1,4 @@
-#include <math.h>
-
 #include "ccn/ccn.h"
-#include "globals/globals.h"
 
 void CGCinit(void) {}
 void CGCfini(void) {}
@@ -31,12 +28,6 @@ node_st *CGCint(node_st *node) {
 }
 
 node_st *CGCfloat(node_st *node) {
-    if (isnan(FLOAT_VAL(node))) {
-        FLOAT_VAL(node) = NAN;
-    } else if (double_biteq(FLOAT_VAL(node), -0.0) && !globals.signed_zeros) {
-        FLOAT_VAL(node) = 0.0;
-    }
-
     if (double_biteq(FLOAT_VAL(node), 0.0) ||
         double_biteq(FLOAT_VAL(node), 1.0)) {
         return node;

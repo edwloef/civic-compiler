@@ -261,7 +261,7 @@ phase MaybeOpt {
 
         traversal ShrinkTables {
             uid = AOST,
-            nodes = { Program, FunDecl, FunBody, Binop, Call, VarRef },
+            nodes = { Program, FunDecl, FunBody, Binop, Call, VarRef, Float },
             travdata {
                 user funtable_ptr funtable,
                 user funtable_ptr new_funtable,

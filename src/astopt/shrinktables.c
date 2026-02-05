@@ -1,4 +1,7 @@
+#include <math.h>
+
 #include "ccn/ccn.h"
+#include "globals/globals.h"
 
 static funtable *AOSFshrink_funtable(void) {
     funtable *funtable = funtable_new(DATA_AOST_GET()->new_funtable);
@@ -155,6 +158,16 @@ node_st *AOSTvarref(node_st *node) {
     vartable_entry *e = vartable_get(DATA_AOST_GET()->vartable, r);
 
     VARREF_L(node) = e->new_l;
+
+    return node;
+}
+
+node_st *AOSTfloat(node_st *node) {
+    if (isnan(FLOAT_VAL(node))) {
+        FLOAT_VAL(node) = NAN;
+    } else if (double_biteq(FLOAT_VAL(node), -0.0) && !globals.signed_zeros) {
+        FLOAT_VAL(node) = 0.0;
+    }
 
     return node;
 }
