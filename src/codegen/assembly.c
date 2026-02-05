@@ -321,38 +321,47 @@ bool inc(node_st *node) {
         return false;
     }
 
-    node_st *base = BINOP_RIGHT(expr);
-    if (NODE_TYPE(base) != NT_VARREF || VARREF_N(base) != VARREF_N(ref) ||
-        VARREF_L(base) != VARREF_L(ref)) {
+    node_st *left = BINOP_LEFT(expr);
+    if (NODE_TYPE(left) != NT_CONSTREF && NODE_TYPE(left) != NT_INT) {
         return false;
+    }
+
+    node_st *right = BINOP_RIGHT(expr);
+    if (NODE_TYPE(right) != NT_VARREF || VARREF_N(right) != VARREF_N(ref) ||
+        VARREF_L(right) != VARREF_L(ref)) {
+        TRAVdo(right);
+        TRAVdo(ref);
     }
 
     int l = VARREF_L(ref);
     vartable_entry e = DATA_CGA_GET()->vartable->buf[l];
 
-    node_st *constant = BINOP_LEFT(expr);
-    switch (NODE_TYPE(constant)) {
+    switch (NODE_TYPE(left)) {
     case NT_CONSTREF: {
-        int cl = CONSTREF_L(constant);
+        int cl = CONSTREF_L(left);
         oprintf("\tiinc %d %d ; %s + ", l, cl, e.name);
         constvalue(DATA_CGA_GET()->consttable->buf[cl]);
         oprintf("\n");
         return true;
     }
     case NT_INT: {
-        int val = INT_VAL(constant);
+        int val = INT_VAL(left);
         switch (val) {
         case 1:
             oprintf("\tiinc_1 %d ; %s = %s + 1\n", l, e.name, e.name);
             return true;
+        case 0:
+            break;
         case -1:
             oprintf("\tidec_1 %d ; %s = %s - 1\n", l, e.name, e.name);
             return true;
         default:
+            DBUG_ASSERT(false, "unknown integer constant %d", val);
             return false;
         }
     }
     default:
+        DBUG_ASSERT(false, "unknown node type");
         return false;
     }
 }
