@@ -311,7 +311,8 @@ node_st *CGAdowhile(node_st *node) {
 
 bool inc(node_st *node) {
     node_st *ref = ASSIGN_REF(node);
-    if (VARREF_N(ref) != 0 || VARREF_RESOLVED_TY(ref) != TY_int) {
+    if (VARREF_N(ref) != 0 || VARREF_EXPRS(ref) != NULL ||
+        VARREF_RESOLVED_TY(ref) != TY_int) {
         return false;
     }
 
@@ -321,7 +322,8 @@ bool inc(node_st *node) {
     }
 
     node_st *base = BINOP_RIGHT(expr);
-    if (NODE_TYPE(base) != NT_VARREF || VARREF_N(base) != 0) {
+    if (NODE_TYPE(base) != NT_VARREF || VARREF_N(base) != VARREF_N(ref) ||
+        VARREF_L(base) != VARREF_L(ref)) {
         return false;
     }
 
@@ -341,10 +343,10 @@ bool inc(node_st *node) {
         int val = INT_VAL(constant);
         switch (val) {
         case 1:
-            oprintf("\tiinc_1 %d ; %s + 1\n", l, e.name);
+            oprintf("\tiinc_1 %d ; %s = %s + 1\n", l, e.name, e.name);
             return true;
         case -1:
-            oprintf("\tidec_1 %d ; %s - 1\n", l, e.name);
+            oprintf("\tidec_1 %d ; %s = %s - 1\n", l, e.name, e.name);
             return true;
         default:
             return false;
