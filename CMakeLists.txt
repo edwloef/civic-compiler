@@ -2,18 +2,19 @@ cmake_minimum_required(VERSION 3.13)
 
 project(civicc VERSION 1.0 LANGUAGES C)
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
 set(TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/test")
 set(COMPILER "${CMAKE_CURRENT_BINARY_DIR}/civicc")
 
 option(DISABLE_ASAN "Disable address sanitizer")
 option(DISABLE_UBSAN "Disable undefined behavior sanitizer")
 
-# These will only work after you received the testing framework from us.
 enable_testing()
 add_test(NAME "basic" COMMAND "${TEST_COMMAND}/run.bash" "${COMPILER}" basic WORKING_DIRECTORY "${TEST_DIR}")
 add_test(NAME "nested_funs" COMMAND "${TEST_COMMAND}/run.bash" "${COMPILER}" nested_funs WORKING_DIRECTORY "${TEST_DIR}")
 add_test(NAME "arrays" COMMAND "${TEST_COMMAND}/run.bash" "${COMPILER}" arrays WORKING_DIRECTORY "${TEST_DIR}")
-
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
@@ -28,7 +29,6 @@ ADD_FLEX_BISON_DEPENDENCY(CivicLexer CivicParser)
 
 include(./coconut/coconut.cmake)
 
-# Whenever you add a file, add it here too.
 add_executable(civicc ${FLEX_CivicLexer_OUTPUTS} ${BISON_CivicParser_OUTPUTS}
     src/analysis/divergecheck.c
     src/analysis/functions.c

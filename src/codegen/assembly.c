@@ -351,7 +351,7 @@ bool inc(node_st *node) {
             oprintf("\tiinc_1 %d ; %s = %s + 1\n", l, e.name, e.name);
             return true;
         case 0:
-            break;
+            return true;
         case -1:
             oprintf("\tidec_1 %d ; %s = %s - 1\n", l, e.name, e.name);
             return true;
