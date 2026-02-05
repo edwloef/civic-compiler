@@ -120,6 +120,23 @@ node_st *AOSTfunbody(node_st *node) {
     return node;
 }
 
+node_st *AOSTbinop(node_st *node) {
+    TRAVchildren(node);
+
+    node_st *left = BINOP_LEFT(node);
+    if (BINOP_OP(node) == BO_add && NODE_TYPE(left) == NT_FLOAT &&
+        (double_biteq(FLOAT_VAL(left), -0.0) ||
+         double_biteq(FLOAT_VAL(left), -1.0))) {
+        BINOP_OP(node) = BO_sub;
+        node_st *tmp = BINOP_LEFT(node);
+        FLOAT_VAL(tmp) *= -1.0;
+        BINOP_LEFT(node) = BINOP_RIGHT(node);
+        BINOP_RIGHT(node) = tmp;
+    }
+
+    return node;
+}
+
 node_st *AOSTcall(node_st *node) {
     TRAVchildren(node);
 

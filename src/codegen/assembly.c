@@ -657,29 +657,31 @@ node_st *CGAint(node_st *node) {
     int val = INT_VAL(node);
     switch (val) {
     case 1:
-        oprintf("\tiloadc_1 ; 1\n");
+        oprintf("\tiloadc_1");
         break;
     case 0:
-        oprintf("\tiloadc_0 ; 0\n");
+        oprintf("\tiloadc_0");
         break;
     case -1:
-        oprintf("\tiloadc_m1 ; -1\n");
+        oprintf("\tiloadc_m1");
         break;
     default:
-        DBUG_ASSERT(false, "int constant not 1, 0 or -1");
+        DBUG_ASSERT(false, "int constant %d not 1, 0 or -1", val);
     }
+    oprintf(" ; %d\n", val);
     return node;
 }
 
 node_st *CGAfloat(node_st *node) {
-    float val = FLOAT_VAL(node);
-    if (val == 1.0) {
-        oprintf("\tfloadc_1 ; 1\n");
-    } else if (val == 0.0) {
-        oprintf("\tfloadc_0 ; 0\n");
+    double val = FLOAT_VAL(node);
+    if (double_biteq(val, 1.0)) {
+        oprintf("\tfloadc_1");
+    } else if (double_biteq(val, 0.0)) {
+        oprintf("\tfloadc_0");
     } else {
-        DBUG_ASSERT(false, "float constant not 1 or 0");
+        DBUG_ASSERT(false, "float constant %lg not +1.0 or +0.0", val);
     }
+    oprintf(" ; %lg\n", val);
     return node;
 }
 
