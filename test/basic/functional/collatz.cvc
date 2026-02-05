@@ -1,0 +1,20 @@
+#include "../../civic.h"
+
+export int main() {
+    collatz(255);
+    return 0;
+}
+
+void collatz(int i) {
+    while (i != 1) {
+        printInt(i);
+        printNewlines(1);
+        if (i % 2 == 0) {
+            i = i / 2;
+        } else {
+            i = 3 * i + 1;
+        }
+    }
+    printInt(i);
+    printNewlines(1);
+}
