@@ -73,7 +73,7 @@ static struct option options[] = {
 static void ProcessArgs(int argc, char *argv[]) {
     int c;
 
-    while ((c = getopt_long_only(argc, argv, "ho:qb:s", options, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "ho:qb:s", options, NULL)) != -1) {
         switch (c) {
         case 'h':
             Usage(argv[0]);
