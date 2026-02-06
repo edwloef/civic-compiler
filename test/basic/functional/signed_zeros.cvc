@@ -1,0 +1,15 @@
+#include "../../civic.h"
+
+export int main() {
+    printFloat(inverse(1.0 / (1.0 / 0.0)));
+    printNewlines(1);
+
+    printFloat(inverse(1.0 / (-1.0 / 0.0)));
+    printNewlines(1);
+
+    return 0;
+}
+
+float inverse(float a) {
+    return 1.0 / a;
+}
