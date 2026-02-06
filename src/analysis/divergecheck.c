@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "ccngen/trav.h"
 #include "print/print.h"
 
 node_st *ADCprogram(node_st *node) {
@@ -10,12 +11,14 @@ node_st *ADCprogram(node_st *node) {
 }
 
 node_st *ADCstmts(node_st *node) {
-    TRAVchildren(node);
+    TRAVstmt(node);
 
     if (STMT_DIVERGES(STMTS_STMT(node)) && STMTS_NEXT(node)) {
         WARNING(STMTS_STMT(node),
                 "any code following this statement is unreachable");
         INFO(STMTS_STMT(STMTS_NEXT(node)), "first unreachable statement");
+    } else {
+        TRAVnext(node);
     }
 
     STMTS_DIVERGES(node) =
