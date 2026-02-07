@@ -41,64 +41,66 @@ node_st *AODSstmts(node_st *node) {
 
     node_st *stmt = STMTS_STMT(node);
     switch (NODE_TYPE(stmt)) {
-    case NT_ASSIGN:
-        if (!VARREF_EXPRS(ASSIGN_REF(stmt)) &&
-            !EXPR_RESOLVED_DIMS(ASSIGN_REF(stmt))) {
-            vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
-                              VARREF_L(ASSIGN_REF(stmt))};
-            vartable_entry *e = vartable_get(DATA_AODS_GET()->vartable, r);
-            bool assign_is_dead = e->read_count == 0;
+    case NT_ASSIGN: {
+        vartable_ref r = {VARREF_N(ASSIGN_REF(stmt)),
+                          VARREF_L(ASSIGN_REF(stmt))};
+        vartable_entry *e = vartable_get(DATA_AODS_GET()->vartable, r);
 
-            if (!assign_is_dead && NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF) {
-                vartable_ref er = {VARREF_N(ASSIGN_EXPR(stmt)),
-                                   VARREF_L(ASSIGN_EXPR(stmt))};
-                assign_is_dead = r.n == er.n && r.l == er.l;
+        bool is_array = VARREF_EXPRS(ASSIGN_REF(stmt)) ||
+                        EXPR_RESOLVED_DIMS(ASSIGN_REF(stmt));
+        bool assign_is_dead =
+            e->read_count == (is_array ? e->write_count - 1 : 0);
+
+        if (!assign_is_dead && !is_array &&
+            NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF) {
+            assign_is_dead = r.n == VARREF_N(ASSIGN_EXPR(stmt)) &&
+                             r.l == VARREF_L(ASSIGN_EXPR(stmt));
+        }
+
+        if (!assign_is_dead && !is_array && VARREF_N(ASSIGN_REF(stmt)) == 0) {
+            funtable *funtable = DATA_AODS_GET()->funtable;
+            vartable *vartable = DATA_AODS_GET()->vartable;
+
+            node_st *parent = DATA_AODS_GET()->parent;
+            node_st *outer_loop = DATA_AODS_GET()->outer_loop;
+
+            TRAVpush(TRAV_CD);
+
+            DATA_CD_GET()->ref = ASSIGN_REF(stmt);
+            DATA_CD_GET()->funtable = funtable;
+            DATA_CD_GET()->vartable = vartable;
+
+            if (outer_loop) {
+                TRAVdo(outer_loop);
+
+                bool prev = DATA_CD_GET()->ref_is_dead;
+
+                TRAVdo(outer_loop);
+
+                DATA_CD_GET()->ref_is_dead = prev;
+            } else {
+                TRAVdo(node);
             }
 
-            if (!assign_is_dead && VARREF_N(ASSIGN_REF(stmt)) == 0) {
-                funtable *funtable = DATA_AODS_GET()->funtable;
-                vartable *vartable = DATA_AODS_GET()->vartable;
+            TRAVopt(parent);
 
-                node_st *parent = DATA_AODS_GET()->parent;
-                node_st *outer_loop = DATA_AODS_GET()->outer_loop;
+            assign_is_dead = DATA_CD_GET()->assign_is_dead;
 
-                TRAVpush(TRAV_CD);
+            TRAVpop();
+        }
 
-                DATA_CD_GET()->ref = ASSIGN_REF(stmt);
-                DATA_CD_GET()->funtable = funtable;
-                DATA_CD_GET()->vartable = vartable;
+        if (assign_is_dead) {
+            TRAVpush(TRAV_ES);
 
-                if (outer_loop) {
-                    TRAVdo(outer_loop);
+            TRAVexpr(stmt);
 
-                    bool prev = DATA_CD_GET()->ref_is_dead;
+            TAKE(STMTS_NEXT(node));
+            node = inline_stmts(node, DATA_ES_GET()->stmts);
 
-                    TRAVdo(outer_loop);
-
-                    DATA_CD_GET()->ref_is_dead = prev;
-                } else {
-                    TRAVdo(node);
-                }
-
-                TRAVopt(parent);
-
-                assign_is_dead = DATA_CD_GET()->assign_is_dead;
-
-                TRAVpop();
-            }
-
-            if (assign_is_dead) {
-                TRAVpush(TRAV_ES);
-
-                TRAVexpr(stmt);
-
-                TAKE(STMTS_NEXT(node));
-                node = inline_stmts(node, DATA_ES_GET()->stmts);
-
-                TRAVpop();
-            }
+            TRAVpop();
         }
         break;
+    }
     case NT_DOWHILE:
         if (outer) {
             if (NODE_TYPE(stmt) == NT_DOWHILE) {
