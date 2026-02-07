@@ -115,7 +115,9 @@ node_st *AOLUstmts(node_st *node) {
                 can_unroll = lllen % llstep == 0;
                 break;
             default:
+                can_unroll = false;
                 DBUG_ASSERT(false, "Unknown binop detected.");
+                break;
             }
         }
 

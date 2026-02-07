@@ -50,6 +50,7 @@ static void short_basic_ty(enum BasicType ty) {
         break;
     default:
         DBUG_ASSERT(false, "unknown output ty %s", fmt_BasicType(ty));
+        break;
     }
 }
 
@@ -77,6 +78,7 @@ static void long_basic_ty(enum BasicType ty) {
         break;
     default:
         DBUG_ASSERT(false, "unknown output ty %s", fmt_BasicType(ty));
+        break;
     }
 }
 
@@ -98,6 +100,7 @@ static void constvalue(consttable_entry e) {
         break;
     default:
         DBUG_ASSERT(false, "unknown constvalue ty %s", fmt_BasicType(e.ty));
+        break;
     }
 }
 
@@ -667,6 +670,7 @@ node_st *CGAint(node_st *node) {
         break;
     default:
         DBUG_ASSERT(false, "int constant %d not 1, 0 or -1", val);
+        break;
     }
     oprintf(" ; %d\n", val);
     return node;
