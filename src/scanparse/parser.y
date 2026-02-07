@@ -658,18 +658,29 @@ node_st *scanparse(node_st *root) {
 
     DBUG_ASSERT(root == NULL, "Started parsing with existing syntax tree.");
 
-    if (globals.input_file) {
+    bool use_stdin = globals.input_file == NULL;
+
+    if (use_stdin) {
+        globals.input_file = STRcpy("<stdin>");
+    }
+
+    if (globals.associative_math && globals.signed_zeros) {
+        emit_message(L_ERROR, "--associative-math requires --no-signed-zeros");
+        abort_on_error();
+    }
+
+    if (use_stdin) {
+        yyin = stdin;
+    } else {
         yyin = fopen(globals.input_file, "r");
         if (yyin == NULL) {
             emit_message(L_ERROR, "couldn't open '%s': %s (os error %d)", globals.input_file, strerror(errno), errno);
             abort_on_error();
         }
-    } else {
-        yyin = stdin;
     }
 
     if (globals.preprocessor) {
-        if (globals.input_file) {
+        if (!use_stdin) {
             fclose(yyin);
             yyin = NULL;
         }
@@ -677,19 +688,13 @@ node_st *scanparse(node_st *root) {
         struct sigaction sa;
         sa.sa_sigaction = sigchld_handler;
         sigemptyset(&sa.sa_mask);
-        sa.sa_flags = SA_RESTART|SA_SIGINFO|SA_NOCLDWAIT;
+        sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_NOCLDWAIT;
         sigaction(SIGCHLD, &sa, NULL);
 
         int static_argv_count = 3;
         char *argv[] = {"cpp", "-traditional-cpp", "-nostdinc", NULL, NULL, NULL};
 
-        if (globals.input_file) {
-            char *file_name = globals.input_file;
-            if (file_name[0] == '-') {
-                file_name = STRfmt("./%s", file_name);
-            }
-            argv[static_argv_count] = file_name;
-        } else {
+        if (use_stdin) {
             char *cwd = getcwd(NULL, 0);
             if (cwd) {
                 argv[static_argv_count] = "-I";
@@ -697,26 +702,26 @@ node_st *scanparse(node_st *root) {
             } else {
                 emit_message(L_WARNING, "couldn't get current working directory: %s (os error %d)", strerror(errno), errno);
             }
+        } else {
+            char *file_name = globals.input_file;
+            if (file_name[0] == '-') {
+                file_name = STRfmt("./%s", file_name);
+            }
+            argv[static_argv_count] = file_name;
         }
 
         yyin = spawn_command(yyin, "cpp", argv);
 
-        if (globals.input_file) {
-            if (argv[static_argv_count] != globals.input_file) {
-                MEMfree(argv[static_argv_count]);
-            }
-        } else {
+        if (use_stdin) {
             MEMfree(argv[static_argv_count + 1]);
+        } else if (argv[static_argv_count] != globals.input_file) {
+            MEMfree(argv[static_argv_count]);
         }
 
         if (!yyin) {
             emit_message(L_ERROR, "couldn't start c preprocessor: %s (os error %d)", strerror(errno), errno);
             abort_on_error();
         }
-    }
-
-    if (!globals.input_file) {
-        globals.input_file = STRcpy("<stdin>");
     }
 
     globals.file = STRcpy(globals.input_file);

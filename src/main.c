@@ -133,11 +133,6 @@ static void ProcessArgs(int argc, char *argv[]) {
         }
     }
 
-    if (globals.associative_math && globals.signed_zeros) {
-        emit_message(L_ERROR, "--associative-math requires --no-signed-zeros");
-        abort_on_error();
-    }
-
     if (optind + 1 < argc) {
         Usage(argv[0]);
         exit(EXIT_FAILURE);
