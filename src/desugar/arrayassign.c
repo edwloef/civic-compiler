@@ -98,11 +98,7 @@ node_st *DAAstmts(node_st *node) {
     TRAVstmt(node);
 
     if (!STMTS_STMT(node)) {
-        if (STMTS_NEXT(node)) {
-            TAKE(STMTS_NEXT(node));
-        } else {
-            node = CCNfree(node);
-        }
+        TAKE(STMTS_NEXT(node));
     }
 
     node = inline_stmts(node, DATA_DAA_GET()->stmts);

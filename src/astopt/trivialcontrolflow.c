@@ -27,16 +27,14 @@ node_st *AOTCFstmts(node_st *node) {
     TRAVchildren(node);
 
     node_st *stmt = STMTS_STMT(node);
-
-    if (!stmt) {
-        TAKE(STMTS_NEXT(node));
-        if (!node) {
-            return node;
-        }
-    } else if (NODE_TYPE(stmt) == NT_STMTS) {
+    if (!stmt || NODE_TYPE(stmt) == NT_STMTS) {
         STMTS_STMT(node) = NULL;
         TAKE(STMTS_NEXT(node));
         node = inline_stmts(node, stmt);
+    }
+
+    if (!node) {
+        return node;
     }
 
     stmt = STMTS_STMT(node);

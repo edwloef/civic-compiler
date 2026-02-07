@@ -188,8 +188,9 @@ phase MaybeOpt {
 
                 traversal CopyProp {
                     uid = AOCP,
-                    nodes = { Program, FunDecl, FunBody, Stmts },
+                    nodes = { Program, FunDecl, FunBody, Stmts, Assign, IfElse, DoWhile },
                     travdata {
+                        Stmts next,
                         Scope parent,
                         user funtable_ptr funtable,
                         user vartable_ptr vartable
@@ -239,8 +240,9 @@ phase MaybeOpt {
 
                 traversal DeadStores {
                     uid = AODS,
-                    nodes = { Program, FunDecl, FunBody, Stmts },
+                    nodes = { Program, FunDecl, FunBody, Stmts, Assign, IfElse, DoWhile },
                     travdata {
+                        Stmts next,
                         Scope parent,
                         Scope outer_loop,
                         user funtable_ptr funtable,

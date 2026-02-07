@@ -1,5 +1,4 @@
 #include "ccn/ccn.h"
-#include "ccngen/trav.h"
 
 void AOCPinit(void) {}
 void AOCPfini(void) {}
@@ -34,63 +33,67 @@ node_st *AOCPfunbody(node_st *node) {
 }
 
 node_st *AOCPstmts(node_st *node) {
+    DATA_AOCP_GET()->next = STMTS_NEXT(node);
 
-    node_st *stmt = STMTS_STMT(node);
-    switch (NODE_TYPE(stmt)) {
-    case NT_ASSIGN:
-        ASSIGN_EXPR(stmt) = TRAVstart(ASSIGN_EXPR(stmt), TRAV_AOCF);
-        if (!VARREF_EXPRS(ASSIGN_REF(stmt)) &&
-            (NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_INT ||
-             NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_FLOAT ||
-             NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_BOOL ||
-             (NODE_TYPE(ASSIGN_EXPR(stmt)) == NT_VARREF &&
-              !VARREF_EXPRS(ASSIGN_EXPR(stmt))))) {
-            funtable *funtable = DATA_AOCP_GET()->funtable;
-            vartable *vartable = DATA_AOCP_GET()->vartable;
-            node_st *parent = DATA_AOCP_GET()->parent;
+    TRAVchildren(node);
 
-            TRAVpush(TRAV_VP);
+    return node;
+}
 
-            DATA_VP_GET()->ref = ASSIGN_REF(stmt);
-            DATA_VP_GET()->expr = ASSIGN_EXPR(stmt);
-            DATA_VP_GET()->funtable = funtable;
-            DATA_VP_GET()->vartable = vartable;
+node_st *AOCPassign(node_st *node) {
+    ASSIGN_EXPR(node) = TRAVstart(ASSIGN_EXPR(node), TRAV_AOCF);
 
-            TRAVnext(node);
-            TRAVopt(parent);
+    if (!VARREF_EXPRS(ASSIGN_REF(node)) &&
+        (NODE_TYPE(ASSIGN_EXPR(node)) == NT_INT ||
+         NODE_TYPE(ASSIGN_EXPR(node)) == NT_FLOAT ||
+         NODE_TYPE(ASSIGN_EXPR(node)) == NT_BOOL ||
+         (NODE_TYPE(ASSIGN_EXPR(node)) == NT_VARREF &&
+          !VARREF_EXPRS(ASSIGN_EXPR(node))))) {
+        funtable *funtable = DATA_AOCP_GET()->funtable;
+        vartable *vartable = DATA_AOCP_GET()->vartable;
 
-            TRAVpop();
-        }
-        break;
-    case NT_DOWHILE: {
-        node_st *parent = ASTscope(DOWHILE_EXPR(stmt), STMTS_NEXT(node),
-                                   DATA_AOCP_GET()->parent);
-        DATA_AOCP_GET()->parent = parent;
-
-        TRAVstmt(node);
-
-        DATA_AOCP_GET()->parent = SCOPE_PARENT(parent);
-        SCOPE_EXPR(parent) = NULL;
-        SCOPE_STMTS(parent) = NULL;
-        SCOPE_PARENT(parent) = NULL;
-        CCNfree(parent);
-        break;
-    }
-    case NT_IFELSE: {
+        node_st *next = DATA_AOCP_GET()->next;
         node_st *parent = DATA_AOCP_GET()->parent;
-        DATA_AOCP_GET()->parent = NULL;
 
-        TRAVstmt(node);
+        TRAVpush(TRAV_VP);
 
-        DATA_AOCP_GET()->parent = parent;
-        break;
+        DATA_VP_GET()->ref = ASSIGN_REF(node);
+        DATA_VP_GET()->expr = ASSIGN_EXPR(node);
+        DATA_VP_GET()->funtable = funtable;
+        DATA_VP_GET()->vartable = vartable;
+
+        TRAVopt(next);
+        TRAVopt(parent);
+
+        TRAVpop();
     }
-    default:
-        TRAVstmt(node);
-        break;
-    }
 
-    TRAVnext(node);
+    return node;
+}
+
+node_st *AOCPifelse(node_st *node) {
+    node_st *parent = DATA_AOCP_GET()->parent;
+    DATA_AOCP_GET()->parent = NULL;
+
+    TRAVchildren(node);
+
+    DATA_AOCP_GET()->parent = parent;
+
+    return node;
+}
+
+node_st *AOCPdowhile(node_st *node) {
+    node_st *parent = ASTscope(DOWHILE_EXPR(node), DATA_AOCP_GET()->next,
+                               DATA_AOCP_GET()->parent);
+    DATA_AOCP_GET()->parent = parent;
+
+    TRAVchildren(node);
+
+    DATA_AOCP_GET()->parent = SCOPE_PARENT(parent);
+    SCOPE_EXPR(parent) = NULL;
+    SCOPE_STMTS(parent) = NULL;
+    SCOPE_PARENT(parent) = NULL;
+    CCNfree(parent);
 
     return node;
 }
