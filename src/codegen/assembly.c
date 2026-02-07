@@ -263,29 +263,20 @@ static void branch_on(node_st *cond, bool val) {
 }
 
 node_st *CGAifelse(node_st *node) {
-    node_st *els = IFELSE_ELSE_BLOCK(node);
-
-    int else_label;
-    if (els) {
-        else_label = create_label();
-    }
+    int else_label = create_label();
+    int end_label = create_label();
 
     branch_on(IFELSE_EXPR(node), false);
-
-    int end_label = create_label();
-    if (els) {
-        oprintf("%d_else\n", else_label);
-    } else {
-        oprintf("%d_end\n", end_label);
-    }
+    oprintf("%d_else\n", else_label);
 
     TRAVif_block(node);
 
-    if (els) {
+    if (IFELSE_ELSE_BLOCK(node)) {
         oprintf("\tjump %d_end\n", end_label);
-        oprintf("%d_else:\n", else_label);
-        TRAVelse_block(node);
     }
+
+    oprintf("%d_else:\n", else_label);
+    TRAVelse_block(node);
 
     oprintf("%d_end:\n", end_label);
 
@@ -312,10 +303,9 @@ node_st *CGAdowhile(node_st *node) {
     return node;
 }
 
-bool inc(node_st *node) {
+static bool iinc(node_st *node) {
     node_st *ref = ASSIGN_REF(node);
-    if (VARREF_N(ref) != 0 || VARREF_EXPRS(ref) != NULL ||
-        VARREF_RESOLVED_TY(ref) != TY_int) {
+    if (VARREF_N(ref) != 0 || VARREF_EXPRS(ref)) {
         return false;
     }
 
@@ -370,7 +360,7 @@ bool inc(node_st *node) {
 }
 
 node_st *CGAassign(node_st *node) {
-    if (!inc(node)) {
+    if (!iinc(node)) {
         TRAVexpr(node);
         TRAVref(node);
     }
@@ -404,8 +394,7 @@ node_st *CGAcall(node_st *node) {
     TRAVchildren(node);
 
     int a = 0;
-    for (node_st *expr = CALL_EXPRS(node); expr != NULL;
-         expr = EXPRS_NEXT(expr)) {
+    for (node_st *expr = CALL_EXPRS(node); expr; expr = EXPRS_NEXT(expr)) {
         a++;
     }
 
@@ -438,7 +427,7 @@ node_st *CGAreturn(node_st *node) {
 
     oprintf("\t");
     node_st *expr = RETURN_EXPR(node);
-    if (expr != NULL) {
+    if (expr) {
         short_ty(TYPE(expr));
     }
     oprintf("return\n");
