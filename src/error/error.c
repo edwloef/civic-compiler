@@ -152,7 +152,7 @@ void emit_message_with_span(span span, level level, char *format, ...) {
         return;
     }
 
-    if (globals.quiet || !globals.linemap) {
+    if (!globals.linemap) {
         fprintf(stderr, "%s:%d:%d: ", span.file, span.bl + 1, span.bc + 1);
     }
 
@@ -162,7 +162,7 @@ void emit_message_with_span(span span, level level, char *format, ...) {
     va_emit_message(level, format, ap);
     va_end(ap);
 
-    if (!(globals.quiet || !globals.linemap)) {
+    if (globals.linemap) {
         va_start(ap, format);
         if (span.bl == span.el) {
             single_line_annotation(span, level, format, ap);
