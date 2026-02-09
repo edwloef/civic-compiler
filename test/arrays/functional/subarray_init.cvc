@@ -8,6 +8,7 @@ int foo() {
 
 export int main() {
     int[2, 2] a = 0;
+    int[4, 4, 4] b = 0;
 
     a[foo()] = 1;
 
@@ -15,6 +16,18 @@ export int main() {
         for (int j = 0, 2) {
             printInt(a[i, j]);
             printSpaces(1);
+        }
+        printNewlines(1);
+    }
+
+    b[foo(), foo()] = foo();
+
+    for (int i = 0, 4) {
+        for (int j = 0, 4) {
+            for (int k = 0, 4) {
+                printInt(b[i, j, k]);
+                printSpaces(1);
+            }
         }
         printNewlines(1);
     }

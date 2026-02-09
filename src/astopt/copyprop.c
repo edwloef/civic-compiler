@@ -1,4 +1,5 @@
 #include "ccn/ccn.h"
+#include "utils.h"
 
 void AOCPinit(void) {}
 void AOCPfini(void) {}
@@ -44,11 +45,7 @@ node_st *AOCPassign(node_st *node) {
     ASSIGN_EXPR(node) = TRAVstart(ASSIGN_EXPR(node), TRAV_AOCF);
 
     if (!VARREF_EXPRS(ASSIGN_REF(node)) &&
-        (NODE_TYPE(ASSIGN_EXPR(node)) == NT_INT ||
-         NODE_TYPE(ASSIGN_EXPR(node)) == NT_FLOAT ||
-         NODE_TYPE(ASSIGN_EXPR(node)) == NT_BOOL ||
-         (NODE_TYPE(ASSIGN_EXPR(node)) == NT_VARREF &&
-          !VARREF_EXPRS(ASSIGN_EXPR(node))))) {
+        is_trivial_scalar(ASSIGN_EXPR(node))) {
         funtable *funtable = DATA_AOCP_GET()->funtable;
         vartable *vartable = DATA_AOCP_GET()->vartable;
 

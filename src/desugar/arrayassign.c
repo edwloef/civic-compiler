@@ -116,11 +116,7 @@ node_st *DAAassign(node_st *node) {
     TRAVchildren(node);
 
     if (NODE_TYPE(ASSIGN_EXPR(node)) != NT_ARREXPRS &&
-        NODE_TYPE(ASSIGN_EXPR(node)) != NT_INT &&
-        NODE_TYPE(ASSIGN_EXPR(node)) != NT_FLOAT &&
-        NODE_TYPE(ASSIGN_EXPR(node)) != NT_BOOL &&
-        (NODE_TYPE(ASSIGN_EXPR(node)) != NT_VARREF ||
-         VARREF_EXPRS(ASSIGN_EXPR(node)))) {
+        !is_trivial_scalar(ASSIGN_EXPR(node))) {
         node_st *ref = vartable_temp_var(DATA_DAA_GET()->vartable,
                                          EXPR_RESOLVED_TY(ASSIGN_EXPR(node)));
         node_st *assign = ASTassign(CCNcopy(ref), ASSIGN_EXPR(node));
@@ -130,13 +126,12 @@ node_st *DAAassign(node_st *node) {
         DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
     }
 
+    node_st *stmts = NULL;
+    node_st *head = NULL;
+
     for (node_st *expr = VARREF_EXPRS(ASSIGN_REF(node)); expr;
          expr = EXPRS_NEXT(expr)) {
-        if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_INT ||
-            NODE_TYPE(EXPRS_EXPR(expr)) == NT_FLOAT ||
-            NODE_TYPE(EXPRS_EXPR(expr)) == NT_BOOL ||
-            (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
-             !VARREF_EXPRS(EXPRS_EXPR(expr)))) {
+        if (is_trivial_scalar(EXPRS_EXPR(expr))) {
             continue;
         }
 
@@ -145,13 +140,24 @@ node_st *DAAassign(node_st *node) {
         VARREF_WRITE(ASSIGN_REF(assign)) = true;
         EXPRS_EXPR(expr) = ref;
 
-        DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
+        node_st *stmt = ASTstmts(assign, NULL);
+        if (stmts) {
+            STMTS_NEXT(stmts) = stmt;
+        } else {
+            head = stmt;
+        }
+        stmts = stmt;
     }
+
+    DATA_DAA_GET()->stmts = inline_stmts(head, DATA_DAA_GET()->stmts);
 
     vartable_ref r = {VARREF_N(ASSIGN_REF(node)), VARREF_L(ASSIGN_REF(node))};
     vartable_entry *e = vartable_get(DATA_DAA_GET()->vartable, r);
 
     int diff = e->ty.len - VARREF_RESOLVED_DIMS(ASSIGN_REF(node));
+
+    VARREF_EXPRS(ASSIGN_REF(node)) =
+        DAArev_exprs(VARREF_EXPRS(ASSIGN_REF(node)));
     node_st *stmt = DAAbuild_array_assign(ASSIGN_REF(node), e->ty.buf + diff,
                                           ASSIGN_EXPR(node), e->ty.len - diff);
 
@@ -167,11 +173,7 @@ node_st *DAAarrexprs(node_st *node) {
     TRAVchildren(node);
 
     if (NODE_TYPE(ARREXPRS_EXPR(node)) == NT_ARREXPRS ||
-        NODE_TYPE(ARREXPRS_EXPR(node)) == NT_INT ||
-        NODE_TYPE(ARREXPRS_EXPR(node)) == NT_FLOAT ||
-        NODE_TYPE(ARREXPRS_EXPR(node)) == NT_BOOL ||
-        (NODE_TYPE(ARREXPRS_EXPR(node)) == NT_VARREF &&
-         !VARREF_EXPRS(ARREXPRS_EXPR(node)))) {
+        is_trivial_scalar(ARREXPRS_EXPR(node))) {
         return node;
     }
 

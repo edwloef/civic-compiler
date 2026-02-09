@@ -36,6 +36,8 @@
         CCNcycleNotify();                                                      \
     }
 
+bool is_trivial_scalar(node_st *node);
+
 node_st *inline_stmts(node_st *node, node_st *stmts);
 
 FILE *spawn_command(FILE *in, const char *cmd, char *const argv[]);

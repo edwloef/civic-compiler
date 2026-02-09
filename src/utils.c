@@ -5,8 +5,18 @@
 #include "ccn/ccn.h"
 #include "utils.h"
 
+bool is_trivial_scalar(node_st *node) {
+    return NODE_TYPE(node) == NT_INT || NODE_TYPE(node) == NT_FLOAT ||
+           NODE_TYPE(node) == NT_BOOL ||
+           (NODE_TYPE(node) == NT_VARREF && !VARREF_EXPRS(node));
+}
+
 node_st *inline_stmts(node_st *node, node_st *stmts) {
-    if (stmts) {
+    if (!stmts) {
+        return node;
+    } else if (!node) {
+        return stmts;
+    } else {
         node_st *tmp = stmts;
         while (STMTS_NEXT(tmp)) {
             tmp = STMTS_NEXT(tmp);
@@ -14,8 +24,6 @@ node_st *inline_stmts(node_st *node, node_st *stmts) {
         STMTS_NEXT(tmp) = node;
         CCNcycleNotify();
         return stmts;
-    } else {
-        return node;
     }
 }
 
