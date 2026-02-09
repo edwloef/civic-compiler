@@ -115,13 +115,29 @@ node_st *DAAassign(node_st *node) {
 
     TRAVchildren(node);
 
-    if (NODE_TYPE(ASSIGN_EXPR(node)) != NT_ARREXPRS) {
+    if (NODE_TYPE(ASSIGN_EXPR(node)) != NT_ARREXPRS &&
+        NODE_TYPE(ASSIGN_EXPR(node)) != NT_INT &&
+        NODE_TYPE(ASSIGN_EXPR(node)) != NT_FLOAT &&
+        NODE_TYPE(ASSIGN_EXPR(node)) != NT_BOOL &&
+        (NODE_TYPE(ASSIGN_EXPR(node)) != NT_VARREF ||
+         VARREF_EXPRS(ASSIGN_EXPR(node)))) {
         node_st *expr = ASSIGN_EXPR(node);
         node_st *ref =
             vartable_temp_var(DATA_DAA_GET()->vartable, EXPR_RESOLVED_TY(expr));
         node_st *assign = ASTassign(CCNcopy(ref), expr);
         VARREF_WRITE(ASSIGN_REF(assign)) = true;
         ASSIGN_EXPR(node) = ref;
+
+        DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
+    }
+
+    for (node_st *dim = VARREF_EXPRS(ASSIGN_REF(node)); dim;
+         dim = EXPRS_NEXT(dim)) {
+        node_st *expr = EXPRS_EXPR(dim);
+        node_st *ref = vartable_temp_var(DATA_DAA_GET()->vartable, TY_int);
+        node_st *assign = ASTassign(CCNcopy(ref), expr);
+        VARREF_WRITE(ASSIGN_REF(assign)) = true;
+        EXPRS_EXPR(dim) = ref;
 
         DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
     }
