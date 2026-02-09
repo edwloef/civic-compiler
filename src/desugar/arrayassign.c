@@ -121,23 +121,29 @@ node_st *DAAassign(node_st *node) {
         NODE_TYPE(ASSIGN_EXPR(node)) != NT_BOOL &&
         (NODE_TYPE(ASSIGN_EXPR(node)) != NT_VARREF ||
          VARREF_EXPRS(ASSIGN_EXPR(node)))) {
-        node_st *expr = ASSIGN_EXPR(node);
-        node_st *ref =
-            vartable_temp_var(DATA_DAA_GET()->vartable, EXPR_RESOLVED_TY(expr));
-        node_st *assign = ASTassign(CCNcopy(ref), expr);
+        node_st *ref = vartable_temp_var(DATA_DAA_GET()->vartable,
+                                         EXPR_RESOLVED_TY(ASSIGN_EXPR(node)));
+        node_st *assign = ASTassign(CCNcopy(ref), ASSIGN_EXPR(node));
         VARREF_WRITE(ASSIGN_REF(assign)) = true;
         ASSIGN_EXPR(node) = ref;
 
         DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
     }
 
-    for (node_st *dim = VARREF_EXPRS(ASSIGN_REF(node)); dim;
-         dim = EXPRS_NEXT(dim)) {
-        node_st *expr = EXPRS_EXPR(dim);
+    for (node_st *expr = VARREF_EXPRS(ASSIGN_REF(node)); expr;
+         expr = EXPRS_NEXT(expr)) {
+        if (NODE_TYPE(EXPRS_EXPR(expr)) == NT_INT ||
+            NODE_TYPE(EXPRS_EXPR(expr)) == NT_FLOAT ||
+            NODE_TYPE(EXPRS_EXPR(expr)) == NT_BOOL ||
+            (NODE_TYPE(EXPRS_EXPR(expr)) == NT_VARREF &&
+             !VARREF_EXPRS(EXPRS_EXPR(expr)))) {
+            continue;
+        }
+
         node_st *ref = vartable_temp_var(DATA_DAA_GET()->vartable, TY_int);
-        node_st *assign = ASTassign(CCNcopy(ref), expr);
+        node_st *assign = ASTassign(CCNcopy(ref), EXPRS_EXPR(expr));
         VARREF_WRITE(ASSIGN_REF(assign)) = true;
-        EXPRS_EXPR(dim) = ref;
+        EXPRS_EXPR(expr) = ref;
 
         DATA_DAA_GET()->stmts = ASTstmts(assign, NULL);
     }
