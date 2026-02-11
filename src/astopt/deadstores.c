@@ -52,20 +52,21 @@ node_st *AODSstmts(node_st *node) {
 }
 
 node_st *AODSassign(node_st *node) {
+    if (VARREF_EXPRS(ASSIGN_REF(node)) ||
+        EXPR_RESOLVED_DIMS(ASSIGN_REF(node))) {
+        return node;
+    }
+
     vartable_ref r = {VARREF_N(ASSIGN_REF(node)), VARREF_L(ASSIGN_REF(node))};
     vartable_entry *e = vartable_get(DATA_AODS_GET()->vartable, r);
+    bool assign_is_dead = e->read_count == 0;
 
-    bool is_array =
-        VARREF_EXPRS(ASSIGN_REF(node)) || EXPR_RESOLVED_DIMS(ASSIGN_REF(node));
-    bool assign_is_dead = e->read_count == (is_array ? e->write_count - 1 : 0);
-
-    if (!assign_is_dead && !is_array &&
-        NODE_TYPE(ASSIGN_EXPR(node)) == NT_VARREF) {
+    if (!assign_is_dead && NODE_TYPE(ASSIGN_EXPR(node)) == NT_VARREF) {
         assign_is_dead = r.n == VARREF_N(ASSIGN_EXPR(node)) &&
                          r.l == VARREF_L(ASSIGN_EXPR(node));
     }
 
-    if (!assign_is_dead && !is_array && VARREF_N(ASSIGN_REF(node)) == 0) {
+    if (!assign_is_dead && VARREF_N(ASSIGN_REF(node)) == 0) {
         funtable *funtable = DATA_AODS_GET()->funtable;
         vartable *vartable = DATA_AODS_GET()->vartable;
 
