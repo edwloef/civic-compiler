@@ -106,9 +106,7 @@ node_st *VPfor(node_st *node) {
 }
 
 node_st *VPreturn(node_st *node) {
-    TRAVchildren(node);
-
-    return node;
+    NOOP();
 }
 
 node_st *VPcall(node_st *node) {

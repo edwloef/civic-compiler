@@ -83,13 +83,12 @@ node_st *PRTscope(node_st *node) {
 }
 
 node_st *PRTprogram(node_st *node) {
-    TRAVchildren(node);
-
-    return node;
+    NOOP();
 }
 
 node_st *PRTdecls(node_st *node) {
     EMIT_INDENT();
+
     TRAVchildren(node);
 
     return node;
@@ -164,9 +163,7 @@ node_st *PRTfundecl(node_st *node) {
 }
 
 node_st *PRTfunbody(node_st *node) {
-    TRAVchildren(node);
-
-    return node;
+    NOOP();
 }
 
 node_st *PRTvardecl(node_st *node) {

@@ -89,15 +89,15 @@ node_st *AOESFvarref(node_st *node) {
 }
 
 node_st *AOESFint(node_st *node) {
-    return node;
+    NOOP();
 }
 
 node_st *AOESFfloat(node_st *node) {
-    return node;
+    NOOP();
 }
 
 node_st *AOESFbool(node_st *node) {
-    return node;
+    NOOP();
 }
 
 node_st *AOESFmalloc(node_st *node) {

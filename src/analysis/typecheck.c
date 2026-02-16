@@ -697,15 +697,15 @@ node_st *ATCtype(node_st *node) {
 }
 
 node_st *ATCint(node_st *node) {
-    return node;
+    NOOP();
 }
 
 node_st *ATCfloat(node_st *node) {
-    return node;
+    NOOP();
 }
 
 node_st *ATCbool(node_st *node) {
-    return node;
+    NOOP();
 }
 
 node_st *ATCconstref(node_st *node) {

@@ -9,9 +9,17 @@
 
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
+#define NOOP()                                                                 \
+    {                                                                          \
+        TRAVchildren(node);                                                    \
+        return node;                                                           \
+    }
+
 #define OUT_OF_LIFETIME()                                                      \
-    DBUG_ASSERT(false, "Unreachable.");                                        \
-    return node;
+    {                                                                          \
+        DBUG_ASSERT(false, "Unreachable.");                                    \
+        return node;                                                           \
+    }
 
 #define TYPE(n)                                                                \
     (thin_vartype) {                                                           \

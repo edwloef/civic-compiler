@@ -4,6 +4,9 @@ void foo() {
         foo();
     }
 
+    for (int i = 10, 0) foo();
+    for (int i = 0, 10, -1) foo();
+
     for (int i = 0, 10)
         foo();
 

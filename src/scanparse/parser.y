@@ -530,10 +530,12 @@ funheader: basictype id "(" params ")"
 block: stmt
        {
          $$ = ASTstmts($1, NULL);
+         add_loc_to_node($$, @$);
        }
      | "{" stmts "}"
        {
          $$ = $2;
+         add_loc_to_node($$, @$);
        }
      | "{" "}"
        {

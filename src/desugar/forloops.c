@@ -78,9 +78,6 @@ node_st *DFLstmts(node_st *node) {
 
     node_st *stmt = STMTS_STMT(node);
     if (NODE_TYPE(stmt) == NT_FOR) {
-        FOR_LOOP_END(stmt) = TRAVstart(FOR_LOOP_END(stmt), TRAV_AOCF);
-        FOR_LOOP_STEP(stmt) = TRAVstart(FOR_LOOP_STEP(stmt), TRAV_AOCF);
-
         node_st *start_ref = FOR_REF(stmt);
         node_st *end_ref;
         node_st *step_ref;

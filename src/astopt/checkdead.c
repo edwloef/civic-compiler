@@ -50,9 +50,7 @@ node_st *CDwhile(node_st *node) {
 }
 
 node_st *CDdowhile(node_st *node) {
-    TRAVchildren(node);
-
-    return node;
+    NOOP();
 }
 
 node_st *CDfor(node_st *node) {
@@ -60,9 +58,7 @@ node_st *CDfor(node_st *node) {
 }
 
 node_st *CDreturn(node_st *node) {
-    TRAVchildren(node);
-
-    return node;
+    NOOP();
 }
 
 node_st *CDcall(node_st *node) {
