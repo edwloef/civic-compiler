@@ -245,11 +245,20 @@ node_st *PRTifelse(node_st *node) {
     TRAVexpr(node);
     printf(") {\n");
     WITH_INDENT(TRAVif_block(node));
+    printf("}");
     if (IFELSE_ELSE_BLOCK(node)) {
-        printf("} else {\n");
-        WITH_INDENT(TRAVelse_block(node));
+        printf(" else ");
+        if (NODE_TYPE(STMTS_STMT(IFELSE_ELSE_BLOCK(node))) == NT_IFELSE &&
+            !STMTS_NEXT(IFELSE_ELSE_BLOCK(node))) {
+            TRAVstmt(IFELSE_ELSE_BLOCK(node));
+        } else {
+            printf("{\n");
+            WITH_INDENT(TRAVelse_block(node));
+            printf("}\n");
+        }
+    } else {
+        printf("\n");
     }
-    printf("}\n");
 
     return node;
 }
