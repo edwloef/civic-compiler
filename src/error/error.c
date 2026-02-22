@@ -12,7 +12,8 @@ static bool color_supported(void) {
     static bool support;
     if (!init) {
         init = true;
-        support = !getenv("NO_COLOR") && isatty(fileno(stderr));
+        char *no_color = getenv("NO_COLOR");
+        support = !(no_color && *no_color) && isatty(fileno(stderr));
     }
     return support;
 }
