@@ -70,8 +70,10 @@ node_st *AOLUstmts(node_st *node) {
 
         if (can_unroll) {
             if (step > 0) {
+                // ensure the last iteration of the loop doesn't wrap around
                 can_unroll = end + step > end;
             } else if (step < 0) {
+                // ensure the last iteration of the loop doesn't wrap around
                 can_unroll = end + step < end;
             } else {
                 CCNfree(BINOP_RIGHT(DOWHILE_EXPR(stmt)));
@@ -93,19 +95,27 @@ node_st *AOLUstmts(node_st *node) {
             switch (BINOP_OP(DOWHILE_EXPR(stmt))) {
             case BO_lt:
                 count = (step < 0) ? lllen / llstep + (lllen % llstep != 0) : 1;
-                can_unroll = (step < 0) == (llend < llstart + llstep);
+                // ensure that the loop doesn't wrap around
+                // which can only happen if step isn't less than 0
+                can_unroll = (step < 0) || !(llend < llstart + llstep);
                 break;
             case BO_le:
                 count = (step < 0) ? lllen / llstep + 1 : 1;
-                can_unroll = (step < 0) == (llend <= llstart + llstep);
+                // ensure that the loop doesn't wrap around
+                // which can only happen if step isn't less than 0
+                can_unroll = (step < 0) || !(llend <= llstart + llstep);
                 break;
             case BO_gt:
                 count = (step > 0) ? lllen / llstep + (lllen % llstep != 0) : 1;
-                can_unroll = (step > 0) == (llend > llstart + llstep);
+                // ensure that the loop doesn't wrap around
+                // which can only happen if step isn't greater than 0
+                can_unroll = (step > 0) || !(llend > llstart + llstep);
                 break;
             case BO_ge:
                 count = (step > 0) ? lllen / llstep + 1 : 1;
-                can_unroll = (step > 0) == (llend >= llstart + llstep);
+                // ensure that the loop doesn't wrap around
+                // which can only happen if step isn't greater than 0
+                can_unroll = (step > 0) || !(llend >= llstart + llstep);
                 break;
             case BO_eq:
                 count = (llstart + llstep == llend) + 1;
