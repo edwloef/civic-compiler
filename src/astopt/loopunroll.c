@@ -3,6 +3,8 @@
 #include "globals/globals.h"
 #include "utils.h"
 
+#include <limits.h>
+
 void AOLUinit(void) {}
 void AOLUfini(void) {}
 
@@ -68,19 +70,11 @@ node_st *AOLUstmts(node_st *node) {
             TRAVpop();
         }
 
-        if (can_unroll) {
-            if (step > 0) {
-                // ensure the last iteration of the loop doesn't wrap around
-                can_unroll = end + step > end;
-            } else if (step < 0) {
-                // ensure the last iteration of the loop doesn't wrap around
-                can_unroll = end + step < end;
-            } else {
-                CCNfree(BINOP_RIGHT(DOWHILE_EXPR(stmt)));
-                BINOP_RIGHT(DOWHILE_EXPR(stmt)) = ASTint(start, TY_int);
-                can_unroll = false;
-                CCNcycleNotify();
-            }
+        if (can_unroll && step == 0) {
+            CCNfree(BINOP_RIGHT(DOWHILE_EXPR(stmt)));
+            BINOP_RIGHT(DOWHILE_EXPR(stmt)) = ASTint(start, TY_int);
+            can_unroll = false;
+            CCNcycleNotify();
         }
 
         long long count;
@@ -94,35 +88,68 @@ node_st *AOLUstmts(node_st *node) {
 
             switch (BINOP_OP(DOWHILE_EXPR(stmt))) {
             case BO_lt:
-                count = (step < 0) ? lllen / llstep + (lllen % llstep != 0) : 1;
-                // ensure that the loop doesn't wrap around
-                // which can only happen if step isn't less than 0
-                can_unroll = (step < 0) || !(llend < llstart + llstep);
+                if (step < 0) {
+                    count = lllen / llstep + (lllen % llstep != 0);
+                    // ensure the first and last iterations don't underflow
+                    can_unroll = llstart + llstep >= INT_MIN &&
+                                 llend + llstep >= INT_MIN;
+                } else {
+                    count = 1;
+                    // ensure the first iteration doesn't overflow, and that the
+                    // loop only has one iteration
+                    can_unroll = llstart + llstep <= INT_MAX &&
+                                 !(llend < llstart + llstep);
+                }
                 break;
             case BO_le:
-                count = (step < 0) ? lllen / llstep + 1 : 1;
-                // ensure that the loop doesn't wrap around
-                // which can only happen if step isn't less than 0
-                can_unroll = (step < 0) || !(llend <= llstart + llstep);
+                if (step < 0) {
+                    count = lllen / llstep + 1;
+                    // ensure the first and last iterations don't underflow
+                    can_unroll = llstart + llstep >= INT_MIN &&
+                                 llend + llstep >= INT_MIN;
+                } else {
+                    count = 1;
+                    // ensure the first iteration doesn't overflow, and that the
+                    // loop only has one iteration
+                    can_unroll = llstart + llstep < INT_MAX &&
+                                 !(llend <= llstart + llstep);
+                }
                 break;
             case BO_gt:
-                count = (step > 0) ? lllen / llstep + (lllen % llstep != 0) : 1;
-                // ensure that the loop doesn't wrap around
-                // which can only happen if step isn't greater than 0
-                can_unroll = (step > 0) || !(llend > llstart + llstep);
+                if (step > 0) {
+                    count = lllen / llstep + (lllen % llstep != 0);
+                    // ensure the first and last iterations don't overflow
+                    can_unroll = llstart + llstep <= INT_MAX &&
+                                 llend + llstep <= INT_MAX;
+                } else {
+                    count = 1;
+                    // ensure the first iteration doesn't underflow, and that
+                    // the loop only has one iteration
+                    can_unroll = llstart + llstep >= INT_MIN &&
+                                 !(llend > llstart + llstep);
+                }
                 break;
             case BO_ge:
-                count = (step > 0) ? lllen / llstep + 1 : 1;
-                // ensure that the loop doesn't wrap around
-                // which can only happen if step isn't greater than 0
-                can_unroll = (step > 0) || !(llend >= llstart + llstep);
+                if (step > 0) {
+                    count = lllen / llstep + 1;
+                    // ensure the first and last iterations don't overflow
+                    can_unroll = llstart + llstep <= INT_MAX &&
+                                 llend + llstep <= INT_MAX;
+                } else {
+                    count = 1;
+                    // ensure the first iteration doesn't underflow, and that
+                    // the loop only has one iteration
+                    can_unroll = llstart + llstep > INT_MIN &&
+                                 !(llend >= llstart + llstep);
+                }
                 break;
             case BO_eq:
                 count = (llstart + llstep == llend) + 1;
                 break;
             case BO_ne:
                 count = lllen / llstep;
-                can_unroll = lllen % llstep == 0;
+                can_unroll = lllen % llstep == 0 &&
+                             (llstep > 0 ? llend > llstart : llend < llstart);
                 break;
             default:
                 can_unroll = false;
