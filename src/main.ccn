@@ -402,7 +402,7 @@ traversal CheckUnroll {
 
 traversal CheckUnrollScope {
     uid = CUS,
-    nodes = { Assign, call },
+    nodes = { Assign, Call },
     travdata {
         bool can_unroll,
         VarRef ref,
