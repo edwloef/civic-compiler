@@ -83,7 +83,12 @@ node_st *PRTscope(node_st *node) {
 }
 
 node_st *PRTprogram(node_st *node) {
-    NOOP();
+    DATA_PRT_GET()->funtable = PROGRAM_FUNTABLE(node);
+    DATA_PRT_GET()->vartable = PROGRAM_VARTABLE(node);
+
+    TRAVchildren(node);
+
+    return node;
 }
 
 node_st *PRTdecls(node_st *node) {
@@ -136,6 +141,9 @@ node_st *PRTarrexprs(node_st *node) {
 }
 
 node_st *PRTfundecl(node_st *node) {
+    vartable *prev = DATA_PRT_GET()->vartable;
+    DATA_PRT_GET()->vartable = FUNDECL_VARTABLE(node);
+
     if (FUNDECL_EXPORTED(node)) {
         printf("export ");
     }
@@ -145,7 +153,13 @@ node_st *PRTfundecl(node_st *node) {
     }
 
     printf("%s ", fmt_BasicType(FUNDECL_TY(node)));
-    TRAVid(node);
+    if (FUNDECL_ID(node)) {
+        TRAVid(node);
+    } else {
+        funtable_ref r = {0, FUNDECL_L(node)};
+        funtable_entry *e = funtable_get(DATA_PRT_GET()->funtable, r);
+        printf("%s", e->name);
+    }
     printf("(");
     TRAVparams(node);
     printf(")");
@@ -159,11 +173,21 @@ node_st *PRTfundecl(node_st *node) {
     }
 
     printf("\n");
+
+    DATA_PRT_GET()->vartable = prev;
+
     return node;
 }
 
 node_st *PRTfunbody(node_st *node) {
-    NOOP();
+    funtable *prev = DATA_PRT_GET()->funtable;
+    DATA_PRT_GET()->funtable = FUNBODY_FUNTABLE(node);
+
+    TRAVchildren(node);
+
+    DATA_PRT_GET()->funtable = prev;
+
+    return node;
 }
 
 node_st *PRTvardecl(node_st *node) {
@@ -177,7 +201,13 @@ node_st *PRTvardecl(node_st *node) {
 
     TRAVty(node);
     printf(" ");
-    TRAVid(node);
+    if (VARDECL_ID(node)) {
+        TRAVid(node);
+    } else {
+        vartable_ref r = {0, VARDECL_L(node)};
+        vartable_entry *e = vartable_get(DATA_PRT_GET()->vartable, r);
+        printf("%s", e->name);
+    }
 
     if (VARDECL_EXPR(node)) {
         printf(" = ");
@@ -209,7 +239,13 @@ node_st *PRTparams(node_st *node) {
 node_st *PRTparam(node_st *node) {
     TRAVty(node);
     printf(" ");
-    TRAVid(node);
+    if (PARAM_ID(node)) {
+        TRAVid(node);
+    } else {
+        vartable_ref r = {0, PARAM_L(node)};
+        vartable_entry *e = vartable_get(DATA_PRT_GET()->vartable, r);
+        printf("%s", e->name);
+    }
 
     return node;
 }
@@ -232,7 +268,13 @@ node_st *PRTassign(node_st *node) {
 }
 
 node_st *PRTcall(node_st *node) {
-    TRAVid(node);
+    if (CALL_ID(node)) {
+        TRAVid(node);
+    } else {
+        funtable_ref r = {CALL_N(node), CALL_L(node)};
+        funtable_entry *e = funtable_get(DATA_PRT_GET()->funtable, r);
+        printf("%s", e->name);
+    }
     printf("(");
     TRAVexprs(node);
     printf(")");
@@ -364,7 +406,13 @@ node_st *PRTtype(node_st *node) {
 }
 
 node_st *PRTvarref(node_st *node) {
-    TRAVid(node);
+    if (VARREF_ID(node)) {
+        TRAVid(node);
+    } else {
+        vartable_ref r = {VARREF_N(node), VARREF_L(node)};
+        vartable_entry *e = vartable_get(DATA_PRT_GET()->vartable, r);
+        printf("%s", e->name);
+    }
 
     if (VARREF_EXPRS(node)) {
         printf("[");

@@ -12,7 +12,7 @@ node_st *Fprogram(node_st *node) {
     vartable_free(PROGRAM_VARTABLE(node));
     PROGRAM_VARTABLE(node) = NULL;
 
-    return node;
+    return CCNfree(node);
 }
 
 node_st *Ffundecl(node_st *node) {
@@ -30,11 +30,5 @@ node_st *Ffunbody(node_st *node) {
     funtable_free(FUNBODY_FUNTABLE(node));
     FUNBODY_FUNTABLE(node) = NULL;
 
-    return node;
-}
-
-node_st *Fid(node_st *node) {
-    TRAVchildren(node);
-    ID_VAL(node) = NULL;
     return node;
 }

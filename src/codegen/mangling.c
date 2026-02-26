@@ -21,7 +21,6 @@ node_st *CGMfundecl(node_st *node) {
     } else {
         e->mangled_name = STRfmt("%s+%s+%d", parent_name, e->name, e->ty.len);
     }
-    ID_VAL(FUNDECL_ID(node)) = e->mangled_name;
 
     DATA_CGM_GET()->name = e->mangled_name;
     TRAVchildren(node);

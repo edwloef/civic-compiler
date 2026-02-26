@@ -12,6 +12,8 @@ start phase RootPhase {
 traversal Print {
     uid = PRT,
     travdata {
+        user funtable_ptr funtable,
+        user vartable_ptr vartable,
         int indent
     }
 };
@@ -62,11 +64,12 @@ phase Analysis {
     }
 };
 
+
 phase Desugar {
     actions {
-        traversal OwnedTables {
-            uid = DOT,
-            nodes = { Program, FunDecl, VarDecl, VarRef, Param, Call },
+        traversal Ids {
+            uid = DI,
+            nodes = { Program, FunDecl, FunBody, VarDecl, VarRef, Param, Call, Id },
             travdata {
                 user funtable_ptr funtable,
                 user vartable_ptr vartable
@@ -80,7 +83,7 @@ phase Desugar {
 
         traversal VarDecls {
             uid = DVD,
-            nodes = { Program, FunDecl, FunBody, Decls, VarRef, Call },
+            nodes = { Program, FunDecl, FunBody, Decls, VarDecl, VarRef, Call },
             travdata {
                 user vartable_ptr vartable,
                 Stmts stmts
@@ -418,7 +421,7 @@ traversal EstimateCost {
 
 traversal Free {
     uid = F,
-    nodes = { Program, Fundecl, Funbody, Id }
+    nodes = { Program, Fundecl, Funbody }
 };
 
 node Scope {
@@ -538,7 +541,7 @@ node Malloc {
 
 node FunDecl {
     children {
-        Id id { constructor, mandatory },
+        Id id { constructor },
         Params params { constructor },
         FunBody body
     },
@@ -573,7 +576,7 @@ node Params {
 node Param {
     children {
         Type ty { constructor, mandatory },
-        Id id { constructor, mandatory }
+        Id id { constructor }
     },
 
     attributes {
@@ -584,7 +587,7 @@ node Param {
 node VarDecl {
     children {
         Type ty { constructor, mandatory },
-        Id id { constructor, mandatory },
+        Id id { constructor },
         Expr expr { constructor }
     },
 
@@ -693,7 +696,7 @@ node Cast {
 
 node Call {
     children {
-        Id id { constructor, mandatory },
+        Id id { constructor },
         Exprs exprs { constructor }
     },
 
@@ -705,7 +708,7 @@ node Call {
 
 node VarRef {
     children {
-        Id id { constructor, mandatory },
+        Id id { constructor },
         Exprs exprs { constructor }
     },
 
@@ -718,7 +721,11 @@ node VarRef {
 
 node Id {
     attributes {
-        user tablestring val { constructor }
+        string val { constructor }
+    },
+
+    lifetime {
+        allowed ( -> Desugar.Ids]
     }
 };
 

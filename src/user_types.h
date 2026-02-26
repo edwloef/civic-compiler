@@ -13,6 +13,3 @@ typedef funtable *funtable_ptr;
 typedef vartable *vartable_ptr;
 
 typedef FILE *FILE_ptr;
-
-#define CCN_USES_UNSAFE_ACKNOWLEDGE
-typedef char *tablestring;

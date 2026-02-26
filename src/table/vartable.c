@@ -1,7 +1,7 @@
-#include "table/vartable.h"
 #include "ccngen/ast.h"
 #include "palm/memory.h"
 #include "palm/str.h"
+#include "table/vartable.h"
 
 vartype vartype_new(enum BasicType ty) {
     return (vartype){0, 0, NULL, ty};
@@ -108,7 +108,7 @@ node_st *vartable_get_ref(vartable *self, vartable_ref r) {
         return NULL;
     }
 
-    node_st *ref = ASTvarref(ASTid(e->name), NULL);
+    node_st *ref = ASTvarref(NULL, NULL);
     VARREF_N(ref) = r.n;
     VARREF_L(ref) = r.l;
     VARREF_RESOLVED_TY(ref) = e->ty.ty;
@@ -135,7 +135,7 @@ node_st *vartable_named_temp_var(vartable *self, enum BasicType ty,
                         false,
                         false,
                         false};
-    node_st *ref = ASTvarref(ASTid(name), NULL);
+    node_st *ref = ASTvarref(NULL, NULL);
     VARREF_RESOLVED_TY(ref) = ty;
     VARREF_L(ref) = vartable_push(self, e).l;
     return ref;

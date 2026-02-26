@@ -612,9 +612,9 @@ node_st *CGAvarref(node_st *node) {
         oprintf("store");
     }
 
+    vartable_entry *e =
+        vartable_get(DATA_CGA_GET()->vartable, (vartable_ref){n, l});
     if (n == DATA_CGA_GET()->nesting) {
-        vartable_entry *e =
-            vartable_get(DATA_CGA_GET()->vartable, (vartable_ref){n, l});
         if (e->external) {
             oprintf("e %d", e->new_l);
         } else {
@@ -630,7 +630,7 @@ node_st *CGAvarref(node_st *node) {
         oprintf("n %d %d", n, l);
     }
 
-    oprintf(" ; %s\n", ID_VAL(VARREF_ID(node)));
+    oprintf(" ; %s\n", e->name);
 
     if (array_access) {
         oprintf("\t");
