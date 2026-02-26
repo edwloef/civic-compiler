@@ -255,7 +255,7 @@ phase MaybeOpt {
 
                 traversal LoopUnroll {
                     uid = AOLU,
-                    nodes = { Program, FunDecl, FunBody, Stmts },
+                    nodes = { Program, FunDecl, FunBody, Stmts, DoWhile },
                     travdata {
                         user funtable_ptr funtable,
                         user vartable_ptr vartable

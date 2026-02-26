@@ -41,165 +41,174 @@ node_st *AOLUstmts(node_st *node) {
     TRAVchildren(node);
 
     node_st *stmt = STMTS_STMT(node);
-    if (NODE_TYPE(stmt) == NT_DOWHILE) {
-        bool can_unroll = DOWHILE_KNOWN_START(stmt) &&
-                          NODE_TYPE(DOWHILE_EXPR(stmt)) == NT_BINOP;
+    if (!stmt || NODE_TYPE(stmt) == NT_STMTS) {
+        STMTS_STMT(node) = NULL;
+        TAKE(STMTS_NEXT(node));
+        node = inline_stmts(node, stmt);
+    }
 
-        int start = DOWHILE_UNROLL_START(stmt);
-        int end;
-        int step;
+    return node;
+}
 
-        if (can_unroll) {
-            end = INT_VAL(BINOP_LEFT(DOWHILE_EXPR(stmt)));
+node_st *AOLUdowhile(node_st *node) {
+    TRAVchildren(node);
 
-            node_st *ref = BINOP_RIGHT(DOWHILE_EXPR(stmt));
-            funtable *funtable = DATA_AOLU_GET()->funtable;
-            vartable *vartable = DATA_AOLU_GET()->vartable;
+    bool can_unroll =
+        DOWHILE_KNOWN_START(node) && NODE_TYPE(DOWHILE_EXPR(node)) == NT_BINOP;
 
-            TRAVpush(TRAV_CU);
+    int start = DOWHILE_UNROLL_START(node);
+    int end;
+    int step;
 
-            DATA_CU_GET()->ref = ref;
-            DATA_CU_GET()->funtable = funtable;
-            DATA_CU_GET()->vartable = vartable;
+    if (can_unroll) {
+        end = INT_VAL(BINOP_LEFT(DOWHILE_EXPR(node)));
 
-            TRAVstmts(stmt);
+        node_st *ref = BINOP_RIGHT(DOWHILE_EXPR(node));
+        funtable *funtable = DATA_AOLU_GET()->funtable;
+        vartable *vartable = DATA_AOLU_GET()->vartable;
 
-            can_unroll = DATA_CU_GET()->can_unroll;
-            step = DATA_CU_GET()->step;
+        TRAVpush(TRAV_CU);
 
-            TRAVpop();
-        }
+        DATA_CU_GET()->ref = ref;
+        DATA_CU_GET()->funtable = funtable;
+        DATA_CU_GET()->vartable = vartable;
 
-        if (can_unroll && step == 0) {
-            CCNfree(BINOP_RIGHT(DOWHILE_EXPR(stmt)));
-            BINOP_RIGHT(DOWHILE_EXPR(stmt)) = ASTint(start, TY_int);
+        TRAVstmts(node);
+
+        can_unroll = DATA_CU_GET()->can_unroll;
+        step = DATA_CU_GET()->step;
+
+        TRAVpop();
+    }
+
+    if (can_unroll && step == 0) {
+        CCNfree(BINOP_RIGHT(DOWHILE_EXPR(node)));
+        BINOP_RIGHT(DOWHILE_EXPR(node)) = ASTint(start, TY_int);
+        can_unroll = false;
+        CCNcycleNotify();
+    }
+
+    long long count;
+
+    if (can_unroll) {
+        long long llstart = start;
+        long long llend = end;
+        long long llstep = step;
+
+        long long lllen = llend - llstart;
+
+        switch (BINOP_OP(DOWHILE_EXPR(node))) {
+        case BO_lt:
+            if (step < 0) {
+                count = lllen / llstep + (lllen % llstep != 0);
+                // ensure the first and last iterations don't underflow
+                can_unroll =
+                    llstart + llstep >= INT_MIN && llend + llstep >= INT_MIN;
+            } else {
+                count = 1;
+                // ensure the first iteration doesn't overflow, and that the
+                // loop only has one iteration
+                can_unroll =
+                    llstart + llstep <= INT_MAX && !(llend < llstart + llstep);
+            }
+            break;
+        case BO_le:
+            if (step < 0) {
+                count = lllen / llstep + 1;
+                // ensure the first and last iterations don't underflow
+                can_unroll =
+                    llstart + llstep >= INT_MIN && llend + llstep >= INT_MIN;
+            } else {
+                count = 1;
+                // ensure the first iteration doesn't overflow, and that the
+                // loop only has one iteration
+                can_unroll =
+                    llstart + llstep < INT_MAX && !(llend <= llstart + llstep);
+            }
+            break;
+        case BO_gt:
+            if (step > 0) {
+                count = lllen / llstep + (lllen % llstep != 0);
+                // ensure the first and last iterations don't overflow
+                can_unroll =
+                    llstart + llstep <= INT_MAX && llend + llstep <= INT_MAX;
+            } else {
+                count = 1;
+                // ensure the first iteration doesn't underflow, and that
+                // the loop only has one iteration
+                can_unroll =
+                    llstart + llstep >= INT_MIN && !(llend > llstart + llstep);
+            }
+            break;
+        case BO_ge:
+            if (step > 0) {
+                count = lllen / llstep + 1;
+                // ensure the first and last iterations don't overflow
+                can_unroll =
+                    llstart + llstep <= INT_MAX && llend + llstep <= INT_MAX;
+            } else {
+                count = 1;
+                // ensure the first iteration doesn't underflow, and that
+                // the loop only has one iteration
+                can_unroll =
+                    llstart + llstep > INT_MIN && !(llend >= llstart + llstep);
+            }
+            break;
+        case BO_eq:
+            count = (llstart + llstep == llend) + 1;
+            break;
+        case BO_ne:
+            count = lllen / llstep;
+            can_unroll = lllen % llstep == 0 &&
+                         (llstep > 0 ? llend > llstart : llend < llstart);
+            break;
+        default:
             can_unroll = false;
-            CCNcycleNotify();
+            DBUG_ASSERT(false, "Unknown binop detected.");
+            break;
+        }
+    }
+
+    long long cost;
+    bool can_partially_unroll = false;
+
+    if (can_unroll && count != 1) {
+        TRAVpush(TRAV_EC);
+
+        TRAVdo(DOWHILE_STMTS(node));
+
+        cost = DATA_EC_GET()->cost;
+
+        TRAVpop();
+
+        can_unroll = count * cost <= globals.unroll_limit;
+        can_partially_unroll = 2 * cost <= globals.unroll_limit;
+    }
+
+    if (can_unroll) {
+        node_st *head = NULL;
+        for (int i = 0; i < count; i++) {
+            head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(node)));
+        }
+        CCNfree(node);
+
+        node = head;
+    } else if (can_partially_unroll) {
+        int inner_count = globals.unroll_limit / cost;
+        int remainder = count % inner_count;
+
+        node_st *head = ASTstmts(node, NULL);
+        for (int i = 0; i < remainder; i++) {
+            head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(node)));
         }
 
-        long long count;
-
-        if (can_unroll) {
-            long long llstart = start;
-            long long llend = end;
-            long long llstep = step;
-
-            long long lllen = llend - llstart;
-
-            switch (BINOP_OP(DOWHILE_EXPR(stmt))) {
-            case BO_lt:
-                if (step < 0) {
-                    count = lllen / llstep + (lllen % llstep != 0);
-                    // ensure the first and last iterations don't underflow
-                    can_unroll = llstart + llstep >= INT_MIN &&
-                                 llend + llstep >= INT_MIN;
-                } else {
-                    count = 1;
-                    // ensure the first iteration doesn't overflow, and that the
-                    // loop only has one iteration
-                    can_unroll = llstart + llstep <= INT_MAX &&
-                                 !(llend < llstart + llstep);
-                }
-                break;
-            case BO_le:
-                if (step < 0) {
-                    count = lllen / llstep + 1;
-                    // ensure the first and last iterations don't underflow
-                    can_unroll = llstart + llstep >= INT_MIN &&
-                                 llend + llstep >= INT_MIN;
-                } else {
-                    count = 1;
-                    // ensure the first iteration doesn't overflow, and that the
-                    // loop only has one iteration
-                    can_unroll = llstart + llstep < INT_MAX &&
-                                 !(llend <= llstart + llstep);
-                }
-                break;
-            case BO_gt:
-                if (step > 0) {
-                    count = lllen / llstep + (lllen % llstep != 0);
-                    // ensure the first and last iterations don't overflow
-                    can_unroll = llstart + llstep <= INT_MAX &&
-                                 llend + llstep <= INT_MAX;
-                } else {
-                    count = 1;
-                    // ensure the first iteration doesn't underflow, and that
-                    // the loop only has one iteration
-                    can_unroll = llstart + llstep >= INT_MIN &&
-                                 !(llend > llstart + llstep);
-                }
-                break;
-            case BO_ge:
-                if (step > 0) {
-                    count = lllen / llstep + 1;
-                    // ensure the first and last iterations don't overflow
-                    can_unroll = llstart + llstep <= INT_MAX &&
-                                 llend + llstep <= INT_MAX;
-                } else {
-                    count = 1;
-                    // ensure the first iteration doesn't underflow, and that
-                    // the loop only has one iteration
-                    can_unroll = llstart + llstep > INT_MIN &&
-                                 !(llend >= llstart + llstep);
-                }
-                break;
-            case BO_eq:
-                count = (llstart + llstep == llend) + 1;
-                break;
-            case BO_ne:
-                count = lllen / llstep;
-                can_unroll = lllen % llstep == 0 &&
-                             (llstep > 0 ? llend > llstart : llend < llstart);
-                break;
-            default:
-                can_unroll = false;
-                DBUG_ASSERT(false, "Unknown binop detected.");
-                break;
-            }
+        node_st *inner_head = DOWHILE_STMTS(node);
+        for (int i = 1; i < inner_count; i++) {
+            inner_head = inline_stmts(inner_head, CCNcopy(DOWHILE_STMTS(node)));
         }
+        DOWHILE_STMTS(node) = inner_head;
 
-        long long cost;
-        bool can_strip_mine = false;
-
-        if (can_unroll && count != 1) {
-            TRAVpush(TRAV_EC);
-
-            TRAVdo(DOWHILE_STMTS(stmt));
-
-            cost = DATA_EC_GET()->cost;
-
-            TRAVpop();
-
-            can_unroll = count * cost <= globals.unroll_limit;
-            can_strip_mine = 2 * cost <= globals.unroll_limit;
-        }
-
-        if (can_unroll) {
-            node_st *head = STMTS_NEXT(node);
-            STMTS_NEXT(node) = NULL;
-
-            for (int i = 0; i < count; i++) {
-                head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(stmt)));
-            }
-
-            CCNfree(node);
-            node = head;
-        } else if (can_strip_mine) {
-            int inner_count = globals.unroll_limit / cost;
-            int remainder = count % inner_count;
-
-            node_st *head = node;
-            for (int i = 0; i < remainder; i++) {
-                head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(stmt)));
-            }
-            node = head;
-
-            head = DOWHILE_STMTS(stmt);
-            for (int i = 1; i < inner_count; i++) {
-                head = inline_stmts(head, CCNcopy(DOWHILE_STMTS(stmt)));
-            }
-            DOWHILE_STMTS(stmt) = head;
-        }
+        node = head;
     }
 
     return node;
