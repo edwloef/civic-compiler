@@ -1,9 +1,9 @@
+#include <limits.h>
+
 #include "ccn/ccn.h"
 #include "ccngen/trav.h"
 #include "globals/globals.h"
 #include "utils.h"
-
-#include <limits.h>
 
 void AOLUinit(void) {}
 void AOLUfini(void) {}
