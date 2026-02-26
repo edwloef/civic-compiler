@@ -80,11 +80,11 @@ node_st *DVDvardecl(node_st *node) {
     node_st *stmts = NULL;
 
     vartable_ref r = {0, VARDECL_L(node)};
-    vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
 
     int i = 0;
     for (node_st *expr = TYPE_EXPRS(VARDECL_TY(node)); expr;
          expr = EXPRS_NEXT(expr), i++) {
+        vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
 
         node_st *ref;
         if (VARDECL_EXTERNAL(node)) {
