@@ -16,19 +16,28 @@ node_st *AODFprogram(node_st *node) {
 node_st *AODFdecls(node_st *node) {
     TRAVchildren(node);
 
-    node_st *decl = DECLS_DECL(node);
-    funtable_ref r = {0, FUNDECL_L(decl)};
+    if (!DECLS_DECL(node)) {
+        TAKE(DECLS_NEXT(node));
+    }
+
+    return node;
+}
+
+node_st *AODFfundecl(node_st *node) {
+    TRAVchildren(node);
+
+    funtable_ref r = {0, FUNDECL_L(node)};
     funtable_entry *e = funtable_get(DATA_AODF_GET()->funtable, r);
+
     if (e->call_count == 0) {
-        TRAVstart(decl, TRAV_F);
-        TAKE(DECLS_NEXT(node));
+        TRAVstart(node, TRAV_F);
+        node = CCNfree(node);
     } else if (STReq(e->name, "__init") &&
-               NODE_TYPE(STMTS_STMT(FUNBODY_STMTS(FUNDECL_BODY(decl)))) ==
+               NODE_TYPE(STMTS_STMT(FUNBODY_STMTS(FUNDECL_BODY(node)))) ==
                    NT_RETURN) {
-        funtable_ref r = {0, FUNDECL_L(decl)};
-        funtable_get(DATA_AODF_GET()->funtable, r)->exported = false;
-        TRAVstart(decl, TRAV_F);
-        TAKE(DECLS_NEXT(node));
+        e->exported = false;
+        TRAVstart(node, TRAV_F);
+        node = CCNfree(node);
     }
 
     return node;

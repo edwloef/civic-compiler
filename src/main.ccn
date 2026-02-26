@@ -145,7 +145,7 @@ phase MaybeOpt {
 
                 traversal DeadFunctions {
                     uid = AODF,
-                    nodes = { Program, Decls, FunBody },
+                    nodes = { Program, Decls, FunDecl, FunBody },
                     travdata {
                         user funtable_ptr funtable
                     }
