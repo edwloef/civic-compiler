@@ -7,6 +7,8 @@ RUN_FUNCTIONAL=${RUN_FUNCTIONAL-1}
 
 ALIGN=52
 
+export ASAN_OPTIONS=exitcode=27
+
 total_tests=0
 failed_tests=0
 
@@ -153,6 +155,7 @@ function check_combined {
 function check_return {
     file=$1
     expect_failure=$2
+    expect_failure2=$3
 
     if [ ! -f $file ]; then return; fi
 
@@ -160,8 +163,9 @@ function check_return {
     printf "%-${ALIGN}s " $file:
 
     $CIVCC $CFLAGS $file -o tmp.s > tmp.out 2>&1
+    exitcode=$?
 
-    if [ $? -eq $expect_failure ]; then
+    if [[ $exitcode -eq $expect_failure || $exitcode -eq $expect_failure2 ]]; then
         echo_success
     else
         echo_failed
@@ -186,6 +190,10 @@ function run_dir {
 
     for f in $BASE/check_error/*.cvc; do
         check_return $f 1
+    done
+
+    for f in $BASE/check_no_crash/*.cvc; do
+        check_return $f 0 1
     done
 
     if [ $RUN_FUNCTIONAL -eq 1 ]; then
