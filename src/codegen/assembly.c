@@ -263,29 +263,30 @@ static void branch_on(node_st *cond, bool val) {
 }
 
 node_st *CGAifelse(node_st *node) {
-    int else_label = create_label();
-
     bool else_block = IFELSE_ELSE_BLOCK(node) != NULL;
-    int end_label;
+    int else_label;
     if (else_block) {
-        end_label = create_label();
+        else_label = create_label();
     }
 
+    int end_label = create_label();
+
     branch_on(IFELSE_EXPR(node), false);
-    oprintf("%d_else\n", else_label);
+    if (else_block) {
+        oprintf("%d_else\n", else_label);
+    } else {
+        oprintf("%d_end\n", end_label);
+    }
 
     TRAVif_block(node);
 
     if (else_block) {
         oprintf("\tjump %d_end\n", end_label);
+        oprintf("%d_else:\n", else_label);
+        TRAVelse_block(node);
     }
 
-    oprintf("%d_else:\n", else_label);
-    TRAVelse_block(node);
-
-    if (else_block) {
-        oprintf("%d_end:\n", end_label);
-    }
+    oprintf("%d_end:\n", end_label);
 
     return node;
 }
