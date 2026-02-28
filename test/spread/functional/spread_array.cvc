@@ -1,0 +1,17 @@
+extern void printInt(int a);
+extern void printSpaces(int a);
+extern void printNewlines(int a);
+
+export int main() {
+    int[3, 2] a = [1, 2];
+
+    for (int i = 0, 3) {
+        for (int j = 0, 2) {
+            printInt(a[i, j]);
+            printSpaces(1);
+        }
+        printNewlines(1);
+    }
+
+    return 0;
+}
