@@ -8,7 +8,8 @@
 bool is_trivial_scalar(node_st *node) {
     return NODE_TYPE(node) == NT_INT || NODE_TYPE(node) == NT_FLOAT ||
            NODE_TYPE(node) == NT_BOOL ||
-           (NODE_TYPE(node) == NT_VARREF && !VARREF_EXPRS(node));
+           (NODE_TYPE(node) == NT_VARREF && !VARREF_EXPRS(node) &&
+            !VARREF_RESOLVED_DIMS(node));
 }
 
 node_st *inline_stmts(node_st *node, node_st *stmts) {
