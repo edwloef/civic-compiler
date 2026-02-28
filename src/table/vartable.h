@@ -31,7 +31,7 @@ typedef struct {
     vartype ty;
     span span;
     int new_l, read_count, write_count;
-    bool external, exported, param, loopvar, escapes;
+    bool external, exported, param, loopvar, read_escapes, write_escapes;
 } vartable_entry;
 
 typedef struct vartable vartable;

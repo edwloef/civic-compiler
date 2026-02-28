@@ -101,6 +101,7 @@ node_st *ARparam(node_st *node) {
                             false,
                             true,
                             false,
+                            false,
                             false};
         vartable_ref r = vartable_insert(DATA_AR_GET()->vartable, e,
                                          VARREF_ID(EXPRS_EXPR(expr)));
@@ -118,6 +119,7 @@ node_st *ARparam(node_st *node) {
                         false,
                         false,
                         true,
+                        false,
                         false,
                         false};
     PARAM_L(node) =
@@ -150,6 +152,7 @@ node_st *ARvardecl(node_st *node) {
                         VARDECL_EXPORTED(node),
                         false,
                         false,
+                        false,
                         false};
     VARDECL_L(node) =
         vartable_insert(DATA_AR_GET()->vartable, e, VARDECL_ID(node)).l;
@@ -169,6 +172,7 @@ node_st *ARfor(node_st *node) {
                         0,
                         0,
                         0,
+                        false,
                         false,
                         false,
                         false,

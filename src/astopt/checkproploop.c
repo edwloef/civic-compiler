@@ -28,7 +28,7 @@ node_st *CPLcall(node_st *node) {
         vartable_ref r = {VARREF_N(DATA_CPL_GET()->ref),
                           VARREF_L(DATA_CPL_GET()->ref)};
         vartable_entry *e = vartable_get(DATA_CPL_GET()->vartable, r);
-        if (e->escapes && e->write_count > 1) {
+        if (e->write_escapes && e->write_count > 1) {
             DATA_CPL_GET()->can_prop = false;
         }
     }
@@ -40,7 +40,7 @@ node_st *CPLcall(node_st *node) {
         vartable_ref r = {VARREF_N(DATA_CPL_GET()->expr),
                           VARREF_L(DATA_CPL_GET()->expr)};
         vartable_entry *e = vartable_get(DATA_CPL_GET()->vartable, r);
-        if (e->escapes) {
+        if (e->write_escapes) {
             DATA_CPL_GET()->can_prop = false;
         }
     }

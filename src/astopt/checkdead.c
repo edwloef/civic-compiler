@@ -72,7 +72,7 @@ node_st *CDcall(node_st *node) {
         vartable_ref r = {VARREF_N(DATA_CD_GET()->ref),
                           VARREF_L(DATA_CD_GET()->ref)};
         vartable_entry *e = vartable_get(DATA_CD_GET()->vartable, r);
-        if (e->escapes && !DATA_CD_GET()->ref_is_dead) {
+        if (e->read_escapes && !DATA_CD_GET()->ref_is_dead) {
             DATA_CD_GET()->assign_is_dead = false;
         }
     }

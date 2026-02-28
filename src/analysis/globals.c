@@ -51,6 +51,7 @@ node_st *AGvardecl(node_st *node) {
                             false,
                             false,
                             false,
+                            false,
                             false};
         vartable_ref r = vartable_insert(DATA_AG_GET()->vartable, e,
                                          VARREF_ID(EXPRS_EXPR(expr)));
@@ -67,6 +68,7 @@ node_st *AGvardecl(node_st *node) {
                         0,
                         0,
                         true,
+                        false,
                         false,
                         false,
                         false,

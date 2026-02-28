@@ -120,7 +120,7 @@ node_st *VPcall(node_st *node) {
         vartable_ref r = {VARREF_N(DATA_VP_GET()->ref),
                           VARREF_L(DATA_VP_GET()->ref)};
         vartable_entry *e = vartable_get(DATA_VP_GET()->vartable, r);
-        if (e->escapes && e->write_count > 1) {
+        if (e->write_escapes && e->write_count > 1) {
             DATA_VP_GET()->expr = NULL;
         }
     }
@@ -132,7 +132,7 @@ node_st *VPcall(node_st *node) {
         vartable_ref r = {VARREF_N(DATA_VP_GET()->expr),
                           VARREF_L(DATA_VP_GET()->expr)};
         vartable_entry *e = vartable_get(DATA_VP_GET()->vartable, r);
-        if (e->escapes) {
+        if (e->write_escapes) {
             DATA_VP_GET()->expr = NULL;
         }
     }

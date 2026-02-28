@@ -134,6 +134,7 @@ node_st *vartable_named_temp_var(vartable *self, enum BasicType ty,
                         false,
                         false,
                         false,
+                        false,
                         false};
     node_st *ref = ASTvarref(NULL, NULL);
     VARREF_RESOLVED_TY(ref) = ty;

@@ -6,7 +6,8 @@ void AOEfini(void) {}
 node_st *AOEprogram(node_st *node) {
     for (int i = 0; i < PROGRAM_VARTABLE(node)->len; i++) {
         vartable_entry *e = &PROGRAM_VARTABLE(node)->buf[i];
-        e->escapes = false;
+        e->read_escapes = false;
+        e->write_escapes = false;
     }
 
     DATA_AOE_GET()->vartable = PROGRAM_VARTABLE(node);
@@ -19,7 +20,8 @@ node_st *AOEprogram(node_st *node) {
 node_st *AOEfundecl(node_st *node) {
     for (int i = 0; i < FUNDECL_VARTABLE(node)->len; i++) {
         vartable_entry *e = &FUNDECL_VARTABLE(node)->buf[i];
-        e->escapes = false;
+        e->read_escapes = false;
+        e->write_escapes = false;
     }
 
     DATA_AOE_GET()->vartable = FUNDECL_VARTABLE(node);
@@ -36,7 +38,12 @@ node_st *AOEvarref(node_st *node) {
 
     vartable_ref r = {VARREF_N(node), VARREF_L(node)};
     vartable_entry *e = vartable_get(DATA_AOE_GET()->vartable, r);
-    e->escapes |= r.n > 0;
+
+    if (VARREF_WRITE(node)) {
+        e->write_escapes |= r.n > 0;
+    } else {
+        e->read_escapes |= r.n > 0;
+    }
 
     return node;
 }

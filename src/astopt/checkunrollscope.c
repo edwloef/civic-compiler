@@ -38,7 +38,7 @@ node_st *CUScall(node_st *node) {
         vartable_ref r = {VARREF_N(DATA_CUS_GET()->ref),
                           VARREF_L(DATA_CUS_GET()->ref)};
         vartable_entry *e = vartable_get(DATA_CUS_GET()->vartable, r);
-        if (e->escapes && e->write_count > 1) {
+        if (e->write_escapes && e->write_count > 1) {
             DATA_CUS_GET()->can_unroll = false;
         }
     }
