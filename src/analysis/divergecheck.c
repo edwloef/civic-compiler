@@ -16,6 +16,7 @@ node_st *ADCstmts(node_st *node) {
     if (STMT_DIVERGES(STMTS_STMT(node)) && STMTS_NEXT(node)) {
         WARNING(STMTS_STMT(node),
                 "any code following this statement is unreachable");
+        INFO(STMTS_STMT(STMTS_NEXT(node)), "first unreachable statement");
     }
 
     STMTS_DIVERGES(node) =
@@ -57,6 +58,8 @@ node_st *ADCifelse(node_st *node) {
 
             if (IFELSE_ELSE_BLOCK(node)) {
                 WARNING(IFELSE_ELSE_BLOCK(node), "unreachable else-branch");
+                INFO(IFELSE_EXPR(node),
+                     "if-condition always evaluates to `true`");
             }
         } else {
             IFELSE_DIVERGES(node) = IFELSE_ELSE_BLOCK(node) &&
@@ -64,6 +67,8 @@ node_st *ADCifelse(node_st *node) {
 
             if (IFELSE_IF_BLOCK(node)) {
                 WARNING(IFELSE_IF_BLOCK(node), "unreachable if-branch");
+                INFO(IFELSE_EXPR(node),
+                     "if-condition always evaluates to `false`");
             }
         }
     } else {
@@ -85,6 +90,8 @@ node_st *ADCwhile(node_st *node) {
             WHILE_DIVERGES(node) = true;
         } else if (WHILE_STMTS(node)) {
             WARNING(WHILE_STMTS(node), "unreachable while-loop body");
+            INFO(WHILE_EXPR(node),
+                 "while-condition always evaluates to `false`");
         }
     }
 
@@ -113,11 +120,18 @@ node_st *ADCfor(node_st *node) {
 
     if (FOR_STMTS(node) && NODE_TYPE(FOR_LOOP_START(node)) == NT_INT &&
         NODE_TYPE(FOR_LOOP_END(node)) == NT_INT &&
-        NODE_TYPE(FOR_LOOP_STEP(node)) == NT_INT &&
-        (INT_VAL(FOR_LOOP_STEP(node)) > 0
-             ? INT_VAL(FOR_LOOP_START(node)) >= INT_VAL(FOR_LOOP_END(node))
-             : INT_VAL(FOR_LOOP_START(node)) <= INT_VAL(FOR_LOOP_END(node)))) {
-        WARNING(FOR_STMTS(node), "unreachable for-loop body");
+        NODE_TYPE(FOR_LOOP_STEP(node)) == NT_INT) {
+        if (INT_VAL(FOR_LOOP_STEP(node)) > 0) {
+            if (INT_VAL(FOR_LOOP_START(node)) >= INT_VAL(FOR_LOOP_END(node))) {
+                WARNING(FOR_STMTS(node), "unreachable for-loop body");
+                INFO(node, "start is larger than end, but step is positive");
+            }
+        } else if (INT_VAL(FOR_LOOP_STEP(node)) < 0) {
+            if (INT_VAL(FOR_LOOP_START(node)) <= INT_VAL(FOR_LOOP_END(node))) {
+                WARNING(FOR_STMTS(node), "unreachable for-loop body");
+                INFO(node, "start is smaller than end, but step is negative");
+            }
+        }
     }
 
     return node;
