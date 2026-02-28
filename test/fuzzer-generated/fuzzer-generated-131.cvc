@@ -1,0 +1,19 @@
+void foo() { 
+ void foo() { 
+    while (false)do {
+foo();
+    foo();
+    } while (t>=e);
+
+    do
+    foo();
+    while (false);
+}   while (false)do {
+foo();
+    foo();
+    } while (t>=e);
+
+    do
+    foo();
+    while (false);
+}

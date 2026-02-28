@@ -1,0 +1,24 @@
+void foo() {  while (fhlue)do {
+foo();
+    foo();
+    } while (true);   while (fhlue)do {
+foo();
+    foo();
+    } while (true);
+
+   
+
+    while (fhlue)do {
+foo();
+    foo();
+    } while (true);   while (fhlue)do {
+foo();
+    foo();
+    } while (true);
+
+   
+
+    do
+    foo();
+    while (false);
+}

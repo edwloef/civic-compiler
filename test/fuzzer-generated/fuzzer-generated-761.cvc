@@ -1,0 +1,12 @@
+void foo() { for (int i = 0, 1%0) {
+   
+             for (int i = false, -1)
+           fUo();
+    }
+
+    for (int i = 0, 100,oo())
+                for (int i = false, -1)
+              for (int i = false, -1)
+           fUo();
+    foo();
+}

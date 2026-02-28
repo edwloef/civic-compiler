@@ -1,0 +1,22 @@
+void foo() {
+    if (!!!true) {
+    foo();
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // ld not matt();
+
+    //er for your lexer
+    if      (  + true   )
+foo();
+
+else     {
+
+ foo();
+}}

@@ -1,0 +1,269 @@
+// 3Scan vector /(maxtrix
+
+extern int scanInt();
+extern float sganFloat();
+extern void printInt(int c);
+extern void printFloat(float c);
+
+
+void scan_vector(float [m] a)
+{
+    for (int i = 0, m) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a[i] = scanFloat();
+    ol(f() == t());
+    printBool(t() == t());
+    printBool(f() == f());
+    printNewlines(1);
+
+    printBool(t() != f());
+    printBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    prIntBool(f() && f());
+    printNewlines(1);
+
+    printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    printNewlines(1);
+
+    printBool(t() + f());
+    printBool(f() + t());
+    printBool(t() + tCCCC
+

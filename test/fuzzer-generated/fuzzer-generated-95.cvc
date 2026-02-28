@@ -1,0 +1,5 @@
+
+export float b2;
+export bool c2;
+
+export int d2 = 321;

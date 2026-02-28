@@ -1,0 +1,13 @@
+  bool n = 20 < 20;
+  bool o = 3.0 < 6.1;
+
+  bool p = 20 <= 20;
+  bool q = 3.0 <= 1.1;
+
+  bool r = 60 < 50 || 30 > 10;
+  bool s = 3.0<= 2.0;
+
+  bool t = 8 != 8;
+  bool u = 8 == 8;
+  bool v = 1.2 != 2.1;
+  bool w = true != false;

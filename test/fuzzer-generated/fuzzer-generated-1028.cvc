@@ -1,0 +1,3 @@
+// 3tor / maxtrix
+
+extern int  [m,n] M;

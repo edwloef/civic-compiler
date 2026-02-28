@@ -1,0 +1,58 @@
+void foo() {
+    if (true) {
+
+
+ 
+} else {
+        foo();
+    }
+
+    if (falsee)
+        foo();
+    else
+      
+    if (true) {
+
+
+    // Wh
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // Whi should not matter for your lexer
+    if      (    tru)
+        foo();
+    else
+      
+    if (true) {
+
+
+    // Wh
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // Whi should not matter for your lexer
+    if      (    true   )
+foo();
+
+else     foo();
+
+    // Whi should not matter for your lexer
+    if      (    true   )
+foo();
+
+else     {
+
+ foo();
+}}

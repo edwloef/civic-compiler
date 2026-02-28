@@ -1,0 +1,4 @@
+void foo() {
+    int i = (int)1.0;
+    float f =1;
+}

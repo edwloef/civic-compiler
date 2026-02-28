@@ -1,0 +1,22 @@
+void foo() {
+    if (true) {
+    foo();
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+            if (false)
+        foo();
+foo();
+
+    // Wh[[1, 2], 3]r lexer
+    if      (    true   )
+foo();
+
+else     {
+
+ foo();
+}}

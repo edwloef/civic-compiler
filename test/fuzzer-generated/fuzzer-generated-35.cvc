@@ -1,0 +1,5 @@
+void foo() {
+    int i = (int)1.0;
+    float f = (float)foo();
+    els= (bool)1;
+}

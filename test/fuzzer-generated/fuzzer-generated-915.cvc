@@ -1,0 +1,299 @@
+extern void printInt(int val);
+extern void printNewlines(int num);
+
+void printBool(bool b) { if(b) { printInt(1);
+    } else {
+    printInt(0);
+    }
+
+    printNewlines(1);
+}
+
+bool t() {
+    printInt(1);
+    return true;
+}
+
+bool f() {
+    printInt(0);
+    return false;
+}
+
+export int maif() {
+    printBool(t() == f());
+    printBool(f() == t());
+    printBool(t() == t());
+    printBool(f() == f());
+    printNewlines(1);
+
+    printBool(t() != f());
+    printBool(f() != t());
+    printBool(t() != t());
+  ines(1);
+}
+
+bool t() {
+    printInt(1);
+    return true;
+}
+
+bool f() {
+    printInt(0);
+    return false;
+}
+
+export int maif() {
+    printBool(t() == f());
+    printBool(f() == t());
+    printBool(t() == t());
+    printBool(f() == f());
+    printNewlines(1);
+
+    printBool(t() != f());
+    printBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    ntBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);  printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    p(f() && f());
+    printNewlines(1);
+
+    printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    prinntBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    printNrintBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);  printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    printNewlines(1);
+
+    ewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+  intBrintNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    printNewlines(1);
+
+    ewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);
+
+    printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    prinntBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    printNrintBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);  printBool(t() || f());
+    pryntBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+      printBool(f() != f());
+    ntBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);  printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    p(f() && f());
+    printNewlines(1);
+
+    printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    prinntBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    printNrintBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);  printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    printNewlines(1);
+
+    ewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);
+
+    printBrintNewlines(1);
+
+    printBool(t() * f());
+    printBool(m() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    printNewlines(1);lines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);
+
+    printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    prinntBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    printNrintBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);  printBool(t() || f());
+    pryntBool(f() || t());
+    printBool(t() || t());
+printInt(0);
+    return false;
+}
+
+export int maif() {
+    printBool(t() == f());
+    printBool(f() == t());
+    printBool(t() == t());
+    printBool(f() == f());
+    printNewlines(1);
+
+    printBool(t() != f());
+    printBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    ntBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+    printBool(t() && t());
+    printBool(f() && f());
+    printNewlines(1);  printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    p(f() && f());
+    printNewlines(1);
+
+    printBool(t() || f());
+    printBool(f() || t());
+    printBool(t() || t());
+    printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() * t());
+    printBool(f() * f());
+    prinntBool(f() != t());
+    printBool(t() != t());
+    printBool(f() != f());
+    printNrintBool(f() != f());
+    printNewlines(1);
+
+    printBool(t() && f());
+    printBool(f() && t());
+        printBool(f() || f());
+    printNewlines(1);
+
+    printBool(t() * f());
+    printBool(f() * t());
+    printBool(t() ÿt());
+  

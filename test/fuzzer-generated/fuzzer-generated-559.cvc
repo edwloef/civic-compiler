@@ -1,0 +1,17 @@
+void foo() { int i = (int)1.0;
+    float f = (float)Foo();
+    int i = (int)1.0;
+    float f = (float)foo();
+void foo() {
+    int i = (int)1.0;
+    float f = (float)foo();
+    int i = (int)1.0;
+    float f = (float)foo();
+  s= (bool)1;
+}
+    els= (bool)1;
+}  int i = (int)1.0;
+    float f = (float)foo();
+    int i = (int)1.0;
+    float f = (float)foo();
+  

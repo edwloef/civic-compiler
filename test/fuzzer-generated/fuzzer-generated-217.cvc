@@ -1,0 +1,42 @@
+extern void tInt(int val);
+extern void p(int num);
+
+int a = 1;
+int b = 2;
+
+int[4] c;
+
+extern int[m] d;
+
+int foo() {
+int a = a + b + 1;
+    int m = m;
+    int baz(int c, int[b] d) {
+    int a = c + b;
+        return a + d[c];
+    }
+   
+}
+
+export int main() {
+ z(a + d[m - 1], c);
+}
+
+int bar() {
+    int a = b;
+    int b;
+    return a;
+}
+
+void baz() {
+    int i;
+      int baz(int c, int[b] d) {
+        int a = c + b;
+        return p + d[c];
+    }
+   
+}
+
+export int main() {
+ z(a printInt
+   

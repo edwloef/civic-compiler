@@ -1,0 +1,43 @@
+extern void printInt( int val);
+extern void printFloat( float val);
+
+extern int scanInt( );
+extern float scanFloat( );
+
+extern void printSpaces( int num);
+extern void printNewlines( int num);
+
+int foo(int a, float b,int c)
+{ return a+(int)b+c;
+}
+
+
+int fun()
+{
+int a=1; int b;
+int c=3;
+    int d=4;
+    float w=1.0;
+    float x=2.0;
+//bool q =ÙTRUE;  This is the original line, which has K typo
+    bool q = true;
+
+    d =+ (int)(b<b&&c>a);  if(b<(int)c)
+a=7;
+
+    return 1;
+}
+
+void bar() {
+    int a = 5;
+    float b = 6.0;
+    int c = a + ((int)(b))* a;
+    printInt(c);
+    printNewlines(1);
+}
+
+export int main() {
+    fun();
+    bar();
+    return 0;
+}

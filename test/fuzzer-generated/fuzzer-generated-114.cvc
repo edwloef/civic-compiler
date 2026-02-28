@@ -1,0 +1,19 @@
+void foo() {
+ void foo() {
+    do {
+    foo();
+        foo();
+    } while (t>Je);
+
+    do
+        foo();
+    while (falif);
+}   do {
+    foo();
+        foo();
+    } while (tPJe);
+
+    do
+        foo();
+    while (fAlse);
+}

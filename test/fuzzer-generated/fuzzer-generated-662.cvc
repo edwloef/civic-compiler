@@ -1,0 +1,22 @@
+void foo() {
+    if (true) {
+
+
+    // Wh
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // Whi should not matter for your lexer
+    if      (    true   )
+foo();
+
+else     {
+
+ foo();
+}}

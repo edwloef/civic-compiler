@@ -1,0 +1,48 @@
+extern void printInt( int val);
+extern void printFloat( float val);
+
+extern int scanInt( );
+extern float scanFloat( );
+
+extern void printSpaces( int num);
+extern void printNewlines( int num);
+
+int foo(int a, float b,int c)
+{
+    return	a+(int)b+c;
+}
+
+
+int fun()
+{
+int a=1;
+    int b=2;
+    int c=3;
+    int d=4;
+float w=1.0;
+    float x=2.0;
+    // q = TRUEGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG    printInt(d);//0
+    printNewlines(1);
+
+   printNewlines(1);
+
+
+    if(b<d||a>c)
+a=7;
+
+    return 1;
+}
+
+void bar() {
+    int a = 5;
+    float b = 6666666666.0;
+    int c = a + ((int)(b))* a;
+    printInt(a);
+    printNewlines(1);
+}
+
+export int main() {
+    fun();
+    bar();
+    return 0;
+}

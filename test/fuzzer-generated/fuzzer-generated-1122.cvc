@@ -1,0 +1,13 @@
+  bool n = 20 < 20;
+  bool o = 3.0 < 6.1;
+
+  bool p = 20 <= 20;
+  bool [4]ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttp = 20 <= 20;
+  bool [4]ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttp = 20 <= 20;
+  bool [4]tttttttttttttttttttttttttttttttttxtttttp = 20 <= 20;
+  bool [4]tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttxtttttp = 20 <= 20;
+  bool [4]tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttxtttttp = 20 <= 20;
+  bool [4]tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttxtttttp = 20 <= 20;
+  bool [4]ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttxtttttp = 20 <= 20;
+  bool [4]ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttxtttttp = 20 <= 20;
+  bool [4]ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt= false;

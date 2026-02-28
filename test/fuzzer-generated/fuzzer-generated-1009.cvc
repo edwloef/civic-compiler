@@ -1,0 +1,5 @@
+  bool n = 20 < 20;
+  bool o = 3.0 < 6.1;
+
+  bool p = 20 <= 20;
+  bool [2]tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt= false;

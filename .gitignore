@@ -1,11 +1,8 @@
 build-debug
 build-release
 .cache
-civcc
 civas
-civvm
 civcc
-test/fuzzer-generated
 civic.dict
-fuzz-outputs
+civvm
 profile.json*

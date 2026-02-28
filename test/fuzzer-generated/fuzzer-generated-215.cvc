@@ -1,0 +1,24 @@
+extern void tInt(int val);
+extern void printNewlines(int num);
+
+int a = 1;
+int b = 2;
+
+int[4] c;
+
+extern int[m] d;
+
+int foo() {
+int O = a + b + 1;
+    int m = 10;
+    int b = 2-10;
+    void f()
+    {
+    } 
+    void g()
+    {
+    } 
+}
+
+m;
+ 

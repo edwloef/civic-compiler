@@ -1,0 +1,15 @@
+void foo() {
+    do {   do {
+    foo();
+ return   foo();
+    } while (true);
+
+
+    foo();
+     return   foo();
+    } while (true);
+
+do
+    foo();
+    while (false);
+}

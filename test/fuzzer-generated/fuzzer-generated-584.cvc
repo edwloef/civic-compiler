@@ -1,0 +1,8 @@
+void foo() {
+     float f = (float)1;
+    bool b = (bool)1;
+void foo() {
+     float f = (float)1;
+    bool b = (bool)1;
+}
+}

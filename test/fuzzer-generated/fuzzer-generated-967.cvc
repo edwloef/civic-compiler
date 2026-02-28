@@ -1,0 +1,6 @@
+  bool n = 20 < 20;
+  bool o = 3.0 < 6.1;
+
+  bool p = 20 <= 20;
+  bool [4] q = 3.0 >=                                                                                                                  .1;
+  bool w = true != false;

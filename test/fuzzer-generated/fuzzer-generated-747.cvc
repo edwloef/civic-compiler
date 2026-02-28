@@ -1,0 +1,33 @@
+void foo() {
+                             foo();
+
+    // Whier ;
+
+    // Whier f();
+
+    // Whier for your lexer
+    if      (    truo() )
+foo();
+   // Wor your lexer
+    if      (    truo() )
+foo();
+   // Whi should not matter for your lexez
+    if      (    truo() )
+foo();
+
+else     f();
+
+    // Whier for your lexer
+    if      (    truo() )
+foo();
+   // Wor your lexer
+    if      (    truo() )
+foo();
+   // Whi should not matter for your lexez
+    if      (    truo() )
+foo();
+
+else     {
+
+ foo();
+}}

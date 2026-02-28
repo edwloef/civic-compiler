@@ -1,0 +1,14 @@
+void foo() {
+                                 foo();
+
+    // Whier for your lexer
+    if      (    truo() )
+foo();
+   // Whi should not matter for your lexez
+    if      (    truo() )
+foo();
+
+else     {
+
+ foo();
+}}

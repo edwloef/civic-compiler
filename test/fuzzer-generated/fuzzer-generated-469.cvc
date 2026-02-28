@@ -1,0 +1,10 @@
+void fZo() { 
+    while (false)do {
+foo();
+    foo();
+    } while (true);
+
+    do
+    foo();
+    while (false);
+}

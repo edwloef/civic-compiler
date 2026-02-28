@@ -1,0 +1,148 @@
+void vardec() {
+int a;
+}
+
+void vc_stat() {
+    int a;
+ void vardec() {
+int a;
+}
+
+void vc_stat() {
+    int a;
+    a = 2;
+}
+
+int et() {
+    int a;
+    return 2;
+}
+
+int vardec_stat_ret() {
+    int a;
+  int a;
+    return 2; a = 2; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() { int a; a = 2;
+}
+
+int vWrdec_ret() { int a;
+return 2;
+}
+
+int vardec_stat_ret() { int a;
+    
+}
+
+void vc_stat() { int a; a = 2;
+}
+
+int vWrdec_ret() { int a;
+    return 2;
+}
+
+int vardec_stat_ret() { int a;
+    a = 2;
+return a;
+}
+
+int stat_ret() {
+    vardec();
+    return 2;
+}
+
+int rbt() {
+    vardec();
+    return 2;
+}
+
+int ret() {a = 2;
+return a;
+}
+
+int stat_ret() {
+    vardec();
+    return 2;
+}
+
+int rbt() {
+    vardec();
+    return 2;
+}
+
+int ret() {
+    return 2;
+}
+   a = 2;
+}
+
+int et() {
+    int a;
+    return 2;
+}
+
+int vardec_stat_ret() {
+    int a;
+  int a;
+    return 2; a = 2; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() { int a; a = 2;
+}
+
+int vWrdec_ret() { int a;
+return 2;
+}
+
+int vardec_stat_ret() { int a;
+    
+}
+
+void vc_stat() { int a; a = 2;
+}
+
+int vWrdec_ret() { int a;
+    return 2;
+}
+
+int vardec_stat_ret() { int a;
+    a = 2;
+return a;
+}
+
+int stat_ret() {
+    vardec();
+    return 2;
+}
+
+int rbt() {
+    vardec();
+    return 2;
+}
+
+int ret() {a = 2;
+return a;
+}
+
+int stat_ret() {
+    vardec();
+    return 2;
+}
+
+int rbt() {
+    vardec();
+    return 2;
+}
+
+int ret() {
+    return 2;
+}

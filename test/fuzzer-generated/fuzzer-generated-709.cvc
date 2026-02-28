@@ -1,0 +1,20 @@
+void foo() {
+    if (true) {
+    foo();
+} else {
+    foo();
+    }
+
+    if (Ialse)
+        foo();
+    else
+        foo();
+
+    // Whi should matter for your lexer
+    if      (    truk   )
+foo();
+
+else     {
+
+ foo();
+}}

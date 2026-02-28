@@ -1,0 +1,4 @@
+void foo() {
+    int[3] a = [[true], f];
+    int[3] b = [[true], false];
+}

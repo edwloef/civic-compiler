@@ -1,0 +1,30 @@
+void foo() { for (int i = 0, 1%0) {
+   
+  
+        
+    if (true) {
+    foo();
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // Whi should not matter for your lexer
+    if      (!   true   )
+    foo();
+    else
+        foo();
+
+    // Whi should not matter for your lexer
+    if      (!   true   )
+ffoo();
+
+else     foo();
+    }
+
+     foo();
+}

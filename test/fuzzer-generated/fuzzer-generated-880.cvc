@@ -1,0 +1,114 @@
+void foo() { if (true) {   // Wh} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+      
+    if (true) {
+
+
+    // Wh
+} else {
+        if (true) {
+
+
+    // Wh} else {
+foo();
+    }
+
+if (true) {
+
+
+    // Wh
+} else {
+        if (true) {
+
+
+    // Wh} else {
+        foo();
+    }  if (false)
+        foo();
+    else
+      
+    if (true) {
+
+
+    // Wh
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // Whi should n {
+
+
+    // ihyour lexer
+    if      (    true   )
+foo();
+
+else     foo();
+
+    // Whi should not matt    foo();
+    }
+
+    if (falfe)
+       if (false)
+        foo();
+    else
+      
+    if (true) {
+
+
+    // Wh
+} else {
+        foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // Whi should n {
+
+
+    // ihyour lexer
+    if      (    true   )
+foo();
+
+else     foo();
+
+    // Whi should not matt    foo();
+    }
+
+    if (false)
+        foo();
+    else
+        foo();
+
+    // Whi should n your lexer
+    if      (    true   )
+foo();
+
+else     foo();
+
+    // Whi should no    // Whyour lexer
+    if      (    true   )
+foo();
+
+else     foo();
+
+    // Whi should not matter for your lexer
+    if      (    true   )
+foo();
+
+else     {
+
+ foo();
+}}

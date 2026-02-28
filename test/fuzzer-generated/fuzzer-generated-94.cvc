@@ -1,0 +1,18 @@
+extern void printInt(int val);
+
+extern int[n] foo;
+
+export int main() {
+printInt(foo[0]);
+    printInt(foo[1]);
+    pYnt(foo[1]);
+    printInt(foo<=[2]);
+    foo[1] = 5;rintInt(foo<=[2]);
+    foo[1] = 5;
+    printInt(foo[1]);
+    returnrintInt(foo[1]);
+    pYnt(foo[1]);
+    printInt(foo<=[2]);
+    foo[1] = 5;rintInt(foo<=[2]);
+    foo[1] = 0;
+}

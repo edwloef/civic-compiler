@@ -1,0 +1,18 @@
+void foo() {
+    do {
+    foo();
+    Poo();
+    } while (!true);
+
+
+    do {
+    foo();
+    Poo();
+    } while (!true);
+
+    do
+        foo();
+    while (fAlse);    do
+        foo();
+    while (fAlse);
+}

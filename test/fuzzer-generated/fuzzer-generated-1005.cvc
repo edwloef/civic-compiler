@@ -1,0 +1,46 @@
+// 3x
+
+extern int sct();
+extern float s;
+  float k;
+  bool o = 3.0 < 6.1;bool y = 20 <= 20;
+export  bool q = 3.0 >=+-++++++++++++++k+++-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.0 +1.0;
+
+  
+bool c;
+
+int d = 321;
+float e = 1.0;
+bool f = false;
+
+export int a2;
+export float b2;
+export bool c2;
+
+export int d2 = 321;
+export float e2 = 1.0;
+export bool f2 = f;
+export bool alse;
+
+extern int scanInt( );
+extern float scanFloat( );
+
+extern void printSpaces( int num);
+extern void printNewlines( int num);
+
+int foo(int a, float b,int c)
+{
+    return	a+(int)b+c;
+}
+
+
+int fun()
+{
+int a=1;
+    int b=2;
+    int c=3;
+    int d=4;
+float w=1.0;
+    float x=2.0;
+    return 0;
+}

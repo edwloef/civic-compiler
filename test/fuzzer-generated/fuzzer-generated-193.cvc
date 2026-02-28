@@ -1,0 +1,7 @@
+void foo() {
+a = 2;
+    return a;
+}
+
+int sta [[3
+}

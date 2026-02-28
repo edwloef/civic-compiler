@@ -1,0 +1,51 @@
+void foo() { doe (!true);
+
+
+do {
+    foo();
+    Poo();
+    } while (!true);
+ do     foo();
+    while (fAlse);    do
+     {
+    foo();
+    Poo();
+    } while (!true);
+
+
+  hile (!true);
+
+    do
+       dfoo();
+    while (fA);
+
+    do
+        foo();  while (fA);
+
+    do
+  
+        foo();
+    while (fAlse);    do
+     {
+    foo();
+    Poo();
+    } while (!true);
+
+
+  hile (!true);
+
+    do
+        foo();
+    while (fA);
+
+    do
+        foo();  while (fA);
+
+    do
+        foo();
+    while (fAlse);    do
+        foo();
+    while (f);    do
+        foo();
+    while (fAlse);
+}
