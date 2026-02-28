@@ -1,4 +1,5 @@
-#include "../../civic.h"
+extern void printFloat(float n);
+extern void printNewlines(int n);
 
 export int main() {
     printFloat(test(1e16, -1e16));

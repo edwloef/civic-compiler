@@ -1,4 +1,6 @@
-#include "../../civic.h"
+extern void printInt(int n);
+extern void printSpaces(int n);
+extern void printNewlines(int n);
 
 int a = -1;
 int foo() {

@@ -1,4 +1,4 @@
-#include "../../civic.h"
+extern void printInt(int n);
 
 export void wideTest() {
     int a1;

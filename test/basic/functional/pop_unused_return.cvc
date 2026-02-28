@@ -1,0 +1,9 @@
+int a() {
+	return 5;
+}
+
+export int main() {
+	a();
+	a();
+	return 0;
+}
