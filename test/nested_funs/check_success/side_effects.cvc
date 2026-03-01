@@ -61,10 +61,10 @@ export void bar() {
     a = 0;
     side_effects();
     printInt(a);
-    b = 0;
+    b[0] = 0;
     no_side_effects_array_param(b);
     printInt(b[0]);
-    b = 0;
+    b[0] = 0;
     side_effects_array_param(b);
     printInt(b[0]);
 }
