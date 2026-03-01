@@ -58,8 +58,7 @@ node_st *ADCifelse(node_st *node) {
 
             if (IFELSE_ELSE_BLOCK(node)) {
                 WARNING(IFELSE_ELSE_BLOCK(node), "unreachable else-branch");
-                INFO(IFELSE_EXPR(node),
-                     "if-condition always evaluates to `true`");
+                INFO(node, "if-condition always evaluates to `true`");
             }
         } else {
             IFELSE_DIVERGES(node) = IFELSE_ELSE_BLOCK(node) &&
@@ -67,8 +66,7 @@ node_st *ADCifelse(node_st *node) {
 
             if (IFELSE_IF_BLOCK(node)) {
                 WARNING(IFELSE_IF_BLOCK(node), "unreachable if-branch");
-                INFO(IFELSE_EXPR(node),
-                     "if-condition always evaluates to `false`");
+                INFO(node, "if-condition always evaluates to `false`");
             }
         }
     } else {
@@ -90,8 +88,7 @@ node_st *ADCwhile(node_st *node) {
             WHILE_DIVERGES(node) = true;
         } else if (WHILE_STMTS(node)) {
             WARNING(WHILE_STMTS(node), "unreachable while-loop body");
-            INFO(WHILE_EXPR(node),
-                 "while-condition always evaluates to `false`");
+            INFO(node, "while-condition always evaluates to `false`");
         }
     }
 
