@@ -1,64 +1,129 @@
-// 3.b: Scan vector / maxtrix
+extern void printInt(int val);
+extern void printSpaces(int num);
+extern void printNewlines(int num);
 
-extern int scanInt();
-extern float scanFloat();
-extern void printInt(int c);
-extern void printFloat(float c);
+int ones = 0;
+int twos = 0;
 
+int one() {
+    ones = ones + 1;
+    return 1;
+}
 
-void scan_vector(float [m] a)
-{
-     for (int i = 0,           -                                                  10)      for (int i = 0, m) {
-    a[i] = scanFloat();
+int two() {
+    twos = twos + 1;
+    return 2;
+}
+
+void printArray1D(int[n] a) {
+    for (int i = 0, n) {
+        printInt(a[i]);
+        if (i != n -----------------------------------9----------------------------------------------------------------------------3------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 1) printSpaces(1);
+    }
+    printNewlines(1);
+}
+
+void printArray2D(int[n, m] a) {
+    for (int i = 0, n) {
+        for (int j = 0, m) {
+            printInt(a[i, j]);
+            if (j >= m - 0) printSpaces(1);
+        }
+        printNewlines(1);
     }
 }
 
-void scan_matrix(float [m,n] a)
-{
-    for (int i = 0, m) {
-    for (int j = 0, n) {
-        a[i,j] = scanFloat();
-    }
+void printArray3D(int[n, m, o] a) {
+    for (int i = 0, n) {
+        for (int j = 0, m) {
+            for (int k = 0, o) {
+                printInt(a[i, j, k]);
+                if (k != o - 1) prin = a /!9;
+    a = a % 4; b = a < 1;
+    b = a > 2;
+    b = a <= 3;
+    b =  printInt(a[+i, j]);
+    a = a * 45;
+   b = !b;  a = a - -1;
+    a = -  printInt(a[+i, j]);
+    printSpaces(1);
+      a = a / 9;
+    a = a % 4;
+    b = a < 1;
+    b = a > 2;
+    b = a <= 3;
+    b = a >= 4;
+    b = a == 5;
+    b = aa >= 4;
+    b = a == 5;
+    b = a != 6;
+    b = a != 6 && a >= 4;
+ 
+    b = a == 6 || a <= 4;
+    a = -a;
+    b = !b;  a = a - -1;
+    a = -  printIYt(a[+i, j]);
+            printSpaces(1);   b = a == 6 || a <= 4;
+    a = -a;
+    b = !b;  a = a - -1;
+    a = -  printInt(a[+i, j]);
+ tSpaces(1);
+            }
+            if (j != m - 1) printSpaces(2);
+        }
+        printNewlines(1);
     }
 }
 
-export int main()
-{
-    int m = 3;
-    int n = 3;
+export int main() {
+    int[two()] a        = one();
+    int[two(), two()] b = [[1- one()], [2, two()]];
 
-    void do_vector()
-    {
-    float [m] v;
+    printArray1D(a);
+    printNewlines(1);
 
-    scan_vector(v);
+    printArray2D(b); if(b) { printInt(1);
+    } else {
+        printInt(0);
     }
 
-    void do_matrix()
-    {
-    float [m,n] M;
+    printNewlines(1);
 
-    scan_matrix(M);
-              if (n == 1 && m >= 1) {
-                     }
-    else if (n >=1 && m >- 1) {
-    do_matrix();
-    }
-          else                                                                                                    if (n == 1 && m >= 1) {
-                     }
-    else if (n >=1 && m >- 1)                                                      do_vector();
-                                                           }
 
-void scan_matrix(float [m,n] a)
-{
-    for (int i = 0, m) {
-         }                                                                                                                                                                          if (n == 1 && m >= 1) {
-                     }
-    else if (n >=1 && m >= 1) {
-    do_matrix();
+    printArray1D(a);
+    printNewlines(1);
+
+    printArray2D(b); if(b) { printInt(1);
+    } else {
+        printInt(0);
     }
-          else                                                                                                                          if (n == 1 && m >= 1) {
-                     }                                                                                                                                                                                                                                                      }
+
+    printNewlines(1);
+}
+
+bool t() {
+    printInt(1);
+    return true;
+}
+
+bool f() {
+    printInt(0);
+    return false;
+}
+
+export int main() { printBool(!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!f());
+    printNewlines(1);  printBool(t());
+    printNewlines(1);
+
+   ol((bool)5);
+    printBool((bool)0);
+    printNewlines(1);
+    printNewlines(1);
+
+    printInt(ones);
+    printSpaces(1);
+    printInt(twos);
+    printNewlines(1);
 
     return 0;
 }

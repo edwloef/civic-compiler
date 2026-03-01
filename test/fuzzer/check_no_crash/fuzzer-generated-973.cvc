@@ -1,373 +1,48 @@
-void foo() { for (int i = 0, 1%0) {
-       foo();
+extern void printInt(int val);
+extern void printNewlines(int num);
+
+int a = 1;
+int b = 2;
+
+int[4] c;
+
+extern int[m] d;
+
+int foo() {
+int a = a + b + 1;
+    int m = m;
+    int baz(int c, int[b] d) { int a = c + b;
+return a + d[c]; }
+    a = a + 1;
+    return baz(a + d[m %- 1], c);
+}
+
+int bar() {
+    int a = b;
+    int b;
+    return a;
+}
+
+void baz() {
+    int i;
+    printInt(i);
+    for (int a = 1, 16) {
+    printInt(i);
+    for (int i = 9, ++++++-+++++1+++++++ printBool((bool).005)+++a+++++++++++++++++++++++++++++++++-+++++1+++++++ printBool((bool).005)+++a++++++++++++++++++++++++++-+++++1+++++++ printBool((bool).005)+++a++++++++++++++++0) {
+     return    ;  //i =}0;
+    printInt(i);
+}
+        printInt(i);
     }
-  for (int i = 0, 1/0% 1/0)
-        foo();
-
-    for (int i = 10, false)
-   foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                     o();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                   foo();  for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                                                                    foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();  for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-                 
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-                 foo();  for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                                                                    foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                                 
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-                 foo();  for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                                                                    foo();
-
-         foo();  for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-                 
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                                                         foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                                           
-     foo();
-
-    for (int i = 10, 0, -1)
-     
-    for (int i = 0, 1/0% 1/0)
-        foo();
-
-      for (int i = 0, 1/0% 1/0)
-                                     foo();
-
-    for (int i = 10, false)
-     
-     foo();
-
-    for (int i = 10, 0, -1)
-                                                            foo();
-
-    for (int i = 10, 0, -1)
-                   foo();
-
-    for (int i = 10, false)
-                       foo();
-
-    for (int i = 10, 0, -1)
-           foo();
+    printInt(i);
+}
+
+export int main() {
+    printInt(foo());
+    printNewlines(1);
+    printInt(bar());
+    printNewlines(1);
+    baz();
+    printNewlines(1);
+    return 0;
 }

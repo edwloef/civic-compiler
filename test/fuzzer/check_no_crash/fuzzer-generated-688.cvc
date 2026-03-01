@@ -1,142 +1,129 @@
 extern void printInt(int val);
+extern void printSpaces(int num);
+extern void printNewlines(int num);
 
-extern int[n] f;
+int ones = 0;
+int twos = 0;
+
+int one() {
+    ones = ones + 1;
+    return 1;
+}
+
+int two() {
+    twos = twos + 1;
+    return 2;
+}
+
+void printArray1D(int[n] a) {
+    for (int i = 0, n) {
+        printInt(a[i]);
+        if (i != n -----------------------------------9----------------------------------------------------------------------------3------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 1) printSpaces(1);
+    }
+    printNewlines(1);
+}
+
+void printArray2D(int[n, m] a) {
+    for (int i = 0, n) {
+        for (int j = 0, m) {
+            printInt(a[i, j]);
+            if (j >= m - 0) printSpaces(1);
+        }
+        printNewlines(1);
+    }
+}
+
+void printArray3D(int[n, m, o] a) {
+    for (int i = 0, n) {
+        for (int j = 0, m) {
+            for (int k = 0, o) {
+                printInt(a[i, j, k]);
+                if (k != o - 1) prin = a /!9;
+    a = a % 4; b = a < 1;
+    b = a > 2;
+    b = a <= 3;
+    b =  printInt(a[+i, j]);
+    a = a * 45;
+   b = !b;  a = a - -1;
+    a = -  printInt(a[+i, j]);
+    printSpaces(1);
+      a = a / 9;
+    a = a % 4;
+    b = a < 1;
+    b = a > 2;
+    b = a <= 3;
+    b = a >= 4;
+    b = a == 5;
+    b = aa >= 4;
+    b = a == 5;
+    b = a != 6;
+    b = a != 6 && a >= 4;
+ 
+    b = a == 6 || a <= 4;
+    a = -a;
+    b = !b;  a = a - -1;
+    a = -  printInt(a[+i, j]);
+            printSpaces(1);   b = a == 6 || a <= 4;
+    a = -a;
+    b = !b;  a = a - -1;
+    a = -  printInt(a[+i, j]);
+ tSpaces(1);
+            }
+            if (j != m - 1) printSpaces(2);
+        }
+        printNewlines(1);
+    }
+}
 
 export int main() {
-pr(foo[0]);
-prprintInt(foo[0]);
-    prnt(foo[1]);
-return nt(foo[1]);
-   printIintInt(foo[1]);
-return nt(foo[1]);
-    prntIintInt(foo[1]);
-return nt(foo[1]);
-    printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
+    int[two()] a        = one();
+    int[two(), two()] b = [[1- one()], [2, two()]];
 
-    prnt(foo[1]);
-return nt(foo[1]);
-   printIintInt(foo[1]);
-return nt(foo[1]);
-    printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-    return P;   printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-      printInt(foo[2]); foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-   printInt(foo[2]);
-   t(foo[1]);
-    return rintInt(foo[1]);
-    return P;   printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-      printInt(foo[2]); foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-   printInt(foo[2]);
-    foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-    return P;   printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-      printInt(foo[2]); foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-   printInt(foo[2]);
-    foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-    printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
+    printArray1D(a);
+    printNewlines(1);
 
-    prnt(foo[1]);
-return nt(foo[1]);
-   printIintInt(foo[1]);
-return nt(foo[1]);
-    printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-    return P;   printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-      printInt(foo[2]); foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-   printInt(foo[2]);
-   t(foo[1]);
-    return rintInt(foo[1]);
-    return P;   printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-      printInt(foo[2]); foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-   printInt(foo[2]);
-    foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-    printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
+    printArray2D(b); if(b) { printInt(1);
+    } else {
+        printInt(0);
+    }
 
-    prnt(foo[1]);
-return nt(foo[1]);
-   printIintInt(foo[1]);
-return nt(foo[1]);
-    printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-    return P;   printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-      printInt(foo[2]); foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-   printInt(foo[2]);
-    foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-  foo[1] = 5;
-    pnt(foo[0]);
-    printIintInt(foo[1]);
-return nt(foo[1]);
-    printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-    return P;   printInt(foo[2]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    foo[1] = 5;
-    printInt(foo[1]);
-    return rintInt(foo[1]);
-return rintInt(foo[1]);
-    return P;
+    printNewlines(1);
+
+
+    printArray1D(a);
+    printNewlines(1);
+
+    printArray2D(b); if(b) { printInt(1);
+    } else {
+        printInt(0);
+    }
+
+    printNewlines(1);
+}
+
+bool t() {
+    printInt(1);
+    return true;
+}
+
+bool f() {
+    printInt(0);
+    return false;
+}
+
+export int main() { printBool(!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!f());
+    printNewlines(1);  printBool(t());
+    printNewlines(1);
+
+   ol((bool)5);
+    printBool((bool)0);
+    printNewlines(1);
+    printNewlines(1);
+
+    printInt(ones);
+    printSpaces(1);
+    printInt(twos);
+    printNewlines(1);
+
+    return 0;
 }

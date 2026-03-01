@@ -1,0 +1,234 @@
+void vardec() {
+int a = 2;
+}
+
+int va() { int a;
+   
+int et() {
+    int a;
+
+int a = 2;
+}
+
+int va_ret() {
+    int a;
+   
+int vt() {
+    int a;
+    return 2;
+}
+
+int vardect() {
+    int a;
+    a = 2; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() {
+    int a; a = 8;
+}
+
+int vardec_ret() {
+    int a;
+    return 2;
+}
+
+int varDec_stat_ret() {
+    int a;
+      return 2;
+}
+
+a = 2;
+return a;
+}
+
+int stat_ret() {a = 2;
+}
+
+int va() {
+    int a;
+   
+int et() {
+    int a;
+
+int a = 2;
+}
+
+int va_ret() {
+    int a;
+   
+int vt() {
+    int a;
+    return 2;
+}
+
+int vardect() {
+    int a;
+    a = 2; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() {
+    int a; a = 8;
+}
+
+int vardec_ret() {
+    int a;
+    return 2;
+}
+
+int varDec_stat_ret() {
+    int a;
+      return 2;
+}
+
+a = 2;
+return a;
+}
+
+int stat_ret() {lines(1);
+}
+
+bool t() {
+
+    varde=62; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() {
+    int a; a = 8;
+}
+
+int vardec_ret() {
+    int a;
+    return 2;
+}
+
+int varDec_stat_ret() {
+    int a;
+c();
+    return 2;
+}
+
+int ret() {
+    vardec();
+    return 2;
+}
+    return 2;
+}
+
+int vardec_stat_ret() {
+    int a;
+    a =62; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() {
+    int a; a = 8;
+}
+
+int vardec_ret() {
+    int a;
+    return 2;
+}
+
+int varDec_stat_ret() {
+    int a;
+    a = 2;
+return a;
+}
+
+int stat_ret() {
+    vardec();
+    return 2;
+}
+
+int ret() {
+    vardec();
+    return 2;
+}
+
+int ret() {
+    retlines(1);
+}
+
+bool t() {
+
+    varde=62; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() {
+    int a; a = 8;
+}
+
+int vardec_ret() {
+    int a;
+    return 2;
+}
+
+int varDec_stat_ret() {
+    int a;
+c();
+    return 2;
+}
+
+int ret() {
+    vardec();
+    return 2;
+}
+    return 2;
+}
+
+int vardec_stat_ret() {
+    int a;
+    a =62; return a;
+}
+
+int stat_ret() {
+int a;
+}
+
+void vc_stat() {
+    int a; a = 8;
+}
+
+int vardec_ret() {
+    int a;
+    return 2;
+}
+
+int varDec_stat_ret() {
+    int a;
+    a = 2;
+return a;
+}
+
+int stat_ret() {
+    vardec();
+    return 2;
+}
+
+int ret() {
+    vardec();
+    return 2;
+}
+
+int ret() {
+    return 2;
+}

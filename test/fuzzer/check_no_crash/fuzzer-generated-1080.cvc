@@ -1,201 +1,55 @@
-void vardec() {
-a = 2;
-}
+extern void printInt(int val);
+extern void printNewlines(int num);
 
-int va() {
-    int a;
-   
-int et() {
-    int a;
+int a = 1;
+int b = 2;
 
-int a = 2;
-}
+int[4] c;
 
-int va_ret() {
-int a;
-   
-int vc_ret() {
-    int a;
-    return 2;
-}
+extern int[m] d;
 
-int vat_ret() {
-    int a;
-    a = 2; return a;
-}
-
-int stat_ret() {
-int a;
-}
-
-void vc_stat() {
-    int a; a = 8;
-}
-
-int vardec_ret() {
-    int a;
-    return 2;
-}
-
-int varDec_stat_ret() {
-    int a;
-    a = 2;
-return a;
-}
-
-int stat_ret() {lines(1);
-}
-
-bool t() {
- 
-int et() {
-    int a;
-
-int a = 2;
-}
-
-int va_ret() {
-    int a;
-   
-int vc_ret() {
-    int a;
+int foo() {
+int a = a + b + 1;
+    int m = a;
+    int baz(int c, int[b] d) {     int q = c / b; m = a;
   
-
-int va() {
-    int a;
+        return a / d[c];
    
-int et() {
-    int a;
-
-int a = 2;
+        for (int i = 9, 10) {
+            //i 
+    a = a + 1;
+ printInt(i);
+        }
+  }
+    a = a + 1;
+    return baz(++++++++++++++++++++ d[m - 1]++++++++++++++++++++++++++++++++++++++0+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++0++++-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ d[m - 1], c);
 }
 
-int va_ret() {
-int a;
-   
-int vc_ret() {
-    int a;
-    return 2;
+int bar() {
+    int a = b;
+    int b;
+    return a;
 }
 
-int vardec_stat_ret() {
-    int a;
-    a = 2; return a;
+void baz() {
+    int i;    for (int i = 1, 10) {
+        printInt(i);
+        for (int i = 9, 10) {
+            //i 
+    a = a + 1;
+ printInt(i);
+        }
+        printInt(i);
+    }
+    printInt(i);
 }
 
-int stat_ret() {
-int a;
-}
-
-void vc_stat() {
-    int a; a = 8;
-}
-
-int vardec_ret() {
-    int a;
-    return 2;
-}
-
-int varDec_stat_ret() {
-    int a;
-    a = 2;
-return a;
-}
-
-int stat_ret() {lines(1);
-}
-
-bool t() {
- 
-int et() {
-    int a;
-
-int a = 2;
-}
-
-int va_ret() {
-    int a;
-   
-int vc_ret() {
-    int a;
-    return 2;
-}
-
-int vardec_stat_ret() {
-    int a;
-    a = 2; return a;
-}
-
-int stat_ret() {
-int a;
-}
-
-void vc_stat() {
-    int a; a = 8;
-}
-
-int vardec_ret() {
-    int a;
-    return 2;
-}
-
-int varDec_stat_ret() {
-    int a;
-    a = 2;
-return a;
-}
-
-int stat_ret() {lines(1);
-}
-
-bool t() {
-
-    varde=62; return a;
-}
-
-int stat_ret() {
-int a;
-}
-
-void vc_stat() {
-    int a; a = 8;
-}
-
-int vardec_ret() {
-    int a;
-    return 2;
-}
-
-int varDec_stat_ret() {
-    int a;
-c();
-    return 2;
-}
-
-int ret() {
-    vardec();
-    return 2;
-}
-    return 2;
-}
-
-int vardec_stat_ret() {
-    int a;
-    a =62; return a;
-}
-
-int stat_ret() {
-int a;
-}
-
-void vc_stat() {
-    int a; a = 8;
-}
-
-int vardec_ret() {
-    int a;
-    return 2;
-}
-
-int varDec_stat_ret()  return 2;
+export int main() {
+    printInt(foo());
+ 	  printNewlines(1);
+    printInt(bar());
+    printNewlines(1);
+    baz();
+    printNewlines(1);
+    return 0;
 }
