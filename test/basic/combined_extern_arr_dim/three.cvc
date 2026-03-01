@@ -1,0 +1,5 @@
+extern void printInt(int a);
+
+export void three(int[n] a) {
+	printInt(a[n-1]);
+}

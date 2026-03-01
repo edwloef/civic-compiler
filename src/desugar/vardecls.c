@@ -87,26 +87,27 @@ node_st *DVDvardecl(node_st *node) {
         vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
 
         node_st *ref;
+        vartable_ref tr;
         if (VARDECL_EXTERNAL(node)) {
             ref = EXPRS_EXPR(expr);
 
             EXPRS_EXPR(expr) = vartable_named_temp_var(
                 DATA_DVD_GET()->vartable, TY_int, STRfmt("%s+%d", e->name, i));
-            vartable_ref r = {0, VARREF_L(EXPRS_EXPR(expr))};
-            vartable_get(DATA_DVD_GET()->vartable, r)->external = true;
+            tr = (vartable_ref){0, VARREF_L(EXPRS_EXPR(expr))};
+            vartable_get(DATA_DVD_GET()->vartable, tr)->external = true;
 
             VARREF_N(EXPRS_EXPR(expr)) =
                 DATA_DVD_GET()->vartable->parent == NULL;
         } else if (VARDECL_EXPORTED(node)) {
             ref = vartable_named_temp_var(DATA_DVD_GET()->vartable, TY_int,
                                           STRfmt("%s+%d", e->name, i));
-            vartable_ref r = {0, VARREF_L(ref)};
-            vartable_get(DATA_DVD_GET()->vartable, r)->exported = true;
+            tr = (vartable_ref){0, VARREF_L(ref)};
+            vartable_get(DATA_DVD_GET()->vartable, tr)->exported = true;
         } else {
             ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
+            tr = (vartable_ref){0, VARREF_L(ref)};
         }
 
-        vartable_ref tr = {0, VARREF_L(ref)};
         vartable_get(DATA_DVD_GET()->vartable, r)->ty.buf[i] = tr;
 
         VARREF_N(ref) = DATA_DVD_GET()->vartable->parent == NULL;

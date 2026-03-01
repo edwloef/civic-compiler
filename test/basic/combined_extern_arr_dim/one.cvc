@@ -1,5 +1,7 @@
 extern int[n] a;
+extern void three(int[n] a);
 
 export void one() {
 	n = 5;
+	three(a);
 }
