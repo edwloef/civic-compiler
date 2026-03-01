@@ -1,0 +1,76 @@
+set -eu
+
+old_size=0
+old_instrs=0
+
+new_size=0
+new_instrs=0
+
+for file in testsuite_public/*/functional/*.cvc; do
+	./civcc $file -o civ.a
+	./civas civ.a -o civ.out
+	old_out=$(./civvm --size --instrs civ.out 2>&1 1>/dev/null)
+
+	rm civ.a civ.out
+
+	./build-debug/civicc $file -o civ.a 2>/dev/null
+	./civas civ.a -o civ.out
+	new_out=$(./civvm --size --instrs civ.out 2>&1 1>/dev/null)
+
+	rm civ.a civ.out
+
+	old_size=$(( old_size + $(echo "$old_out" | awk '/Size of code/ {print $6}') ))
+	old_instrs=$(( old_instrs + $(echo "$old_out" | awk '/Instructions executed/ {print $3}') ))
+
+	new_size=$(( new_size + $(echo "$new_out" | awk '/Size of code/ {print $6}') ))
+	new_instrs=$(( new_instrs + $(echo "$new_out" | awk '/Instructions executed/ {print $3}') ))
+done
+
+for dir in testsuite_public/*/combined_*; do
+	ofiles=""
+
+	for file in $(find $dir -name "*.cvc"); do
+		ofile="$(basename $file .cvc).out"
+		ofiles="$ofiles $ofile"
+
+		./civcc $file -o civ.a
+		./civas civ.a -o $ofile
+	done
+
+	old_out=$(./civvm --size --instrs $ofiles 2>&1 1>/dev/null)
+
+	rm civ.a $ofiles
+
+	ofiles=""
+
+	for file in $(find $dir -name "*.cvc"); do
+		ofile="$(basename $file .cvc).out"
+		ofiles="$ofiles $ofile"
+
+		./build-debug/civicc $file -o civ.a 2>/dev/null 2>/dev/null
+		./civas civ.a -o $ofile
+	done
+
+	new_out=$(./civvm --size --instrs $ofiles 2>&1 1>/dev/null)
+
+	rm civ.a $ofiles
+
+	old_size=$(( old_size + $(echo "$old_out" | awk '/Size of code/ {s+=$6} END {print s}') ))
+	old_instrs=$(( old_instrs + $(echo "$old_out" | awk '/Instructions executed/ {s+=$3} END {print s}') ))
+
+	new_size=$(( new_size + $(echo "$new_out" | awk '/Size of code/ {s+=$6} END {print s}') ))
+	new_instrs=$(( new_instrs + $(echo "$new_out" | awk '/Instructions executed/ {s+=$3} END {print s}') ))
+done
+
+echo "-- old --"
+echo "Total size of code: $old_size bytes"
+echo "Total instructions executed: $old_instrs"
+echo
+
+echo "-- new --"
+echo "Total size of code: $new_size bytes"
+echo "Total instructions executed: $new_instrs"
+echo
+
+echo "Code size change: $(awk "BEGIN {printf \"%.2f\", 100-($old_size)/($new_size)*100}")%"
+echo "Instruction count change: $(awk "BEGIN {printf \"%.2f\", 100-($old_instrs)/($new_instrs)*100}")%"
