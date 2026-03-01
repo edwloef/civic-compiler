@@ -1,0 +1,5 @@
+extern int[n] a;
+
+export void one() {
+	n = 5;
+}

@@ -88,14 +88,15 @@ node_st *DVDvardecl(node_st *node) {
 
         node_st *ref;
         if (VARDECL_EXTERNAL(node)) {
-            char *name = STRfmt("%s+%d", e->name, i);
+            ref = EXPRS_EXPR(expr);
 
+            EXPRS_EXPR(expr) = vartable_named_temp_var(
+                DATA_DVD_GET()->vartable, TY_int, STRfmt("%s+%d", e->name, i));
             vartable_ref r = {0, VARREF_L(EXPRS_EXPR(expr))};
-            vartable_entry *e = vartable_get(DATA_DVD_GET()->vartable, r);
+            vartable_get(DATA_DVD_GET()->vartable, r)->external = true;
 
-            e->unmangled_name = e->name;
-            e->name = name;
-            continue;
+            VARREF_N(EXPRS_EXPR(expr)) =
+                DATA_DVD_GET()->vartable->parent == NULL;
         } else if (VARDECL_EXPORTED(node)) {
             ref = vartable_named_temp_var(DATA_DVD_GET()->vartable, TY_int,
                                           STRfmt("%s+%d", e->name, i));
@@ -105,7 +106,7 @@ node_st *DVDvardecl(node_st *node) {
             ref = vartable_temp_var(DATA_DVD_GET()->vartable, TY_int);
         }
 
-        vartable_ref tr = {VARREF_N(ref), VARREF_L(ref)};
+        vartable_ref tr = {0, VARREF_L(ref)};
         vartable_get(DATA_DVD_GET()->vartable, r)->ty.buf[i] = tr;
 
         VARREF_N(ref) = DATA_DVD_GET()->vartable->parent == NULL;

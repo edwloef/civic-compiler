@@ -1,0 +1,6 @@
+extern void printInt(int a);
+extern int[n] a;
+
+export void two() {
+	printInt(n);
+}

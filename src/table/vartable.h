@@ -27,7 +27,6 @@ void vartype_free(vartype self);
 
 typedef struct {
     char *name;
-    char *unmangled_name;
     vartype ty;
     span span;
     int new_l, read_count, write_count;

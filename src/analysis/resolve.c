@@ -91,7 +91,6 @@ node_st *ARparam(node_st *node) {
     for (node_st *expr = TYPE_EXPRS(PARAM_TY(node)); expr;
          expr = EXPRS_NEXT(expr)) {
         vartable_entry e = {ID_VAL(VARREF_ID(EXPRS_EXPR(expr))),
-                            NULL,
                             vartype_new(TY_int),
                             SPAN(VARREF_ID(EXPRS_EXPR(expr))),
                             0,
@@ -110,7 +109,6 @@ node_st *ARparam(node_st *node) {
     }
 
     vartable_entry e = {ID_VAL(PARAM_ID(node)),
-                        NULL,
                         ty,
                         SPAN(PARAM_ID(node)),
                         0,
@@ -142,7 +140,6 @@ node_st *ARvardecl(node_st *node) {
     }
 
     vartable_entry e = {ID_VAL(VARDECL_ID(node)),
-                        NULL,
                         ty,
                         SPAN(VARDECL_ID(node)),
                         0,
@@ -166,7 +163,6 @@ node_st *ARfor(node_st *node) {
     TRAVloop_step(node);
 
     vartable_entry e = {ID_VAL(VARREF_ID(FOR_REF(node))),
-                        NULL,
                         vartype_new(TY_int),
                         SPAN(FOR_REF(node)),
                         0,

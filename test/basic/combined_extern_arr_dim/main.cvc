@@ -1,0 +1,10 @@
+export int[3] a;
+
+extern void one();
+extern void two();
+
+export int main() {
+    one();
+    two();
+    return 0;
+}

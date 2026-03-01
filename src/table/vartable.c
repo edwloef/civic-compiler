@@ -1,7 +1,7 @@
+#include "table/vartable.h"
 #include "ccngen/ast.h"
 #include "palm/memory.h"
 #include "palm/str.h"
-#include "table/vartable.h"
 
 vartype vartype_new(enum BasicType ty) {
     return (vartype){0, 0, NULL, ty};
@@ -124,7 +124,6 @@ node_st *vartable_temp_var(vartable *self, enum BasicType ty) {
 node_st *vartable_named_temp_var(vartable *self, enum BasicType ty,
                                  char *name) {
     vartable_entry e = {name,
-                        NULL,
                         vartype_new(ty),
                         {0, 0, 0, 0, NULL},
                         0,
@@ -144,7 +143,6 @@ node_st *vartable_named_temp_var(vartable *self, enum BasicType ty,
 
 void vartable_entry_free(vartable_entry e) {
     MEMfree(e.name);
-    MEMfree(e.unmangled_name);
     vartype_free(e.ty);
 }
 
