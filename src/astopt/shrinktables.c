@@ -164,7 +164,11 @@ node_st *AOSTvarref(node_st *node) {
 
 node_st *AOSTfloat(node_st *node) {
     if (isnan(FLOAT_VAL(node))) {
-        FLOAT_VAL(node) = NAN;
+        if (signbit(FLOAT_VAL(node))) {
+            FLOAT_VAL(node) = -NAN;
+        } else {
+            FLOAT_VAL(node) = NAN;
+        }
     } else if (double_biteq(FLOAT_VAL(node), -0.0) && !globals.signed_zeros) {
         FLOAT_VAL(node) = 0.0;
     }
